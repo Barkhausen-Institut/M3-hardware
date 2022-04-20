@@ -187,7 +187,7 @@ parameter TCU_LOG_CMD_PRIV_INV_PAGE           = 8'd28,
 parameter TCU_LOG_CMD_PRIV_INV_TLB            = 8'd29,
 parameter TCU_LOG_CMD_PRIV_INS_TLB            = 8'd30,
 parameter TCU_LOG_CMD_PRIV_XCHG_VPE           = 8'd31,
-parameter TCU_LOG_CMD_PRIV_TIMER              = 8'd32,
+parameter TCU_LOG_CMD_PRIV_SET_TIMER          = 8'd32,
 parameter TCU_LOG_CMD_PRIV_ABORT              = 8'd33,
 parameter TCU_LOG_CMD_PRIV_FINISH             = 8'd34,
 parameter TCU_LOG_PRIV_CORE_REQ_FORMSG        = 8'd35,
@@ -196,7 +196,8 @@ parameter TCU_LOG_PRIV_TLB_WRITE_ENTRY        = 8'd37,
 parameter TCU_LOG_PRIV_TLB_READ_ENTRY         = 8'd38,
 parameter TCU_LOG_PRIV_TLB_DEL_ENTRY          = 8'd39,
 parameter TCU_LOG_PRIV_CUR_VPE_CHANGE         = 8'd40,
-parameter TCU_LOG_PMP_ACCESS_DENIED           = 8'd41,
+parameter TCU_LOG_PRIV_TIMER_INTR             = 8'd41,
+parameter TCU_LOG_PMP_ACCESS_DENIED           = 8'd42,
 
 
 

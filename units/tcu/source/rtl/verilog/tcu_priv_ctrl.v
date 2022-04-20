@@ -67,7 +67,11 @@ module tcu_priv_ctrl #(
     //logging
     output wire                                log_priv_fifo_empty_o,
     output wire        [TCU_LOG_DATA_SIZE-1:0] log_priv_fifo_data_out_o,
-    input  wire                                log_priv_fifo_pop_i
+    input  wire                                log_priv_fifo_pop_i,
+
+    //---------------
+    //for debugging
+    input  wire          [NOC_CHIPID_SIZE-1:0] home_chipid_i
 );
 
     `include "tcu_functions.v"
@@ -255,7 +259,7 @@ module tcu_priv_ctrl #(
 
                         TCU_OPCODE_PRIV_SET_TIMER: begin
                             `TCU_DEBUG(("CMD_PRIV_SET_TIMER, nanos: %0d", priv_cmd_arg0_i));
-                            tcu_log_priv_cmd_data = {priv_cmd_arg0_i, TCU_LOG_CMD_PRIV_TIMER};
+                            tcu_log_priv_cmd_data = {priv_cmd_arg0_i, TCU_LOG_CMD_PRIV_SET_TIMER};
 
                             next_priv_ctrl_state = S_PRIV_CTRL_SET_TIMER;
                         end
@@ -599,7 +603,9 @@ module tcu_priv_ctrl #(
             .core_req_formsg_data_i  (core_req_formsg_data_i),
             .core_req_formsg_stall_o (core_req_formsg_stall_o),
 
-            .tcu_log_core_req_data_o (tcu_log_core_req_data)
+            .tcu_log_core_req_data_o (tcu_log_core_req_data),
+
+            .home_chipid_i           (home_chipid_i)
         );
     end
     else begin: NO_CORE_REQ
@@ -633,6 +639,10 @@ module tcu_priv_ctrl #(
         wire                         log_tlb_fifo_empty;
         wire [TCU_LOG_DATA_SIZE-1:0] log_tlb_fifo_data_out;
 
+        wire                         log_timer_fifo_push = timer_int && !priv_reg_stall_i;
+        reg                          log_timer_fifo_pop;
+        wire                         log_timer_fifo_empty;
+        wire   [TCU_LOG_ID_SIZE-1:0] log_timer_fifo_data_out;
 
         //use FIFOs because logs may occure at the same time
         sync_fifo #(
@@ -683,6 +693,21 @@ module tcu_priv_ctrl #(
             .rempty_o	(log_tlb_fifo_empty)
         );
 
+        sync_fifo #(
+            .DATA_WIDTH (TCU_LOG_ID_SIZE),
+            .ADDR_WIDTH (1)
+        ) log_timer_fifo (
+            .clk_i		(clk_i),
+            .resetn_i	(reset_n_i),
+
+            .wr_en_i	(log_timer_fifo_push),
+            .wdata_i	(TCU_LOG_PRIV_TIMER_INTR),
+            .wfull_o	(),     //we do not expect a full FIFO
+
+            .rd_en_i	(log_timer_fifo_pop),
+            .rdata_o	(log_timer_fifo_data_out),
+            .rempty_o	(log_timer_fifo_empty)
+        );
 
         always @* begin
             tcu_log_tlb_data = TCU_LOG_NONE;
@@ -728,6 +753,7 @@ module tcu_priv_ctrl #(
             log_priv_cmd_fifo_pop = 1'b0;
             log_core_req_fifo_pop = 1'b0;
             log_tlb_fifo_pop = 1'b0;
+            log_timer_fifo_pop = 1'b0;
 
             if (!log_priv_cmd_fifo_empty) begin
                 log_priv_fifo_data_out = log_priv_cmd_fifo_data_out;
@@ -741,9 +767,13 @@ module tcu_priv_ctrl #(
                 log_priv_fifo_data_out = log_tlb_fifo_data_out;
                 log_tlb_fifo_pop = log_priv_fifo_pop_i;
             end
+            else if (!log_timer_fifo_empty) begin
+                log_priv_fifo_data_out = log_timer_fifo_data_out;
+                log_timer_fifo_pop = log_priv_fifo_pop_i;
+            end
         end
 
-        assign log_priv_fifo_empty_o = log_priv_cmd_fifo_empty && log_core_req_fifo_empty && log_tlb_fifo_empty;
+        assign log_priv_fifo_empty_o = log_priv_cmd_fifo_empty && log_core_req_fifo_empty && log_tlb_fifo_empty && log_timer_fifo_empty;
         assign log_priv_fifo_data_out_o = log_priv_fifo_data_out;
     end
     else begin: NO_LOGGING

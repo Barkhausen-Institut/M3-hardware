@@ -2,19 +2,22 @@
 module tcu_noc_mux #(
     `include "tcu_parameter.vh"
     ,`include "noc_parameter.vh"
-    ,parameter [0:0] TX_IF1_PRIO        = 1'b0,        //if 1, IF1 has priority, otherwise IF 2
-    parameter  [0:0] RX_IF1_PRIO        = 1'b0,        //if 1, IF1 has priority, otherwise IF 2
-    parameter [31:0] RX_IF1_ADDR_START  = 32'h0,       //address range for IF1 (disabled when size = 0)
-    parameter [31:0] RX_IF1_ADDR_END    = 32'hFFFFFFFF,
-    parameter  [0:0] RX_IF1_ONLY_MODE_2 = 1'b0,        //if 1, IF1 only takes packets with mode _2
-    parameter [31:0] RX_IF2_ADDR_START  = 32'h0,       //address range for IF2 (disabled when size = 0)
-    parameter [31:0] RX_IF2_ADDR_END    = 32'hFFFFFFFF,
-    parameter  [0:0] RX_IF2_ONLY_MODE_2 = 1'b0         //if 1, IF2 only takes packets with mode _2
+    ,parameter [0:0] TX_IF1_PRIO          = 1'b0,        //if 1, IF1 has priority, otherwise IF 2
+    parameter  [0:0] RX_IF1_PRIO          = 1'b0,        //if 1, IF1 has priority, otherwise IF 2
+    parameter [31:0] RX_IF1_ADDR_START    = 32'h0,       //address range for IF1 (disabled when size = 0)
+    parameter [31:0] RX_IF1_ADDR_END      = 32'hFFFFFFFF,
+    parameter  [0:0] RX_IF1_ONLY_HOMECHIP = 1'b0,        //if 1, IF1 only takes packets addressed to home_chipid
+    parameter  [0:0] RX_IF1_ONLY_MODE_2   = 1'b0,        //if 1, IF1 only takes packets with mode _2
+    parameter [31:0] RX_IF2_ADDR_START    = 32'h0,       //address range for IF2 (disabled when size = 0)
+    parameter [31:0] RX_IF2_ADDR_END      = 32'hFFFFFFFF,
+    parameter  [0:0] RX_IF2_ONLY_MODE_2   = 1'b0,        //if 1, IF2 only takes packets with mode _2
+    parameter  [0:0] RX_IF2_ONLY_HOMECHIP = 1'b0         //if 1, IF2 only takes packets addressed to home_chipid
 
 )(
     input  wire                          clk_i,
     input  wire                          reset_n_i,
     input  wire                          tcu_reset_i,
+    input  wire    [NOC_CHIPID_SIZE-1:0] home_chipid_i,
 
     //---------------
     //NoC IF 1
@@ -141,9 +144,12 @@ module tcu_noc_mux #(
                         (noc_out_rx_mode_i == MODE_READ_REQ_2) ||
                         (noc_out_rx_mode_i == MODE_READ_RSP_2);
 
+    //check chipid
+    wire rx_to_homechip = (noc_out_rx_trg_chipid_i == home_chipid_i);
+
     //check if addr valid
-    wire if1_rx_addr_valid = (noc_out_rx_addr_i >= RX_IF1_ADDR_START) && (noc_out_rx_addr_i <= RX_IF1_ADDR_END);
-    wire if2_rx_addr_valid = (noc_out_rx_addr_i >= RX_IF2_ADDR_START) && (noc_out_rx_addr_i <= RX_IF2_ADDR_END);
+    wire if1_rx_addr_valid = (noc_out_rx_addr_i >= RX_IF1_ADDR_START) && (noc_out_rx_addr_i <= RX_IF1_ADDR_END) && (!RX_IF1_ONLY_HOMECHIP || rx_to_homechip);
+    wire if2_rx_addr_valid = (noc_out_rx_addr_i >= RX_IF2_ADDR_START) && (noc_out_rx_addr_i <= RX_IF2_ADDR_END) && (!RX_IF2_ONLY_HOMECHIP || rx_to_homechip);
 
 
 

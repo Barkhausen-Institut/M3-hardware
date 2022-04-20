@@ -50,9 +50,11 @@ module tcu_top #(
     parameter NOCMUX_RX_IF1_ADDR_START    = 32'h0,
     parameter NOCMUX_RX_IF1_ADDR_END      = 32'hFFFFFFFF,
     parameter NOCMUX_RX_IF1_ONLY_MODE_2   = 0,
+    parameter NOCMUX_RX_IF1_ONLY_HOMECHIP = 0,
     parameter NOCMUX_RX_IF2_ADDR_START    = 32'h0,
     parameter NOCMUX_RX_IF2_ADDR_END      = 32'hFFFFFFFF,
-    parameter NOCMUX_RX_IF2_ONLY_MODE_2   = 0
+    parameter NOCMUX_RX_IF2_ONLY_MODE_2   = 0,
+    parameter NOCMUX_RX_IF2_ONLY_HOMECHIP = 0
 )(
     input  wire                           clk_i,
     input  wire                           reset_n_i,
@@ -689,13 +691,16 @@ module tcu_top #(
         .RX_IF1_ADDR_START          (NOCMUX_RX_IF1_ADDR_START),
         .RX_IF1_ADDR_END            (NOCMUX_RX_IF1_ADDR_END),
         .RX_IF1_ONLY_MODE_2         (NOCMUX_RX_IF1_ONLY_MODE_2),
+        .RX_IF1_ONLY_HOMECHIP       (NOCMUX_RX_IF1_ONLY_HOMECHIP),
         .RX_IF2_ADDR_START          (NOCMUX_RX_IF2_ADDR_START),
         .RX_IF2_ADDR_END            (NOCMUX_RX_IF2_ADDR_END),
-        .RX_IF2_ONLY_MODE_2         (NOCMUX_RX_IF2_ONLY_MODE_2)
+        .RX_IF2_ONLY_MODE_2         (NOCMUX_RX_IF2_ONLY_MODE_2),
+        .RX_IF2_ONLY_HOMECHIP       (NOCMUX_RX_IF2_ONLY_HOMECHIP)
     ) i_tcu_noc_mux (
         .clk_i                      (clk_i),
         .reset_n_i                  (reset_n_i),
         .tcu_reset_i                (tcu_reset_s),
+        .home_chipid_i              (home_chipid_i),
 
         //---------------
         //NoC IF 1 (from tcu_ctrl)

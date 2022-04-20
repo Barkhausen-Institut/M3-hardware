@@ -523,8 +523,8 @@ module tcu_ctrl #(
 
     //---------------
     //interface for logging
-    reg  [TCU_LOG_DATA_SIZE-1:0] tcu_log_unpriv_data;
-    reg  [TCU_LOG_DATA_SIZE-1:0] tcu_log_ext_data;
+    wire [TCU_LOG_DATA_SIZE-1:0] tcu_log_unpriv_data_s;
+    wire [TCU_LOG_DATA_SIZE-1:0] tcu_log_ext_data_s;
     reg  [TCU_LOG_DATA_SIZE-1:0] tcu_log_noc_data;
 
 
@@ -750,6 +750,9 @@ module tcu_ctrl #(
         wire start_recv_msg = (noc_state == S_NOC_RECEIVE_MSG_PAUSE) && !rm_active;
         reg r_start_recv_msg;
 
+        //logging
+        reg [TCU_LOG_DATA_SIZE-1:0] tcu_log_unpriv_data;
+        reg [TCU_LOG_DATA_SIZE-1:0] tcu_log_ext_data;
 
         wire [63:0] epdata_0;
         wire [63:0] epdata_1;
@@ -862,6 +865,9 @@ module tcu_ctrl #(
         assign start_recv_msg_s = r_start_recv_msg;
 
         assign read_initep_start_s = read_initep_start;
+
+        assign tcu_log_unpriv_data_s = tcu_log_unpriv_data;
+        assign tcu_log_ext_data_s = tcu_log_ext_data;
 
         //---------------
         //state machine for unprivileged commands
@@ -1576,6 +1582,9 @@ module tcu_ctrl #(
         assign read_initep_reg_addr = {TCU_REG_ADDR_SIZE{1'b0}};
         assign read_initep_active = 1'b0;
         assign read_initep_start_s = 1'b0;
+
+        assign tcu_log_unpriv_data_s = TCU_LOG_NONE;
+        assign tcu_log_ext_data_s = TCU_LOG_NONE;
     end
     endgenerate
 
@@ -1682,7 +1691,7 @@ module tcu_ctrl #(
                 rin_mem_addr = mar_mem_addr;
 
                 if (mar_mem_addr[3:0] > 4'd8) begin
-                    rin_mem_wdata = {r_noc_rx_data0, r2_noc_rx_data1, r2_noc_rx_data0} >> {(5'd16 - mar_mem_addr[3:0]), 3'h0};
+                    rin_mem_wdata = {r_noc_rx_data0, r2_noc_rx_data1, r2_noc_rx_data0} >> {(5'd16 - mar_mem_addr[3:0] + mar_shift), 3'h0};
                 end else begin
                     rin_mem_wdata = {r_noc_rx_data1, r_noc_rx_data0, r2_noc_rx_data1} >> {(4'd8 - mar_mem_addr[3:0] + mar_shift), 3'h0};
                 end
@@ -2386,8 +2395,8 @@ module tcu_ctrl #(
                                 rin_rsp_error = noc_rx_data0_i[TCU_ERROR_SIZE-1:0];     //read incoming error type
                                 noc_rx_stall_o = 1'b0;
 
-                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, error: %0d", noc_rx_src_modid_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
-                                tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_src_modid_i, TCU_LOG_NOC_ERROR};
+                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, addr: 0x%0x, error: %0d", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
+                                tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_addr_i, noc_rx_src_modid_i, TCU_LOG_NOC_ERROR};
                             end
                             else begin
                                 //release packet and do nothing
@@ -2395,8 +2404,8 @@ module tcu_ctrl #(
                                 rin_noc_error_flit_count = r_noc_error_flit_count + 1;
                                 rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
-                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, error: %0d, no response expected. Packet ignored!", noc_rx_src_modid_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
-                                tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_src_modid_i, TCU_LOG_NOC_ERROR_UNEXP};
+                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, addr: 0x%0x, error: %0d, no response expected. Packet ignored!", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
+                                tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_addr_i, noc_rx_src_modid_i, TCU_LOG_NOC_ERROR_UNEXP};
                             end
                         end
 
@@ -3295,7 +3304,11 @@ module tcu_ctrl #(
             //logging
             .log_priv_fifo_empty_o   (log_priv_fifo_empty_s),
             .log_priv_fifo_data_out_o(log_priv_fifo_data_out_s),
-            .log_priv_fifo_pop_i     (log_priv_fifo_pop_s)
+            .log_priv_fifo_pop_i     (log_priv_fifo_pop_s),
+
+            //---------------
+            //for debugging
+            .home_chipid_i           (home_chipid_i)
         );
 
     end
@@ -3319,6 +3332,9 @@ module tcu_ctrl #(
         assign unpriv_send_abort = 1'b0;
         assign unpriv_reply_abort = 1'b0;
 
+        assign log_priv_fifo_empty_s = 1'b1;
+        assign log_priv_fifo_data_out_s = TCU_LOG_NONE;
+
     end
     endgenerate
 
@@ -3337,12 +3353,12 @@ module tcu_ctrl #(
         reg                          rin_tcu_log_en;
         reg  [TCU_LOG_DATA_SIZE-1:0] rin_tcu_log_data;
 
-        wire                         log_unpriv_fifo_push = (tcu_log_unpriv_data[TCU_LOG_ID_SIZE-1:0] != TCU_LOG_NONE);
+        wire                         log_unpriv_fifo_push = (tcu_log_unpriv_data_s[TCU_LOG_ID_SIZE-1:0] != TCU_LOG_NONE);
         reg                          log_unpriv_fifo_pop;
         wire                         log_unpriv_fifo_empty;
         wire [TCU_LOG_DATA_SIZE-1:0] log_unpriv_fifo_data_out;
 
-        wire                         log_ext_fifo_push = (tcu_log_ext_data[TCU_LOG_ID_SIZE-1:0] != TCU_LOG_NONE);
+        wire                         log_ext_fifo_push = (tcu_log_ext_data_s[TCU_LOG_ID_SIZE-1:0] != TCU_LOG_NONE);
         reg                          log_ext_fifo_pop;
         wire                         log_ext_fifo_empty;
         wire [TCU_LOG_DATA_SIZE-1:0] log_ext_fifo_data_out;
@@ -3380,7 +3396,7 @@ module tcu_ctrl #(
             .resetn_i	(reset_n_i),
 
             .wr_en_i	(log_unpriv_fifo_push),
-            .wdata_i	(tcu_log_unpriv_data),
+            .wdata_i	(tcu_log_unpriv_data_s),
             .wfull_o	(),     //we do not expect a full FIFO
 
             .rd_en_i	(log_unpriv_fifo_pop),
@@ -3396,7 +3412,7 @@ module tcu_ctrl #(
             .resetn_i	(reset_n_i),
 
             .wr_en_i	(log_ext_fifo_push),
-            .wdata_i	(tcu_log_ext_data),
+            .wdata_i	(tcu_log_ext_data_s),
             .wfull_o	(),     //we do not expect a full FIFO
 
             .rd_en_i	(log_ext_fifo_pop),

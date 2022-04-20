@@ -27,7 +27,11 @@ module tcu_priv_core_req #(
 
     //---------------
     //logging
-    output reg         [TCU_LOG_DATA_SIZE-1:0] tcu_log_core_req_data_o
+    output reg         [TCU_LOG_DATA_SIZE-1:0] tcu_log_core_req_data_o,
+
+    //---------------
+    //for debugging
+    input  wire          [NOC_CHIPID_SIZE-1:0] home_chipid_i
 );
 
 

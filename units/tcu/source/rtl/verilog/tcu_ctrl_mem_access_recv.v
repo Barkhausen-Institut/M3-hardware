@@ -205,8 +205,6 @@ module tcu_ctrl_mem_access_recv #(
             //---------------
             //wait for incoming command
             S_CTRL_MAR_IDLE: begin
-                rin_size = 'd8; //set default size of single packet
-
                 if (mar_start_i) begin
                     //set info for WRITE ACK
                     rin_mode_write_posted = (noc_mode_i == MODE_WRITE_POSTED);
@@ -214,8 +212,10 @@ module tcu_ctrl_mem_access_recv #(
                     rin_ack_modid = noc_modid_i;
                     rin_ack_addr = noc_addr_i;
                     if (noc_burst_i) begin
+                        rin_size = {burst_length, 4'h0} - start_shift - (5'd16 - end_shift);
                         rin_ack_size = {burst_length, 4'h0} - start_shift - (5'd16 - end_shift);
                     end else begin
+                        rin_size = bsel_count_ones;
                         rin_ack_size = bsel_count_ones;
                     end
 
@@ -248,7 +248,6 @@ module tcu_ctrl_mem_access_recv #(
 
                     //send size info to mem, if a lot of data is expected
                     if (TCU_ENABLE_DRAM && noc_burst_i && (burst_length > 'd1)) begin
-                        rin_size = {burst_length, 4'h0} - start_shift - (5'd16 - end_shift);
                         next_ctrl_mar_state = S_CTRL_MAR_PREPARE_MEM;
                     end
 
@@ -296,7 +295,6 @@ module tcu_ctrl_mem_access_recv #(
 
                             rin_start_shift = start_shift;    //right shift for data
                             rin_end_shift = end_shift;
-                            rin_size = {burst_length, 4'h0} - start_shift - (5'd16 - end_shift);
 
                             rin_wben = ({TCU_MEM_BSEL_SIZE{1'b1}} >> start_shift) << r_laddr[3:0];
                             rin2_wben_msb = r_wben[TCU_MEM_BSEL_SIZE-1];
@@ -311,13 +309,13 @@ module tcu_ctrl_mem_access_recv #(
                             end
                         end
 
-                        //no burst, write single 8 byte to memory
+                        //no burst, write single bytes to memory
                         else begin
                             //check if two memory writes are necessary due to bad recv addr alignment
                             //if so, do not pop FIFO yet
                             if ((5'd16 - r_laddr[3:0]) < bsel_count_ones) begin
                                 rin_laddr = {(r_laddr[31:4]+'d1), 4'h0}; //increment to full next 16 bytes
-                                rin_size = 5'd16 - r_laddr[3:0];
+                                rin_size = r_size - (5'd16 - r_laddr[3:0]);
                                 next_ctrl_mar_state = S_CTRL_MAR_MEM_WRITE1_SPLIT;
                             end
                             else begin
@@ -456,7 +454,7 @@ module tcu_ctrl_mem_access_recv #(
                             end
 
                             //when there are more stores required
-                            else if ((r_end_shift + r_laddr[3:0]) > 'd16) begin
+                            else if (((r_size + r_laddr[3:0]) > 'd16) && ((r_end_shift + r_laddr[3:0]) > 'd16)) begin
                                 rin_wben = {TCU_MEM_BSEL_SIZE{1'b1}} >> (6'd32 - r_size - r_laddr[3:0]);    //16-new_r_size
                                 rin2_wben_msb = r_wben[TCU_MEM_BSEL_SIZE-1];
                                 rin_laddr = r_laddr + 'd16;
@@ -593,8 +591,8 @@ module tcu_ctrl_mem_access_recv #(
             //second write for non-burst packet
             else if (ctrl_mar_state == S_CTRL_MAR_MEM_WRITE1_SPLIT) begin
                 rin_mem_en = 3'b001;
-                rin_shift = r_size[3:0];
-                rin_mem_wben = ({{(TCU_MEM_BSEL_SIZE/2){1'b0}}, noc_bsel_i} >> bsel_firstone) >> r_size[3:0];
+                rin_shift = bsel_firstone + bsel_count_ones - r_size[3:0];
+                rin_mem_wben = ({{(TCU_MEM_BSEL_SIZE/2){1'b0}}, noc_bsel_i} >> bsel_firstone) >> (bsel_count_ones - r_size[3:0]);
             end
 
             //first part of burst
