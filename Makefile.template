@@ -1,0 +1,21 @@
+# local configuration of build environment
+# 
+# Do not check in changes of this file into git, unless you are changing the build process itself.
+# 
+# You may want to add this file into your .gitignore file.
+
+# 1) Add the variable FPGA_DESIGN with the path to the root of your local repository to your environment. For example:
+#export FPGA_DESIGN
+
+# 2) Xilinx Vivado must be added to your environment (e.g. by loading module file), i.e.
+# - variable XILINX_VIVADO must be point to Vivado install folder (e.g. xilinx/Vivado/'version') - for simulation only
+# - path to $XILINX_VIVADO/bin must be added to PATH environment variable
+
+# 3) Choose where to store temporary Vivado files, default is root of local repository
+export VIVADO_TMP_DIR=$(FPGA_DESIGN)/tmp
+
+
+# no need to change this
+export VIVADO_SYNTH_DIR=$(VIVADO_TMP_DIR)/vivado_synth
+export VIVADO_SIM_DIR=$(VIVADO_TMP_DIR)/vivado_sim
+export VIVADO_SIMNET_DIR=$(VIVADO_TMP_DIR)/vivado_simnet
