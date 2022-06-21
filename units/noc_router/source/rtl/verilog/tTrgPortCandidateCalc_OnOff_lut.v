@@ -47,7 +47,7 @@ module tTrgPortCandidateCalc_OnOff_lut #(
     wire    [MOD_Z_COORD_SIZE-1:0]                          trg_mod_z_OffChip;
 
     wire    [NOC_CHIPID_SIZE-1:0]                           trg_chipID;
-    
+
 
     reg     go_home;
     reg     go_left;

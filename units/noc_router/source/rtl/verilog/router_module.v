@@ -164,7 +164,6 @@ module router_module #(
     reg                             read_cntr;
     reg                             read_lut;
     reg                             read_burst;
-    reg                             read_cnt_mode;
     reg                             r_outreg_used;
     reg                             rin_outreg_used;
 
@@ -188,7 +187,6 @@ module router_module #(
     always @* begin: data_path
         // default values
         read_req            = 1'b0;
-        read_cnt_mode       = 1'b0;
         read_cntr           = 1'b0;
         read_lut            = 1'b0;
         read_burst          = 1'b0;
@@ -687,7 +685,6 @@ module router_module #(
 
                 default: begin
                     read_req            = 1'b0;
-                    read_cnt_mode       = 1'b0;
                     read_cntr           = 1'b0;
                     read_lut            = 1'b0;
                     read_burst          = 1'b0;

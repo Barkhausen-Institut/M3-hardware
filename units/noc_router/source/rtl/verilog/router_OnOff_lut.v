@@ -84,7 +84,6 @@ module router_OnOff_lut #(
     wire    [OUTPORT_QUANT-1:0]                 tmp_rdreq;
 
     wire    [OUTPORT_QUANT*NOC_PAYLOAD_SIZE-1:0]    tmp0_payload;
-    reg     [OUTPORT_QUANT*NOC_PAYLOAD_SIZE-1:0]    tmp1_payload;
 
 
     genvar gen_i, gen_j;
