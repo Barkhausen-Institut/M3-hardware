@@ -87,7 +87,7 @@ module sync_fifo #(
             .MEM_TYPE("auto"),
             .MEM_DATAWIDTH(DATA_WIDTH),
             .MEM_ADDRWIDTH(ADDR_WIDTH)
-        ) tlb_mem (
+        ) fifo_mem (
             .clk    (clk_i),
             .reset  (~resetn_i),
 
