@@ -1,6 +1,4 @@
 
-`timescale 1ns/100ps
-
 module util_reset_sync (
     input  wire clk_i,
     input  wire reset_q_i,
@@ -17,9 +15,7 @@ module util_reset_sync (
         .data_o    (reset_release_sync)
     );
 
-    // ignore combinational logic in reset path in HAL
-    // lint_checking GLTASR off
     assign sync_reset_q_o = (scan_mode_i) ? reset_q_i : reset_release_sync;
-    // lint_checking GLTASR on
+
 
 endmodule

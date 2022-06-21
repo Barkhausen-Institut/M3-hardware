@@ -4,14 +4,15 @@
 module util_clkbuf #(
     parameter DELAY = 0.1
 )(
-    input  wire I,
-    output wire Z
+    input  wire clk_i,
+    output wire clk_o
 );
 
     assign
         // synopsys translate_off
         #DELAY
         // synopsys translate_on
-        Z = I;
+        clk_o = clk_i;
+
 
 endmodule 

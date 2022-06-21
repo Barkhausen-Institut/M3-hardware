@@ -4,41 +4,39 @@
 module util_clkgate #(
     parameter DELAY = 0.1
 )(
-    input  wire CP,
-    input  wire EN,
-    input  wire TE,
-    output wire CPEN
+    input  wire clk_i,
+    input  wire en_i,
+    input  wire testmode_i,
+    output wire clk_o
 );
 
-
-
-`ifdef FPGA_COMPILE
+`ifdef XILINX
 
     BUFGCE clkgate_bufgce (
-	   .I  (CP),
-       .CE (EN | TE),
-       .O  (CPEN)
-	);
-	
+       .I  (clk_i),
+       .CE (en_i | testmode_i),
+       .O  (clk_o)
+    );
+
 `else
-   
-    reg  CKL;
-    wire INT_E;
+
+    reg  int_clk;
+    wire int_en;
 
     assign
         // synopsys translate_off
         #DELAY
         // synopsys translate_on
-        INT_E = EN | (TE == 1'b1);
+        int_en = en_i | testmode_i;
 
-    always @(CP or INT_E) begin
-        if (CP == 1'b0) begin
-            CKL <= INT_E;
+    always @(clk_i or int_en) begin
+        if (clk_i == 1'b0) begin
+            int_clk <= int_en;
         end
     end
 
-    assign CPEN = CKL & CP;
+    assign clk_o = int_clk & clk_i;
 
 `endif
-	
+
 endmodule
