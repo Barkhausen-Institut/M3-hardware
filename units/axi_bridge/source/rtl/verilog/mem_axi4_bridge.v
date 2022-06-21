@@ -72,6 +72,7 @@ module mem_axi4_bridge #(
     localparam S_RFIFO_IDLE       = 3'h0;
     localparam S_RFIFO_REQNREAD   = 3'h1;
     localparam S_RFIFO_WAIT_FETCH = 3'h2;
+    localparam S_RFIFO_WAITLAST   = 3'h3;
     localparam S_RFIFO_ERROR      = 3'h4;
     localparam S_RFIFO_FINISH     = 3'h7;
 
@@ -141,7 +142,8 @@ module mem_axi4_bridge #(
     //+1 if size or addr is not 16-byte aligned
     //+1 if size+addr exceeds 16-byte alignment
     wire    [LOG_DATA_BYTES:0] extra_req_count = mem_wdata_rout[LOG_DATA_BYTES-1:0] + mem_addr_rout[LOG_DATA_BYTES-1:0];
-    wire [31-LOG_DATA_BYTES:0] req_count = mem_wdata_rout[31:LOG_DATA_BYTES] +
+    wire [31-LOG_DATA_BYTES:0] req_count = req_rfifo_empty ? {(32-LOG_DATA_BYTES){1'b0}} :
+                                                mem_wdata_rout[31:LOG_DATA_BYTES] +
                                                 ((extra_req_count != 'h0) ? 1 : 0) +
                                                 ((extra_req_count > DATA_BYTES) ? 1 : 0);
 
@@ -720,7 +722,6 @@ module mem_axi4_bridge #(
 
             //wait until all data has arrived, meanwhile request further data
             S_RFIFO_REQNREAD: begin
-
                 //check if we must request data
                 if ((r_req_count > 'h0) && !auxmem_overflow) begin
                     //send valid and wait for ready
@@ -749,7 +750,11 @@ module mem_axi4_bridge #(
                 if (axi4_r_valid_i) begin
                     if (axi4_r_resp_i != AXI_RESP_TYPE_OKAY) begin
                         rin_req_rfifo_pop = 1'b1;
-                        next_state_rfifo = S_RFIFO_ERROR;
+                        if (axi4_r_last_i) begin
+                            next_state_rfifo = S_RFIFO_ERROR;
+                        end else begin
+                            next_state_rfifo = S_RFIFO_WAITLAST;
+                        end
                     end
                     else if (axi4_r_last_i && (r_req_count == 'h0)) begin
                         //compare number of requested elements and actual incoming elements
@@ -768,7 +773,11 @@ module mem_axi4_bridge #(
                 //end here if master already stops fetching data from auxmem
                 if (!mem_access_i) begin
                     rin_req_rfifo_pop = 1'b1;
-                    next_state_rfifo = S_RFIFO_FINISH;
+                    if (axi4_r_valid_i && axi4_r_last_i) begin
+                        next_state_rfifo = S_RFIFO_ERROR;
+                    end else begin
+                        next_state_rfifo = S_RFIFO_WAITLAST;
+                    end
                 end
             end
 
@@ -777,6 +786,16 @@ module mem_axi4_bridge #(
                 if (!mem_rdata_avail) begin
                     rin_req_rfifo_pop = 1'b1;
                     next_state_rfifo = S_RFIFO_FINISH;
+                end
+            end
+
+            //---------------
+            //apparently, the master does not need the data anymore
+            //wait until AXI burst has finished
+            S_RFIFO_WAITLAST: begin
+                if (axi4_r_valid_i && axi4_r_last_i) begin
+                    //finally, indicate error because something unexpected happened before
+                    next_state_rfifo = S_RFIFO_ERROR;
                 end
             end
 
