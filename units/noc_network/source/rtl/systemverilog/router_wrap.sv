@@ -45,8 +45,8 @@ wire                                            reset_q_router_s;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 util_clkbuf i_util_clkbuf_router (
-    .I(clk_i),
-    .Z(clk_router_s)
+    .clk_i(clk_i),
+    .clk_o(clk_router_s)
 );
 
 util_reset_sync i_util_reset_sync_router (
