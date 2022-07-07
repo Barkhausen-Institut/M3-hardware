@@ -16,22 +16,29 @@ module sync_fifo #(
     output wire                   rempty_o
 );
 
+    localparam DEPTH = (1 << ADDR_WIDTH);
+
     generate
     if (USE_MEM) begin: SYNC_FIFO_MEM
 
-        localparam DEPTH = (1 << ADDR_WIDTH);
-
         reg    [ADDR_WIDTH:0] r_rd_ptr, rin_rd_ptr;
         reg    [ADDR_WIDTH:0] r_wr_ptr, rin_wr_ptr;
-        reg                   r_rempty, rin_rempty;
+        reg                   rin_rempty;
+        reg                   r_rempty2, rin_rempty2;
 
         wire [ADDR_WIDTH-1:0] waddr = r_wr_ptr[ADDR_WIDTH-1:0];
         wire [ADDR_WIDTH-1:0] raddr = rin_rd_ptr[ADDR_WIDTH-1:0];
 
+        wire [ADDR_WIDTH:0] rd_ptr2 = r_rd_ptr + 1;
+
         wire wr_en_s = wr_en_i & !wfull_o;
         wire rd_en_s = rd_en_i & !rempty_o;
 
-        assign rempty_o = r_rempty || rin_rempty;
+        //rempty2 indicates if last element in FIFO will be access
+        //if so, set FIFO to empty because mem-based FIFO needs one cycle more to release the next element
+        //in other words: if (rin_rempty2 && !r_rempty2) == 1, the last element in FIFO is the next element to be released,
+        //wait a cycle because it wasn't read from mem yet
+        assign rempty_o = rin_rempty || (rin_rempty2 && !r_rempty2);
 
 
         always @(posedge clk_i or negedge resetn_i) begin
@@ -68,9 +75,9 @@ module sync_fifo #(
 
         always @(posedge clk_i or negedge resetn_i) begin
             if (resetn_i == 1'b0) begin
-                r_rempty <= 1'b0;
+                r_rempty2 <= 1'b0;
             end else begin
-                r_rempty <= rin_rempty;
+                r_rempty2 <= wr_en_s ? 1'b0 : rin_rempty2;
             end
         end
 
@@ -79,6 +86,14 @@ module sync_fifo #(
             if ((r_rd_ptr[ADDR_WIDTH-1:0] == r_wr_ptr[ADDR_WIDTH-1:0]) &&
                 (r_rd_ptr[ADDR_WIDTH] == r_wr_ptr[ADDR_WIDTH])) begin
                 rin_rempty = 1'b1;
+            end
+        end
+
+        always @* begin
+            rin_rempty2 = 1'b0;
+            if ((rd_ptr2[ADDR_WIDTH-1:0] == r_wr_ptr[ADDR_WIDTH-1:0]) &&
+                (rd_ptr2[ADDR_WIDTH] == r_wr_ptr[ADDR_WIDTH])) begin
+                rin_rempty2 = 1'b1;
             end
         end
 
@@ -104,8 +119,6 @@ module sync_fifo #(
 
     end
     else begin: SYNC_FIFO
-
-        localparam DEPTH = (1 << ADDR_WIDTH);
 
         reg    [ADDR_WIDTH:0] rd_ptr;
         reg    [ADDR_WIDTH:0] wr_ptr;
