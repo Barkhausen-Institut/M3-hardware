@@ -1,0 +1,9 @@
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/uart.cc
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/SimUART.cc
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/SimUART.v
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/plusarg_reader.v
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/remote_bitbang.cc
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/SimJTAG.cc
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/SimJTAG.v
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/IOCell.v
+/home/labu/scoha/git/chipyard/sims/verilator/generated-src/chipyard.TestHarness.BigRocketMmioJtagUartConfig/ClockDividerN.sv

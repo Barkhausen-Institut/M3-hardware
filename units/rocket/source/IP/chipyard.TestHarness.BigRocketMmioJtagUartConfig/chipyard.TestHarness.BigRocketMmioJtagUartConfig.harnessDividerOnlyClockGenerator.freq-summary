@@ -1,0 +1,4 @@
+
+harnessDividerOnlyClockGenerator Frequency Summary
+  Input Reference Frequency: 100.0 MHz
+  Output clock buildtop_reference_clock, requested: 100.0 MHz, actual: 100.0 MHz (division of 1)
