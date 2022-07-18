@@ -488,14 +488,15 @@ module tcu_ctrl_mem_access_send #(
                 if (!noc_stall_i) begin
                     noc_wrreq_o = 1'b1;
 
-                    if (r_tmp_size > 'd0) begin
-                        rin_tmp_size = (r_tmp_size > 'd16) ? (r_tmp_size - 'd16) : 'd0;
+                    if (r_tmp_size > 'd16) begin
+                        rin_tmp_size = r_tmp_size - 'd16;
                         noc_burst_o = 1'b1;
                     end
 
                     //stop burst
                     else begin
                         rin_size = 'd0;
+                        rin_tmp_size = 'd0;
                         noc_burst_o = 1'b0;
                         next_ctrl_mas_state = S_CTRL_MAS_FINISH;
                     end
