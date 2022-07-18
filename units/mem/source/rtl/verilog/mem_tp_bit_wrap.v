@@ -18,7 +18,7 @@ module mem_tp_bit_wrap #(
     output wire        [MEM_DATAWIDTH-1:0] doutb
 );
 
-`ifdef FPGA_COMPILE
+`ifdef XILINX_FPGA
 
     genvar idx_byte;
 

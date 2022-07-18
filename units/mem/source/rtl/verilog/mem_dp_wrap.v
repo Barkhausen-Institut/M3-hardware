@@ -21,7 +21,7 @@ module mem_dp_wrap #(
     output wire        [MEM_DATAWIDTH-1:0] doutb
 );
 
-`ifdef FPGA_COMPILE
+`ifdef XILINX_FPGA
 
     xpm_tdp_ram #(
         .MEM_TYPE(MEM_TYPE),

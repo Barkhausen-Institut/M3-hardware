@@ -15,7 +15,7 @@ module mem_sp_wrap #(
     output wire        [MEM_DATAWIDTH-1:0] dout
 );
 
-`ifdef FPGA_COMPILE
+`ifdef XILINX_FPGA
 
     xpm_sp_ram #(
         .MEM_TYPE(MEM_TYPE),
