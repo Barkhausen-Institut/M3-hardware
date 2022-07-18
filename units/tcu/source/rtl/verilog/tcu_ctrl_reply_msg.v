@@ -83,7 +83,11 @@ module tcu_ctrl_reply_msg #(
     //---------------
     //TCU feature settings
     input  wire                             tcu_features_virt_addr_i,
-    input  wire                             tcu_features_virt_pes_i
+    input  wire                             tcu_features_virt_pes_i,
+
+    //---------------
+    //Home Chip-ID
+    input  wire       [NOC_CHIPID_SIZE-1:0] home_chipid_i
 );
 
     `include "tcu_functions.v"
@@ -545,7 +549,13 @@ module tcu_ctrl_reply_msg #(
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
-                    noc_data0_o = {r_size, sep_crdep, r_recvep, HOME_MODID, {TCU_SLOT_SIZE{1'b0}}, TCU_HD_FLAG_REPLY};
+                    noc_data0_o = {sep_crdep,
+                                    r_recvep,
+                                    r_size[TCU_MSGLEN_SIZE-1:0],
+                                    home_chipid_i,
+                                    HOME_MODID,
+                                    {TCU_RSIZE_SIZE{1'b0}},
+                                    TCU_HD_FLAG_REPLY};
                     noc_data1_o = {sep_label, 32'h0};
 
                     //skip payload for empty msg
