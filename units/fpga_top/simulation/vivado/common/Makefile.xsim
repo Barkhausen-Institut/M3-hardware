@@ -1,0 +1,27 @@
+FPGA_DESIGN ?= $(error FPGA_DESIGN is not set. See instructions in Makefile.local)
+include $(FPGA_DESIGN)/Makefile.local
+
+TB=tb_fpga_top
+TC=$(notdir $(shell pwd))
+
+REPO_DIR=$(FPGA_DESIGN)/units
+TMP_DIR=$(VIVADO_SIM_DIR)/$(TB)/$(TC)
+
+
+
+.PHONY: clean
+clean:
+	rm -rf $(TMP_DIR) logfiles/* .Xil/ xsim.dir/ webtalk* xsim* xvlog.pb xvhdl.pb xelab.pb
+
+
+.PHONY: compile
+compile: $(REPO_DIR)/fpga_top/source/fpga_files.tcl
+	mkdir -p logfiles
+	vivado -tempDir $(TMP_DIR) -mode batch -journal logfiles/compile.jou -log logfiles/compile.log -source ../common/compile.tcl
+
+.PHONY: simulate
+simulate: compile
+	xsim $(TB) -key {Behavioral:sim_1:Functional:$(TB)} -log logfiles/simulate.log -gui
+
+
+
