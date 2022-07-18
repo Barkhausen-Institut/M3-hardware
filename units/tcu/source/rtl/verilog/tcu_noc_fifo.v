@@ -40,7 +40,7 @@ module tcu_noc_fifo #(
 
     localparam FIFO_WIDTH = NOC_HEADER_SIZE + NOC_PAYLOAD_SIZE - NOC_ARQ_SIZE;  //TCU controller does not handle ARQ bit
 
-    localparam COUNT_SIZE = 16;
+    localparam COUNT_SIZE = 8+1;    //+1 for overflow flag
 
 
     generate
@@ -79,11 +79,10 @@ module tcu_noc_fifo #(
         wire noc_burst_out = fifo_rdata[FIFO_WIDTH-1];  //MSB
         
         //counter detect number of finished bursts
-        wire burst_ready = (r_burst_count_in > r_burst_count_out);
-
-        //overflow when count_in reaches limit - reset counter and keep difference
-        wire count_limit = (r_burst_count_in == {COUNT_SIZE{1'b1}});
-
+        wire burst_ready = ((r_burst_count_in[COUNT_SIZE-2:0] > r_burst_count_out[COUNT_SIZE-2:0]) &&
+                            (r_burst_count_in[COUNT_SIZE-1] == r_burst_count_out[COUNT_SIZE-1])) ||
+                                ((r_burst_count_in[COUNT_SIZE-2:0] < r_burst_count_out[COUNT_SIZE-2:0]) &&
+                                (r_burst_count_in[COUNT_SIZE-1] != r_burst_count_out[COUNT_SIZE-1]));
 
         //in master mode stall is 1 by default, stall is deasserted when wrreq is there and flit can be taken (FIFO not full)
         assign noc_stall_o = (NOC_MASTER == 1) ? (fifo_full || !fifo_push) : fifo_full;
@@ -129,8 +128,13 @@ module tcu_noc_fifo #(
             rin_burst_count_in = r_burst_count_in;
             rin_fifo_wdata = {FIFO_WIDTH{1'b0}};
 
-            if (noc_wrreq_i && !fifo_full) begin
+            //reset counter if FIFO is empty
+            if (fifo_empty) begin
+                rin_burst_count_in = {COUNT_SIZE{1'b0}};
+            end
 
+            //despite an empty FIFO there could be a wrreq where the counter has to be incremented
+            if (noc_wrreq_i && !fifo_full) begin
                 //single packet or header of burst
                 if (!r_noc_burst_in) begin
                     rin_fifo_wdata = fifo_wdata_noburst;
@@ -146,11 +150,6 @@ module tcu_noc_fifo #(
                     else begin
                         fifo_push = 1'b1;
                     end
-
-                    //overflow: decrement counter and keep difference to count_out
-                    if (count_limit) begin
-                        rin_burst_count_in = r_burst_count_in - r_burst_count_out;
-                    end
                 end
                 
                 //burst packet
@@ -160,14 +159,14 @@ module tcu_noc_fifo #(
 
                     //if it is last flit of burst increment counter
                     if (!noc_burst_i) begin
-                        rin_burst_count_in = r_burst_count_in + 1;
+                        //only if FIFO is empty, this is always the first burst
+                        if (fifo_empty) begin
+                            rin_burst_count_in = 1;
+                        end else begin
+                            rin_burst_count_in = r_burst_count_in + 1;
+                        end
                     end
                 end
-            end
-
-            //reset counter if no wrreq anymore and FIFO becomes empty
-            else if (fifo_empty) begin
-                rin_burst_count_in = {COUNT_SIZE{1'b0}};
             end
         end
 
@@ -176,11 +175,6 @@ module tcu_noc_fifo #(
         always @* begin
             rin_noc_wrreq_out = 1'b0;
             rin_burst_count_out = r_burst_count_out;
-
-            //overflow: reset count_out together with count_in
-            if (count_limit && fifo_push && !r_noc_burst_in) begin
-                rin_burst_count_out = {COUNT_SIZE{1'b0}};
-            end
 
             if (!fifo_empty) begin
                 //if it is not a burst or last flit of burst has arrived in FIFO - take it
@@ -192,11 +186,6 @@ module tcu_noc_fifo #(
                 //detect last flit of outgoing burst to increment counter
                 if (!noc_burst_out && r_noc_burst_out && !noc_stall_i) begin
                     rin_burst_count_out = r_burst_count_out + 1;
-
-                    //if incr and reset is at the same time, only take the +1
-                    if (count_limit && fifo_push && !r_noc_burst_in) begin
-                        rin_burst_count_out = 1;
-                    end
                 end
             end
             else begin
