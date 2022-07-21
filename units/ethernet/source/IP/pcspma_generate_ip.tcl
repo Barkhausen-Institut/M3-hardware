@@ -25,8 +25,6 @@ if {[file exists $IP_DIR/$IP_NAME/$IP_NAME.xci]} {
     lappend props CONFIG.TxLane0_Placement {DIFF_PAIR_2}
     lappend props CONFIG.RxLane0_Placement {DIFF_PAIR_0}
     lappend props CONFIG.Tx_In_Upper_Nibble {0}
-    lappend props PARAM_VALUE.DIFFCLK_BOARD_INTERFACE {sgmii_phyclk}
-    lappend props PARAM_VALUE.ETHERNET_BOARD_INTERFACE {sgmii_lvds}
 
     set_property -dict $props $ipi
     generate_target all $ipi
