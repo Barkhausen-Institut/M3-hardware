@@ -11,9 +11,6 @@ fi
 
 cp $MK_TEMPLATE $MK_LOCAL
 
-#REPO_ROOT=$(pwd)
 source ./conf_env.sh
 sed -i "s|#export FPGA_DESIGN|export FPGA_DESIGN=$REPO_ROOT|1" $MK_LOCAL 
-#export FPGA_DESIGN=$REPO_ROOT
 
-#echo $REPO_ROOT

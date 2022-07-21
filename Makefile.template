@@ -16,6 +16,7 @@ export VIVADO_TMP_DIR=$(FPGA_DESIGN)/tmp
 
 
 # no need to change this
+export VIVADO_IP_DIR=$(VIVADO_TMP_DIR)/vivado_ip
 export VIVADO_SYNTH_DIR=$(VIVADO_TMP_DIR)/vivado_synth
 export VIVADO_SIM_DIR=$(VIVADO_TMP_DIR)/vivado_sim
 export VIVADO_SIMNET_DIR=$(VIVADO_TMP_DIR)/vivado_simnet
