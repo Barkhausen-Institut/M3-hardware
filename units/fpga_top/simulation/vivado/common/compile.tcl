@@ -134,7 +134,7 @@ lappend ELAB_CMD -L xbip_pipe_v3_0_6
 lappend ELAB_CMD -L xbip_bram18k_v3_0_6
 lappend ELAB_CMD -L mult_gen_v12_0_15
 lappend ELAB_CMD -L axi_lite_ipif_v3_0_4
-lappend ELAB_CMD -L gig_ethernet_pcs_pma_v16_1_6
+lappend ELAB_CMD -L gig_ethernet_pcs_pma_v$pcspma_curr_version
 lappend ELAB_CMD -L xlconstant_v1_1_6
 lappend ELAB_CMD -L c_reg_fd_v12_0_6
 lappend ELAB_CMD -L c_mux_bit_v12_0_6

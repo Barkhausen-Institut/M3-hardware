@@ -1,6 +1,6 @@
 
 set IP_NAME    gig_ethernet_pcs_pma_xcvu9p
-set IP_TYPE    xilinx.com:ip:gig_ethernet_pcs_pma:16.1
+set IP_TYPE    xilinx.com:ip:gig_ethernet_pcs_pma:16.*
 set BOARD      xilinx.com:vcu118:part0:2.3
 set PART       xcvu9p-flga2104-2L-e
 
@@ -50,3 +50,9 @@ if {[info exists SIMULATION]} {
     }
 }
 
+#set version of precompiled PCS/PMA lib
+if {[info exists SIMULATION]} {
+    set vivado_versions [list 2019.1 2019.2 2020.1 2020.2 2020.2.2 2020.3 2021.1 2021.1.1 2021.2 2021.2.1 2022.1]
+    set pcspma_versions [list 16_1_6 16_1_7 16_2 16_2_1 16_2_2 16_2_3 16_2_4 16_2_5 16_2_6 16_2_7 16_2_8]
+    set pcspma_curr_version [lindex $pcspma_versions [lsearch $vivado_versions [version -short]]]
+}
