@@ -79,7 +79,11 @@ module tcu_ctrl_send_msg #(
     //---------------
     //TCU feature settings
     input  wire                             tcu_features_virt_pes_i,
-    input  wire                             tcu_features_virt_addr_i
+    input  wire                             tcu_features_virt_addr_i,
+
+    //---------------
+    //Home Chip-ID
+    input  wire       [NOC_CHIPID_SIZE-1:0] home_chipid_i
 );
 
     `include "tcu_functions.v"
@@ -117,7 +121,7 @@ module tcu_ctrl_send_msg #(
     reg     [TCU_EP_SIZE-1:0] r_crdep, rin_crdep;
     reg    [TCU_CRD_SIZE-1:0] r_curcrd, rin_curcrd;
     reg     [TCU_EP_SIZE-1:0] r_replyep, rin_replyep;
-    reg   [TCU_SLOT_SIZE-1:0] r_replysize, rin_replysize;
+    reg  [TCU_RSIZE_SIZE-1:0] r_replysize, rin_replysize;
     reg                [31:0] r_replylabel, rin_replylabel;
 
     reg r_stall;
@@ -174,7 +178,7 @@ module tcu_ctrl_send_msg #(
             r_crdep      <= {TCU_EP_SIZE{1'b0}};
             r_curcrd     <= {TCU_CRD_SIZE{1'b0}};
             r_replyep    <= {TCU_EP_SIZE{1'b0}};
-            r_replysize  <= {TCU_SLOT_SIZE{1'b0}};
+            r_replysize  <= {TCU_RSIZE_SIZE{1'b0}};
             r_replylabel <= 32'h0;
 
             r_stall <= 1'b0;
@@ -396,7 +400,7 @@ module tcu_ctrl_send_msg #(
             S_CTRL_SM_READ_REPLYEP2: begin
                 //reg read data should be there now
                 if (sm_reg_rdata_i[TCU_EP_TYPE_SIZE-1:0] == TCU_EP_TYPE_RECEIVE) begin
-                    rin_replysize = sm_reg_rdata_i[2*TCU_SLOT_SIZE+TCU_EP_SIZE+TCU_EP_TYPE_SIZE+16-1 : TCU_SLOT_SIZE+TCU_EP_SIZE+TCU_EP_TYPE_SIZE+16];   //slot_size
+                    rin_replysize = sm_reg_rdata_i[TCU_RSIZE_SIZE+TCU_SLOT_SIZE+TCU_EP_SIZE+TCU_EP_TYPE_SIZE+16-1 : TCU_SLOT_SIZE+TCU_EP_SIZE+TCU_EP_TYPE_SIZE+16];   //slot_size
                     next_ctrl_sm_state = S_CTRL_SM_CHECK_CREDITS;
                 end
                 else begin
@@ -482,7 +486,7 @@ module tcu_ctrl_send_msg #(
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
-                    noc_data0_o = {r_size, r_replyep, r_crdep, HOME_MODID, r_replysize, {TCU_HD_FLAG_SIZE{1'b0}}};
+                    noc_data0_o = {r_replyep, r_crdep, r_size[TCU_MSGLEN_SIZE-1:0], home_chipid_i, HOME_MODID, r_replysize, {TCU_HD_FLAG_SIZE{1'b0}}};
                     noc_data1_o = {sep_label, r_replylabel};
 
                     //skip payload for empty msg
@@ -560,13 +564,14 @@ module tcu_ctrl_send_msg #(
                 if (!noc_stall_i) begin
                     noc_wrreq_o = 1'b1;
                     
-                    if (r_size > 'd0) begin
-                        rin_size = (r_size > 'd16) ? (r_size - 'd16) : 'd0;
+                    if (r_size > 'd16) begin
+                        rin_size = r_size - 'd16;
                         noc_burst_o = 1'b1;
                     end
 
                     //stop burst
                     else begin
+                        rin_size = 'd0;
                         noc_burst_o = 1'b0;
                         next_ctrl_sm_state = S_CTRL_SM_WAIT_ACK;
                     end

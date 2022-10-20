@@ -666,7 +666,7 @@ module tcu_ctrl_recv_msg #(
 
             S_CTRL_RM_CREATE_REPLYEP2: begin
                 if (!rm_reg_stall_i) begin
-                    rin_reg_wben = {(TCU_PEID_SIZE+TCU_EP_SIZE){1'b1}};
+                    rin_reg_wben = {(TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_EP_SIZE){1'b1}};
                     rin_reg_addr = r_reg_addr + 'd8;
                     rin_reg_wdata = {hd_sendchip, hd_sendpe, hd_recvep};
                     next_ctrl_rm_state = S_CTRL_RM_CREATE_REPLYEP3;

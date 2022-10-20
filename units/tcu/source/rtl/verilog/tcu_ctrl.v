@@ -2006,7 +2006,7 @@ module tcu_ctrl #(
                 if (!r_noc_tx_burst) begin
                     rin_noc_tx_burst = 1'b0;
                     rin_noc_tx_bsel = r_mas_noc_bsel;
-                    rin_noc_tx_trg_chipid = mas_noc_chipid; //should actually also use registered value, but modid does not change within packet
+                    rin_noc_tx_trg_chipid = mas_noc_chipid; //should actually also use registered value, but chipid does not change within packet
                     rin_noc_tx_trg_modid = mas_noc_modid;   //should actually also use registered value, but modid does not change within packet
                     rin_noc_tx_mode = mas_noc_mode;         //should actually also use registered value, but mode does not change within packet
                     rin_noc_tx_addr = r_mas_noc_addr;
@@ -2864,7 +2864,9 @@ module tcu_ctrl #(
             //---------------
             //TCU feature settings
             .tcu_features_virt_addr_i(tcu_features_virt_addr_i),
-            .tcu_features_virt_pes_i (tcu_features_virt_pes_i)
+            .tcu_features_virt_pes_i (tcu_features_virt_pes_i),
+
+            .home_chipid_i           (home_chipid_i)
         );
 
 
@@ -3017,7 +3019,9 @@ module tcu_ctrl #(
             //---------------
             //TCU feature settings
             .tcu_features_virt_addr_i(tcu_features_virt_addr_i),
-            .tcu_features_virt_pes_i (tcu_features_virt_pes_i)
+            .tcu_features_virt_pes_i (tcu_features_virt_pes_i),
+
+            .home_chipid_i           (home_chipid_i)
         );
 
 

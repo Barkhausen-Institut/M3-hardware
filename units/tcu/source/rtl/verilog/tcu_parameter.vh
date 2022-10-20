@@ -218,7 +218,7 @@ parameter TCU_VPE_MSGS_SIZE = 16,
 parameter TCU_VPEID_INVALID = {TCU_VPEID_SIZE{1'b1}},
 
 parameter TCU_SLOT_SIZE = 6,
-parameter TCU_RSIZE_SIZE = 5,
+parameter TCU_RSIZE_SIZE = 4,
 parameter TCU_MSGLEN_SIZE = 13,
 
 parameter TCU_STATUS_SIZE = 64,

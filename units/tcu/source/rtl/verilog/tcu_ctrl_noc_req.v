@@ -73,7 +73,7 @@ module tcu_ctrl_noc_req #(
 
 
     //FIFO to store incoming read requests
-    //laddr, retaddr, read_size, chipid, modid, bsel
+    //laddr, retaddr, read_size, mode, chipid, modid, bsel
     sync_fifo #(
         .DATA_WIDTH (REQFIFO_DATA_SIZE),
         .ADDR_WIDTH (REQFIFO_ADDR_SIZE)
