@@ -11,6 +11,9 @@ module rocket_ctrl
 
 wire core_en_sync;
 
+reg r_reset_n, rin_reset_n;
+reg [2:0] r_core_delay_count, rin_core_delay_count;
+
 
 `ifndef XILINX_FPGA
 
@@ -34,10 +37,14 @@ util_sync i_util_sync_ctrl (
     .reset_n_i(reset_n_i)
 );
 
+util_reset_sync i_util_reset_sync_ctrl (
+    .clk_i(clk_core_o),
+    .reset_q_i(r_reset_n),
+    .scan_mode_i(1'b0),
+    .sync_reset_q_o(reset_core_n_o)
+);
 
 
-    reg r_reset_n, rin_reset_n;
-    reg [2:0] r_core_delay_count, rin_core_delay_count;
 
     always @(posedge clk_i or negedge reset_n_i) begin
         if(!reset_n_i) begin
@@ -63,9 +70,6 @@ util_sync i_util_sync_ctrl (
             rin_core_delay_count = 3'd0;
         end
     end
-
-
-    assign reset_core_n_o = r_reset_n;
 
 
 endmodule
