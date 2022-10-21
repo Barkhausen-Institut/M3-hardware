@@ -1,0 +1,13 @@
+#define PLUSARG_USAGE_OPTIONS "EMULATOR VERILOG PLUSARGS\n\
+       +uart_tx=INT\n\
+                           Enable/disable the TX to speed up simulation\n\
+                             (default=1)\n\
+\n\
+       +jtag_rbb_enable=INT\n\
+                           Enable SimJTAG for JTAG Connections. Simulation will pause until connection is made.\n\
+                             (default=0)\n\
+"
+static const char * verilog_plusargs [] = {\
+                                            "uart_tx",\
+                                            "jtag_rbb_enable",\
+                                            0};

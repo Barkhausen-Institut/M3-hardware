@@ -6,6 +6,7 @@ if {[info exists USE_ETHERNET_FMC]} {
 }
 source $REPO_DIR/mem/source/mem_files.tcl
 source $REPO_DIR/rocket/source/rocket_files.tcl
+source $REPO_DIR/boom/source/boom_files.tcl
 source $REPO_DIR/tcu/source/tcu_files.tcl
 if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
 	source $REPO_DIR/ddr4/source/ddr4_files.tcl
