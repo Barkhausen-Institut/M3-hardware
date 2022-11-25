@@ -73,7 +73,7 @@ set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet/source/constr
 
 
 add_files -fileset [current_fileset -constrset] $REPO_DIR/rocket/source/constraints/constraints_rocket.xdc
-
+add_files -fileset [current_fileset -constrset] $REPO_DIR/boom/source/constraints/constraints_boom.xdc
 
 if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
     add_files -fileset [current_fileset -constrset] $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc
