@@ -10,7 +10,7 @@ module util_clkgate #(
     output wire clk_o
 );
 
-`ifdef XILINX
+`ifdef XILINX_FPGA
 
     BUFGCE clkgate_bufgce (
        .I  (clk_i),

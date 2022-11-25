@@ -8,7 +8,7 @@ module util_sync #(
     output wire [WIDTH-1:0] data_o
 );
 
-`ifdef XILINX
+`ifdef XILINX_FPGA
 
     (* ASYNC_REG = "TRUE", KEEP = "TRUE" *)
     reg [WIDTH-1:0] data_sync0;
