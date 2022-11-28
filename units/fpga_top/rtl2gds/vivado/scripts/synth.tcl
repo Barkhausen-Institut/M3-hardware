@@ -80,6 +80,15 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
     set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc]
 }
 
+if {[info exists USE_ETHERNET_FMC]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_pins.tcl
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_clocks.xdc
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_delays.tcl
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_pins.tcl]
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_delays.tcl]
+    set_property processing_order LATE [get_files $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_delays.tcl]
+}
+
 #--------------------------------------------------------------------------------
 
 #do synthesis 
