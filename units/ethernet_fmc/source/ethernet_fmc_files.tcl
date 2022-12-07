@@ -2,7 +2,7 @@
 source $REPO_DIR/ethernet_fmc/source/IP/bd_axi4_mux_1to2.tcl
 source $REPO_DIR/ethernet_fmc/source/IP/bd_axi4_mux_2to1.tcl
 source $REPO_DIR/ethernet_fmc/source/IP/bd_axi_dma_eth_fmc.tcl
-if {$ETHERNET_FMC_PORT_COUNT > 1} {
+if {[info exists ETHERNET_FMC_PORT_COUNT] && $ETHERNET_FMC_PORT_COUNT > 1} {
     source $REPO_DIR/ethernet_fmc/source/IP/bd_axi_dma_eth_fmc_nsl.tcl
 }
 
