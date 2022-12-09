@@ -121,6 +121,21 @@ if {[info exists VHDL_FILES]} {
 #-----------------------------------------------------------------
 #elab
 
+#set version of IPs and precompiled libs
+if {[info exists SIMULATION]} {
+    set vivado_versions  [list 2019.1 2019.2 2020.1 2020.2 2020.3 2021.1 2021.2 2021.2.1 2022.1 2022.2]
+    set pcspma_versions  [list 16_1_6 16_1_7 16_2   16_2_1 16_2_3 16_2_4 16_2_6 16_2_7   16_2_8 16_2_9]
+    set xlconst_versions [list 1_1_6  1_1_6  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7    1_1_7  1_1_7]
+    set temac_versions   [list 9_0_14 9_0_15 9_0_16 9_0_17 9_0_18 9_0_19 9_0_20 9_0_21   9_0_22 9_0_23]
+    set utilvl_versions  [list 2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1    2_0_2  2_0_2]
+
+    set pcspma_curr_version [lindex $pcspma_versions [lsearch $vivado_versions [version -short]]]
+    set xlconst_curr_version [lindex $xlconst_versions [lsearch $vivado_versions [version -short]]]
+    set temac_curr_version [lindex $temac_versions [lsearch $vivado_versions [version -short]]]
+    set utilvl_curr_version [lindex $utilvl_versions [lsearch $vivado_versions [version -short]]]
+}
+
+
 set ELAB_CMD xelab
 lappend ELAB_CMD --relax
 lappend ELAB_CMD --incr
@@ -135,7 +150,7 @@ lappend ELAB_CMD -L xbip_bram18k_v3_0_6
 lappend ELAB_CMD -L mult_gen_v12_0_15
 lappend ELAB_CMD -L axi_lite_ipif_v3_0_4
 lappend ELAB_CMD -L gig_ethernet_pcs_pma_v$pcspma_curr_version
-lappend ELAB_CMD -L xlconstant_v1_1_6
+lappend ELAB_CMD -L xlconstant_v$xlconst_curr_version
 lappend ELAB_CMD -L c_reg_fd_v12_0_6
 lappend ELAB_CMD -L c_mux_bit_v12_0_6
 lappend ELAB_CMD -L c_shift_ram_v12_0_13
@@ -146,7 +161,7 @@ lappend ELAB_CMD -L c_addsub_v12_0_13
 lappend ELAB_CMD -L c_gate_bit_v12_0_6
 lappend ELAB_CMD -L xbip_counter_v3_0_6
 lappend ELAB_CMD -L c_counter_binary_v12_0_13
-lappend ELAB_CMD -L util_vector_logic_v2_0_1
+lappend ELAB_CMD -L util_vector_logic_v$utilvl_curr_version
 lappend ELAB_CMD -L unisims_ver
 lappend ELAB_CMD -L unimacro_ver
 lappend ELAB_CMD -L secureip
@@ -163,7 +178,7 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_E
     lappend ELAB_CMD -L lib_cdc_v1_0_2
 
     if {[info exists USE_ETHERNET_FMC]} {
-        lappend ELAB_CMD -L tri_mode_ethernet_mac_v9_0_14
+        lappend ELAB_CMD -L tri_mode_ethernet_mac_v$temac_curr_version
         lappend ELAB_CMD -L smartconnect_v1_0
         lappend ELAB_CMD -L lib_pkg_v1_0_2
         lappend ELAB_CMD -L axi_ethernet_buffer_v2_0_20
