@@ -4,18 +4,6 @@ set PART    xcvu9p-flga2104-2L-e
 
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2019.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-    puts ""
-    catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-    return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -161,9 +149,14 @@ set_property -dict [ list \
 
 
 # Create ports
-set axi4_clk [ create_bd_port -dir I -type clk axi4_clk ]
+if { [string match [version -short] "2019.1"] } {
+    set axi4_clk [ create_bd_port -dir I -type clk axi4_clk ]
+} else {
+    set axi4_clk [ create_bd_port -dir I -type clk -freq_hz 100000000 axi4_clk ]
+}
 set_property -dict [ list \
     CONFIG.ASSOCIATED_BUSIF {AXI4_IN0:AXI4_OUT:AXI4_IN1} \
+    CONFIG.FREQ_HZ {100000000} \
 ] $axi4_clk
 set axi4_reset_n [ create_bd_port -dir I -type rst axi4_reset_n ]
 

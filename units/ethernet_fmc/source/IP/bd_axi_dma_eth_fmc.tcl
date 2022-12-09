@@ -4,18 +4,6 @@ set PART    xcvu9p-flga2104-2L-e
 
 
 ################################################################
-# Check if script is running in correct Vivado version.
-################################################################
-set scripts_vivado_version 2019.1
-set current_vivado_version [version -short]
-
-if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-    puts ""
-    catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-    return 1
-}
-
-################################################################
 # START
 ################################################################
 
@@ -41,8 +29,8 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
     set list_check_ips "\ 
-    xilinx.com:ip:axi_dma:7.1\
-    xilinx.com:ip:axi_ethernet:7.1\
+    xilinx.com:ip:axi_dma:7.*\
+    xilinx.com:ip:axi_ethernet:7.*\
     xilinx.com:ip:smartconnect:1.0\
     "
 
@@ -137,13 +125,21 @@ set rgmii_0 [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:rgmii_
 
 
 # Create ports
-set aclk_0 [ create_bd_port -dir I -type clk aclk_0 ]
+if { [string match [version -short] "2019.1"] } {
+    set aclk_0 [ create_bd_port -dir I -type clk aclk_0 ]
+} else {
+    set aclk_0 [ create_bd_port -dir I -type clk -freq_hz 100000000 aclk_0 ]
+}
 set_property -dict [ list \
     CONFIG.ASSOCIATED_BUSIF {S00_AXI_0:M00_AXI_0} \
     CONFIG.FREQ_HZ {100000000} \
 ] $aclk_0
 set aresetn_0 [ create_bd_port -dir I -type rst aresetn_0 ]
-set gtx_clk_0 [ create_bd_port -dir I -type clk gtx_clk_0 ]
+if { [string match [version -short] "2019.1"] } {
+    set gtx_clk_0 [ create_bd_port -dir I -type clk gtx_clk_0 ]
+} else {
+    set gtx_clk_0 [ create_bd_port -dir I -type clk -freq_hz 125000000 gtx_clk_0 ]
+}
 set_property -dict [ list \
     CONFIG.FREQ_HZ {125000000} \
     CONFIG.PHASE {0} \
@@ -152,14 +148,18 @@ set interrupt_axi_ethernet [ create_bd_port -dir O -type intr interrupt_axi_ethe
 set mac_irq_0 [ create_bd_port -dir O -type intr mac_irq_0 ]
 set mm2s_dma_introut [ create_bd_port -dir O -type intr mm2s_dma_introut ]
 set phy_rst_n_0 [ create_bd_port -dir O -from 0 -to 0 -type rst phy_rst_n_0 ]
-set ref_clk_0 [ create_bd_port -dir I -type clk ref_clk_0 ]
-set_property -dict [ list \
-    CONFIG.FREQ_HZ {333333333} \
-] $ref_clk_0
+if { [string match [version -short] "2019.1"] } {
+    set ref_clk_0 [ create_bd_port -dir I -type clk ref_clk_0 ]
+    set_property -dict [ list \
+        CONFIG.FREQ_HZ {333333333} \
+    ] $ref_clk_0
+} else {
+    set ref_clk_0 [ create_bd_port -dir I -type clk -freq_hz 333333333 ref_clk_0 ]
+}
 set s2mm_dma_introut [ create_bd_port -dir O -type intr s2mm_dma_introut ]
 
 # Create instance: axi_dma_0, and set properties
-set axi_dma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0 ]
+set axi_dma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.* axi_dma_0 ]
 set_property -dict [ list \
     CONFIG.c_include_sg {1} \
     CONFIG.c_m_axi_mm2s_data_width {128} \
@@ -169,7 +169,7 @@ set_property -dict [ list \
 ] $axi_dma_0
 
 # Create instance: axi_ethernet_0, and set properties
-set axi_ethernet_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_ethernet:7.1 axi_ethernet_0 ]
+set axi_ethernet_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_ethernet:7.* axi_ethernet_0 ]
 set_property -dict [ list \
     CONFIG.Frame_Filter {false} \
     CONFIG.MDIO_BOARD_INTERFACE {Custom} \
@@ -181,52 +181,6 @@ set_property -dict [ list \
     CONFIG.TXCSUM {Full} \
     CONFIG.TXMEM {32k} \
 ] $axi_ethernet_0
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/axi_rxd_arstn]
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/axi_rxs_arstn]
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/axi_txc_arstn]
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/axi_txd_arstn]
-
-set_property -dict [ list \
-    CONFIG.ASSOCIATED_BUSIF {m_axis_rxd:m_axis_rxs:s_axis_txc:s_axis_txd} \
-    CONFIG.ASSOCIATED_RESET {axi_rxd_arstn:axi_rxs_arstn:axi_txc_arstn:axi_txd_arstn} \
-] [get_bd_pins /axi_ethernet_0/axis_clk]
-
-set_property -dict [ list \
-    CONFIG.FREQ_HZ {125000000} \
-] [get_bd_pins /axi_ethernet_0/gtx_clk]
-
-set_property -dict [ list \
-    CONFIG.SENSITIVITY {LEVEL_HIGH} \
-] [get_bd_pins /axi_ethernet_0/interrupt]
-
-set_property -dict [ list \
-    CONFIG.SENSITIVITY {EDGE_RISING} \
-] [get_bd_pins /axi_ethernet_0/mac_irq]
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/phy_rst_n]
-
-set_property -dict [ list \
-    CONFIG.ASSOCIATED_BUSIF {s_axi} \
-    CONFIG.ASSOCIATED_RESET {s_axi_lite_resetn} \
-] [get_bd_pins /axi_ethernet_0/s_axi_lite_clk]
-
-set_property -dict [ list \
-    CONFIG.POLARITY {ACTIVE_LOW} \
-] [get_bd_pins /axi_ethernet_0/s_axi_lite_resetn]
 
 # Create instance: smartconnect_0, and set properties
 set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
