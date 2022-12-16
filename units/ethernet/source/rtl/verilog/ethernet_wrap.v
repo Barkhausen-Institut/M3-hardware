@@ -374,7 +374,7 @@ tcu_top #(
     .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (125),
     .NOCMUX_TX_IF1_PRIO         (0),
-    .NOCMUX_RX_IF1_PRIO         (0),
+    .NOCMUX_RX_IF1_PRIO         (1),
     .NOCMUX_RX_IF1_ADDR_START   (32'hF0000000),        //IF1 only takes packets to regs from this chip
     .NOCMUX_RX_IF1_ADDR_END     (32'hFFFFFFFF),
     .NOCMUX_RX_IF1_ONLY_MODE_2  (0),
