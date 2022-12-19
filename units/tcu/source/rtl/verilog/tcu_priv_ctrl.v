@@ -133,10 +133,11 @@ module tcu_priv_ctrl #(
 
 
     //assign args
-    wire    [TCU_TLB_VPEID_SIZE-1:0] priv_cmd_vpeid    = priv_cmd_arg0_i[32+TCU_TLB_VPEID_SIZE-1:32];
-    wire [TCU_TLB_VIRTPAGE_SIZE-1:0] priv_cmd_virtpage = priv_cmd_arg0_i[TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE +: TCU_TLB_VIRTPAGE_SIZE];
-    wire     [TCU_TLB_PERM_SIZE-1:0] priv_cmd_perm     = priv_cmd_arg0_i[TCU_TLB_PERM_SIZE-1:0];
-    wire [TCU_TLB_PHYSPAGE_SIZE-1:0] priv_cmd_physpage = priv_cmd_arg1_i[TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE +: TCU_TLB_PHYSPAGE_SIZE];
+    wire    [TCU_TLB_VPEID_SIZE-1:0] priv_cmd_inv_page_vpeid = priv_cmd_arg0_i[TCU_TLB_VPEID_SIZE-1:0];
+    wire    [TCU_TLB_VPEID_SIZE-1:0] priv_cmd_ins_tlb_vpeid  = priv_cmd_arg0_i[32+TCU_TLB_VPEID_SIZE-1:32];
+    wire [TCU_TLB_VIRTPAGE_SIZE-1:0] priv_cmd_virtpage       = priv_cmd_arg1_i[TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE +: TCU_TLB_VIRTPAGE_SIZE];
+    wire     [TCU_TLB_PERM_SIZE-1:0] priv_cmd_perm           = priv_cmd_arg0_i[TCU_TLB_PERM_SIZE-1:0];
+    wire [TCU_TLB_PHYSPAGE_SIZE-1:0] priv_cmd_physpage       = priv_cmd_arg0_i[TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE +: TCU_TLB_PHYSPAGE_SIZE];
 
     wire                      [31:0] priv_cmd_xchg_vpe = priv_cmd_arg0_i[31:0];
 
@@ -231,8 +232,8 @@ module tcu_priv_ctrl #(
                     case (priv_cmd_opcode_i)
 
                         TCU_OPCODE_PRIV_INV_PAGE: begin
-                            `TCU_DEBUG(("CMD_PRIV_INV_PAGE, vpeid: %0d, virt: 0x%x", priv_cmd_vpeid, priv_cmd_virtpage));
-                            tcu_log_priv_cmd_data = {priv_cmd_virtpage, priv_cmd_vpeid, TCU_LOG_CMD_PRIV_INV_PAGE};
+                            `TCU_DEBUG(("CMD_PRIV_INV_PAGE, vpeid: %0d, virt: 0x%x", priv_cmd_inv_page_vpeid, priv_cmd_virtpage));
+                            tcu_log_priv_cmd_data = {priv_cmd_virtpage, priv_cmd_inv_page_vpeid, TCU_LOG_CMD_PRIV_INV_PAGE};
 
                             next_priv_ctrl_state = S_PRIV_CTRL_INV_PAGE;
                         end
@@ -245,8 +246,8 @@ module tcu_priv_ctrl #(
                         end
 
                         TCU_OPCODE_PRIV_INS_TLB: begin
-                            `TCU_DEBUG(("CMD_PRIV_INS_TLB, vpeid: %0d, virt: 0x%x, phys: 0x%x", priv_cmd_vpeid, priv_cmd_virtpage, priv_cmd_physpage));
-                            tcu_log_priv_cmd_data = {priv_cmd_physpage, priv_cmd_virtpage, priv_cmd_vpeid, TCU_LOG_CMD_PRIV_INS_TLB};
+                            `TCU_DEBUG(("CMD_PRIV_INS_TLB, vpeid: %0d, virt: 0x%x, phys: 0x%x", priv_cmd_ins_tlb_vpeid, priv_cmd_virtpage, priv_cmd_physpage));
+                            tcu_log_priv_cmd_data = {priv_cmd_physpage, priv_cmd_virtpage, priv_cmd_ins_tlb_vpeid, TCU_LOG_CMD_PRIV_INS_TLB};
 
                             next_priv_ctrl_state = S_PRIV_CTRL_INS_TLB;
                         end
@@ -287,7 +288,7 @@ module tcu_priv_ctrl #(
                 if (!tlb_active && !unpriv_tlb_en) begin
                     ctrl_tlb_en = 1'b1;
                     ctrl_tlb_cmd = TCU_TLB_CMD_DEL_ENTRY;
-                    ctrl_tlb_wdata = {priv_cmd_virtpage, priv_cmd_vpeid};
+                    ctrl_tlb_wdata = {TCU_MEMFLAG_R, {TCU_TLB_PHYSPAGE_SIZE{1'b0}}, priv_cmd_virtpage, priv_cmd_inv_page_vpeid};
 
                     next_priv_ctrl_state = S_PRIV_CTRL_INV_PAGE_WAIT;
                 end
@@ -323,7 +324,7 @@ module tcu_priv_ctrl #(
                 if (!tlb_active && !unpriv_tlb_en) begin
                     ctrl_tlb_en = 1'b1;
                     ctrl_tlb_cmd = TCU_TLB_CMD_WRITE_ENTRY;
-                    ctrl_tlb_wdata = {priv_cmd_perm, priv_cmd_physpage, priv_cmd_virtpage, priv_cmd_vpeid};
+                    ctrl_tlb_wdata = {priv_cmd_perm, priv_cmd_physpage, priv_cmd_virtpage, priv_cmd_ins_tlb_vpeid};
 
                     next_priv_ctrl_state = S_PRIV_CTRL_INS_TLB_WAIT;
                 end
