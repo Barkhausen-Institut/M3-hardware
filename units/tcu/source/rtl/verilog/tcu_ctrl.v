@@ -726,7 +726,7 @@ module tcu_ctrl #(
         reg                     [31:0] r_firecmd_recvaddr, rin_firecmd_recvaddr;
         reg      [TCU_CHIPID_SIZE-1:0] r_firecmd_recvchip, rin_firecmd_recvchip;
         reg        [TCU_PEID_SIZE-1:0] r_firecmd_recvpe, rin_firecmd_recvpe;
-        reg                     [31:0] r_firecmd_replylabel, rin_firecmd_replylabel;
+        reg                     [63:0] r_firecmd_replylabel, rin_firecmd_replylabel;
         reg     [TCU_EXT_ARG_SIZE-1:0] r_firecmd_ext_arg, rin_firecmd_ext_arg;
 
         reg       [TCU_ERROR_SIZE-1:0] r_error_type, rin_error_type;
@@ -790,7 +790,7 @@ module tcu_ctrl #(
                 r_firecmd_recvaddr   <= 32'h0;
                 r_firecmd_recvchip   <= {TCU_CHIPID_SIZE{1'b0}};
                 r_firecmd_recvpe     <= {TCU_PEID_SIZE{1'b0}};
-                r_firecmd_replylabel <= 32'h0;
+                r_firecmd_replylabel <= 64'h0;
                 r_firecmd_ext_arg    <= {TCU_EXT_ARG_SIZE{1'b0}};
 
                 r_error_type <= {TCU_ERROR_SIZE{1'b0}};

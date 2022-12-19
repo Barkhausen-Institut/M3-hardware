@@ -67,7 +67,7 @@ module tcu_ctrl_send_msg #(
     input  wire           [TCU_EP_SIZE-1:0] sm_sendep_i,   //send ep which is used to send now, from cmd_ep
     input  wire                  [3*64-1:0] sm_epdata_i,
     input  wire           [TCU_EP_SIZE-1:0] sm_replyep_i,  //from cmd_arg0
-    input  wire                      [31:0] sm_replylabel_i,   //from arg1 reg
+    input  wire                      [63:0] sm_replylabel_i,   //from arg1 reg
     input  wire        [TCU_VPEID_SIZE-1:0] sm_cur_vpeid_i,
     input  wire                             sm_abort_i,
     input  wire                             sm_crd_update_stall_i,
@@ -122,7 +122,7 @@ module tcu_ctrl_send_msg #(
     reg    [TCU_CRD_SIZE-1:0] r_curcrd, rin_curcrd;
     reg     [TCU_EP_SIZE-1:0] r_replyep, rin_replyep;
     reg  [TCU_RSIZE_SIZE-1:0] r_replysize, rin_replysize;
-    reg                [31:0] r_replylabel, rin_replylabel;
+    reg                [63:0] r_replylabel, rin_replylabel;
 
     reg r_stall;
 
@@ -179,7 +179,7 @@ module tcu_ctrl_send_msg #(
             r_curcrd     <= {TCU_CRD_SIZE{1'b0}};
             r_replyep    <= {TCU_EP_SIZE{1'b0}};
             r_replysize  <= {TCU_RSIZE_SIZE{1'b0}};
-            r_replylabel <= 32'h0;
+            r_replylabel <= 64'h0;
 
             r_stall <= 1'b0;
             r_sm_mem_en <= 1'b0;
@@ -487,7 +487,7 @@ module tcu_ctrl_send_msg #(
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
                     noc_data0_o = {r_replyep, r_crdep, r_size[TCU_MSGLEN_SIZE-1:0], home_chipid_i, HOME_MODID, r_replysize, {TCU_HD_FLAG_SIZE{1'b0}}};
-                    noc_data1_o = {sep_label, r_replylabel};
+                    noc_data1_o = {sep_label[31:0], r_replylabel[31:0]};    //todo: extend header
 
                     //skip payload for empty msg
                     if (r_size == 'd0) begin

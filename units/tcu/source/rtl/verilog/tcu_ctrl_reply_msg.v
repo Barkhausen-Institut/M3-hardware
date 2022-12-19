@@ -557,7 +557,7 @@ module tcu_ctrl_reply_msg #(
                                     HOME_MODID,
                                     {TCU_RSIZE_SIZE{1'b0}},
                                     TCU_HD_FLAG_REPLY};
-                    noc_data1_o = {sep_label, 32'h0};
+                    noc_data1_o = {sep_label[31:0], 32'h0};     //todo: extend header
 
                     //skip payload for empty msg
                     if (r_size == 'd0) begin

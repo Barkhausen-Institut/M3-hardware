@@ -174,8 +174,8 @@ module tcu_ctrl_recv_msg #(
     wire  [TCU_MSGLEN_SIZE-1:0] hd_length     = r_hd_0[TCU_MSGLEN_SIZE+TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_RSIZE_SIZE+TCU_HD_FLAG_SIZE-1 : TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_RSIZE_SIZE+TCU_HD_FLAG_SIZE];
     wire      [TCU_EP_SIZE-1:0] hd_sendep     = r_hd_0[TCU_EP_SIZE+32-1 : 32];
     wire      [TCU_EP_SIZE-1:0] hd_recvep     = r_hd_0[2*TCU_EP_SIZE+32-1 : TCU_EP_SIZE+32];
-    wire                 [31:0] hd_replylabel = r_hd_1[31:0];
-    wire                 [31:0] hd_label      = r_hd_1[63:32];
+    wire                 [63:0] hd_replylabel = r_hd_1[31:0];   //todo: extend header
+    wire                 [63:0] hd_label      = r_hd_1[63:32];
 
 
     //some helper wires
