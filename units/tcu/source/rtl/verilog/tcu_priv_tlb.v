@@ -382,10 +382,11 @@ module tcu_priv_tlb #(
                     tlb_mem_en = 1'b1;
                 end
 
-                //check vpeid and virt addr
+                //check vpeid, virt addr, and perm (only r+w)
                 if (r2_tlb_valid_entry_bit &&
                     (!(TCU_ENABLE_VIRT_PES && tcu_features_virt_pes_i) || (tlb_rdata_vpeid == tlb_wdata_vpeid)) &&
-                    (tlb_rdata_virtpage == tlb_wdata_virtpage)) begin
+                    (tlb_rdata_virtpage == tlb_wdata_virtpage) &&
+                    (tlb_rdata_perm[1:0] == tlb_wdata_perm[1:0])) begin
                     //TLB hit - remove entry
                     rin_tlb_mem_addr = r_tlb_mem_addr + 1;  //incr again because we decr it already
                     next_tlb_state = S_TLB_DEL_REMOVE;
