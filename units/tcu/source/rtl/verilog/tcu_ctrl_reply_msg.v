@@ -105,13 +105,14 @@ module tcu_ctrl_reply_msg #(
     localparam S_CTRL_RPM_PREPARE_MEM2 = 5'h08;
     localparam S_CTRL_RPM_SEND_HD1     = 5'h09;
     localparam S_CTRL_RPM_SEND_HD2     = 5'h0A;
-    localparam S_CTRL_RPM_SEND_PL      = 5'h0B;
-    localparam S_CTRL_RPM_ABORT        = 5'h0C;
-    localparam S_CTRL_RPM_WAIT_ACK     = 5'h0D;
-    localparam S_CTRL_RPM_UPDATE_SEP   = 5'h0E;
-    localparam S_CTRL_RPM_UPDATE_VPE1  = 5'h0F;
-    localparam S_CTRL_RPM_UPDATE_VPE2  = 5'h10;
-    localparam S_CTRL_RPM_UPDATE_REP   = 5'h11;
+    localparam S_CTRL_RPM_SEND_HD3     = 5'h0B;
+    localparam S_CTRL_RPM_SEND_PL      = 5'h0C;
+    localparam S_CTRL_RPM_ABORT        = 5'h0D;
+    localparam S_CTRL_RPM_WAIT_ACK     = 5'h0E;
+    localparam S_CTRL_RPM_UPDATE_SEP   = 5'h0F;
+    localparam S_CTRL_RPM_UPDATE_VPE1  = 5'h10;
+    localparam S_CTRL_RPM_UPDATE_VPE2  = 5'h11;
+    localparam S_CTRL_RPM_UPDATE_REP   = 5'h12;
     localparam S_CTRL_RPM_FINISH       = 5'h1F;
 
     reg [CTRL_RPM_STATES_SIZE-1:0] ctrl_rpm_state, next_ctrl_rpm_state;
@@ -538,7 +539,7 @@ module tcu_ctrl_reply_msg #(
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {(r_size[3:0] - 1), {(NOC_BSEL_SIZE/2){1'b1}}};   //aligned msg header (laddr[3:0]==0), last valid byte: size[3:0] - 1
-                    noc_data0_o = r_size[15:4] + |r_size[3:0] + 1;  //burst length: palyoad + header
+                    noc_data0_o = r_size[15:4] + |r_size[3:0] + 2;  //burst length: palyoad + header
 
                     next_ctrl_rpm_state = S_CTRL_RPM_SEND_HD2;
                 end
@@ -546,7 +547,8 @@ module tcu_ctrl_reply_msg #(
 
             S_CTRL_RPM_SEND_HD2: begin
                 if (!noc_stall_i) begin
-                    //send flit with msg header
+                    //send first flit with msg header
+                    //rlabel = 0
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
@@ -557,7 +559,18 @@ module tcu_ctrl_reply_msg #(
                                     HOME_MODID,
                                     {TCU_RSIZE_SIZE{1'b0}},
                                     TCU_HD_FLAG_REPLY};
-                    noc_data1_o = {sep_label[31:0], 32'h0};     //todo: extend header
+
+                    next_ctrl_rpm_state = S_CTRL_RPM_SEND_HD3;
+                end
+            end
+
+            S_CTRL_RPM_SEND_HD3: begin
+                if (!noc_stall_i) begin
+                    //send second flit with msg header
+                    noc_wrreq_o = 1'b1;
+                    noc_burst_o = 1'b1;
+                    noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
+                    noc_data0_o = sep_label;
 
                     //skip payload for empty msg
                     if (r_size == 'd0) begin

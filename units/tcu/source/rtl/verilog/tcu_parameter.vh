@@ -27,7 +27,7 @@ parameter TCU_LOG_REG_COUNT    = 1<<17, //do not edit, fixed block RAM
 parameter TCU_PRINT_REG_COUNT  = 'd32,
 
 parameter TCU_EP_REG_SIZE      = 'h18,
-parameter TCU_HD_REG_SIZE      = 'h10,
+parameter TCU_HD_REG_SIZE      = 'h20,
 parameter TCU_CFG_REG_SIZE     = 'h8,
 parameter TCU_STATUS_REG_SIZE  = 'h8,
 parameter TCU_PRINT_REG_SIZE   = 'h8,
