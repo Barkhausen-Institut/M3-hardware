@@ -721,7 +721,10 @@ module tcu_priv_ctrl #(
                                     r_tlb_wdata[TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE-1 : TCU_TLB_VPEID_SIZE],
                                     r_tlb_wdata[TCU_TLB_PHYSPAGE_SIZE+TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE-1 : TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE],
                                     r_tlb_wdata[TCU_TLB_DATA_SIZE-1 : TCU_TLB_PHYSPAGE_SIZE+TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE]));
-                        tcu_log_tlb_data = {r_tlb_wdata, TCU_LOG_PRIV_TLB_WRITE_ENTRY};
+                        //only log 20 bits of virt. page due to limited log-buffer size
+                        tcu_log_tlb_data = {r_tlb_wdata[TCU_TLB_DATA_SIZE-1 : TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE],
+                                            r_tlb_wdata[20+TCU_TLB_VPEID_SIZE-1 : 0],
+                                            TCU_LOG_PRIV_TLB_WRITE_ENTRY};
                     end
                     TCU_TLB_CMD_READ_ENTRY: begin
                         `TCU_DEBUG(("TLB_READ_ENTRY, vpeid: 0x%0x, virt: 0x%x, read phys: 0x%x, read perm: 0x%x",
@@ -729,8 +732,9 @@ module tcu_priv_ctrl #(
                                     r_tlb_wdata[TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE-1 : TCU_TLB_VPEID_SIZE],
                                     tlb_rdata[TCU_TLB_PHYSPAGE_SIZE+TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE-1 : TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE],
                                     tlb_rdata[TCU_TLB_DATA_SIZE-1 : TCU_TLB_PHYSPAGE_SIZE+TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE]));
+                        //only log 20 bits of virt. page due to limited log-buffer size
                         tcu_log_tlb_data = {tlb_rdata[TCU_TLB_DATA_SIZE-1 : TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE],
-                                            r_tlb_wdata[TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE-1 : 0],
+                                            r_tlb_wdata[20+TCU_TLB_VPEID_SIZE-1 : 0],
                                             TCU_LOG_PRIV_TLB_READ_ENTRY};
                     end
                     TCU_TLB_CMD_DEL_ENTRY: begin
