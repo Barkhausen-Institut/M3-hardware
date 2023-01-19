@@ -501,6 +501,7 @@ module tcu_ctrl #(
     wire    [NOC_MODID_SIZE-1:0] rpm_noc_modid;
 
     wire                         rpm_log_valid;
+    wire   [TCU_CHIPID_SIZE-1:0] rpm_log_rpl_chip;
     wire     [TCU_PEID_SIZE-1:0] rpm_log_rpl_pe;
 
     wire                         rpm_done;
@@ -984,7 +985,8 @@ module tcu_ctrl #(
 
                 S_CTRL_MEM_WRITE_WAIT_INITEP: begin
                     if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_WRITE, trg-modid: 0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d", mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
+                        `TCU_DEBUG(("CMD_WRITE, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
                         tcu_log_unpriv_data = {mep_pe, r_firecmd_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_WRITE};
 
                         next_ctrl_state = S_CTRL_MEM_WRITE_CHECK_INITEP;
@@ -1122,7 +1124,8 @@ module tcu_ctrl #(
 
                 S_CTRL_MEM_READ_WAIT_INITEP: begin
                     if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_READ, trg-modid: 0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d", mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
+                        `TCU_DEBUG(("CMD_READ, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
                         tcu_log_unpriv_data = {mep_pe, r_firecmd_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_READ};
 
                         next_ctrl_state = S_CTRL_MEM_READ_CHECK_INITEP;
@@ -1263,7 +1266,8 @@ module tcu_ctrl #(
                         next_ctrl_state = S_CTRL_SEND_MSG_READ_INITEP;
                     end
                     else if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_SEND, trg-modid: 0x%x, send-ep: %0d, local addr: 0x%x, size: %0d", epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_addr, r_firecmd_size));
+                        `TCU_DEBUG(("CMD_SEND, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, size: %0d",
+                            epdata_1[TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_PEID_SIZE+TCU_EP_SIZE], epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_addr, r_firecmd_size));
                         tcu_log_unpriv_data = {epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_size, r_firecmd_addr, r_firecmd_ep, TCU_LOG_CMD_SEND};
 
                         next_ctrl_state = S_CTRL_SEND_MSG_START;
@@ -1363,7 +1367,8 @@ module tcu_ctrl #(
 
                 S_CTRL_REPLY_MSG: begin
                     if (rpm_log_valid) begin
-                        `TCU_DEBUG(("CMD_REPLY, trg-modid: 0x%x, send-ep: %0d, local addr: 0x%x, msg offset: 0x%x, size: %0d", rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_msgoffset, r_firecmd_size));
+                        `TCU_DEBUG(("CMD_REPLY, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, msg offset: 0x%x, size: %0d",
+                            rpm_log_rpl_chip, rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_msgoffset, r_firecmd_size));
                         tcu_log_unpriv_data = {rpm_log_rpl_pe, r_firecmd_size[19:0], r_firecmd_msgoffset[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_REPLY};
                     end
 
@@ -2231,7 +2236,8 @@ module tcu_ctrl #(
                                 else begin
                                     next_noc_state = S_NOC_TCU_REG_WRITE;
 
-                                    `TCU_DEBUG(("NOC_REG_WRITE, mode: %d, src-modid: 0x%x, addr: 0x%x, data0: 0x%x", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i));
+                                    `TCU_DEBUG(("NOC_REG_WRITE, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x, data0: 0x%x",
+                                        noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i));
                                     tcu_log_noc_data = {noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_REG_WRITE};
                                 end
                             end
@@ -2256,7 +2262,8 @@ module tcu_ctrl #(
 
                                         next_noc_state = S_NOC_MEM_WRITE_PAUSE;
 
-                                        `TCU_DEBUG(("NOC_READ_RSP, mode: %d, src-modid: 0x%x, addr: 0x%x", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i));
+                                        `TCU_DEBUG(("NOC_READ_RSP, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x",
+                                            noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i));
                                         tcu_log_noc_data = {noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_READ_RSP};
                                     end
                                     else begin
@@ -2265,7 +2272,8 @@ module tcu_ctrl #(
                                         rin_noc_error_flit_count = r_noc_error_flit_count + 1;
                                         rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
-                                        `TCU_DEBUG(("NOC_READ_RSP, mode: %d, src-modid: 0x%x, addr: 0x%x, no response expected. Packet dropped!", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i));
+                                        `TCU_DEBUG(("NOC_READ_RSP, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x, no response expected. Packet dropped!",
+                                            noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i));
                                         tcu_log_noc_data = {noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_READ_RSP_ERR};
                                     end
                                 end
@@ -2274,7 +2282,8 @@ module tcu_ctrl #(
                                 else begin
                                     next_noc_state = S_NOC_MEM_WRITE_PAUSE;
 
-                                    `TCU_DEBUG(("NOC_WRITE, mode: %d, src-modid: 0x%x, addr: 0x%x", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i));
+                                    `TCU_DEBUG(("NOC_WRITE, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x",
+                                        noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i));
                                     tcu_log_noc_data = {noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_WRITE};
                                 end
                             end
@@ -2298,13 +2307,15 @@ module tcu_ctrl #(
                                 rin_noc_error_flit_count = r_noc_error_flit_count + 1;
                                 rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
-                                `TCU_DEBUG(("NOC_READ, mode: %d, src-modid: 0x%x, addr: 0x%x, #bytes: %0d, invalid read request. Packet dropped!", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[63:32]));
+                                `TCU_DEBUG(("NOC_READ, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x, #bytes: %0d, invalid read request. Packet dropped!",
+                                    noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[63:32]));
                                 tcu_log_noc_data = {noc_rx_data0_i[63:32], noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_READ_ERR};
                             end
                             else begin
                                 rin_reqfifo_push = 1'b1;
 
-                                `TCU_DEBUG(("NOC_READ, mode: %d, src-modid: 0x%x, addr: 0x%x, #bytes: %0d", noc_rx_mode_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[63:32]));
+                                `TCU_DEBUG(("NOC_READ, mode: %d, src-(chip:mod): %d:0x%x, addr: 0x%x, #bytes: %0d",
+                                    noc_rx_mode_i, noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[63:32]));
 
                                 //do not log reads of log
                                 if ((noc_rx_addr_i < TCU_REGADDR_TCU_LOG) || (noc_rx_addr_i >= (TCU_REGADDR_TCU_LOG+TCU_LOG_REG_COUNT*8))) begin
@@ -2333,7 +2344,8 @@ module tcu_ctrl #(
                                     next_noc_state = S_NOC_RECEIVE_MSG_PAUSE;
                                 end
 
-                                `TCU_DEBUG(("NOC_MSG, src-modid: 0x%x, recv-ep: %0d", noc_rx_src_modid_i, noc_rx_addr_i[TCU_EP_SIZE-1:0]));
+                                `TCU_DEBUG(("NOC_MSG, src-(chip:mod): %d:0x%x, recv-ep: %0d",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i[TCU_EP_SIZE-1:0]));
                                 tcu_log_noc_data = {noc_rx_addr_i[TCU_EP_SIZE-1:0], noc_rx_src_modid_i, TCU_LOG_NOC_MSG};
                             end
                             else begin
@@ -2342,7 +2354,8 @@ module tcu_ctrl #(
                                 rin_noc_error_flit_count = r_noc_error_flit_count + 1;
                                 rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
-                                `TCU_DEBUG(("NOC_MSG, src-modid: 0x%x, recv-ep: %0d. Invalid header packet received. Packet dropped!", noc_rx_src_modid_i, noc_rx_addr_i[TCU_EP_SIZE-1:0]));
+                                `TCU_DEBUG(("NOC_MSG, src-(chip:mod: %d:0x%x, recv-ep: %0d. Invalid header packet received. Packet dropped!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i[TCU_EP_SIZE-1:0]));
                                 tcu_log_noc_data = {noc_rx_addr_i[TCU_EP_SIZE-1:0], noc_rx_src_modid_i, TCU_LOG_NOC_MSG_INV};
                             end
                         end
@@ -2359,14 +2372,16 @@ module tcu_ctrl #(
                                     rin_write_ack_recv = 1'b1;
                                     rin_noc_rx_data0 = noc_rx_data0_i[31:0];     //read WRITE size
 
-                                    `TCU_DEBUG(("NOC_WRITE_ACK, src-modid: 0x%x, addr: 0x%0x, size: %0d", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[31:0]));
+                                    `TCU_DEBUG(("NOC_WRITE_ACK, src-(chip:mod): %d:0x%x, addr: 0x%0x, size: %0d",
+                                        noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[31:0]));
                                     tcu_log_noc_data = {noc_rx_data0_i[31:0], noc_rx_addr_i, noc_rx_src_modid_i, TCU_LOG_NOC_WRITE_ACK};
                                 end
                                 else begin
                                     rin_msg_ack_recv = 1'b1;
                                     rin_noc_rx_data0 = noc_rx_data0_i[TCU_ERROR_SIZE-1:0];     //read incoming error type
 
-                                    `TCU_DEBUG(("NOC_MSG_ACK, src-modid: 0x%x, label: 0x%0x, error: %0d", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
+                                    `TCU_DEBUG(("NOC_MSG_ACK, src-(chip:mod): %d:0x%x, label: 0x%0x, error: %0d",
+                                        noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
                                     tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_src_modid_i, TCU_LOG_NOC_MSG_ACK};
                                 end
 
@@ -2395,7 +2410,8 @@ module tcu_ctrl #(
                                 rin_rsp_error = noc_rx_data0_i[TCU_ERROR_SIZE-1:0];     //read incoming error type
                                 noc_rx_stall_o = 1'b0;
 
-                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, addr: 0x%0x, error: %0d", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
+                                `TCU_DEBUG(("NOC_ERROR, src-(chip:mod): %d:0x%x, addr: 0x%0x, error: %0d",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
                                 tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_addr_i, noc_rx_src_modid_i, TCU_LOG_NOC_ERROR};
                             end
                             else begin
@@ -2404,7 +2420,8 @@ module tcu_ctrl #(
                                 rin_noc_error_flit_count = r_noc_error_flit_count + 1;
                                 rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
-                                `TCU_DEBUG(("NOC_ERROR, src-modid: 0x%x, addr: 0x%0x, error: %0d, no response expected. Packet ignored!", noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
+                                `TCU_DEBUG(("NOC_ERROR, src-(chip:mod): %d:0x%x, addr: 0x%0x, error: %0d, no response expected. Packet ignored!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_addr_i, noc_rx_data0_i[TCU_ERROR_SIZE-1:0]));
                                 tcu_log_noc_data = {noc_rx_data0_i[TCU_ERROR_SIZE-1:0], noc_rx_addr_i, noc_rx_src_modid_i, TCU_LOG_NOC_ERROR_UNEXP};
                             end
                         end
@@ -2417,10 +2434,12 @@ module tcu_ctrl #(
                             rin_noc_drop_flit_count = r_noc_drop_flit_count + 1;
 
                             if (noc_rx_burst_i) begin
-                                `TCU_DEBUG(("NOC packet with invalid mode received. src-modid: 0x%x, mode: %d, addr: 0x%x, burst flag: 1, burst length: %d. Packet dropped!", noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i, noc_rx_data0_i[12:0]));
+                                `TCU_DEBUG(("NOC packet with invalid mode received. src-(chip:mod): %d:0x%x, mode: %d, addr: 0x%x, burst flag: 1, burst length: %d. Packet dropped!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i, noc_rx_data0_i[12:0]));
                                 tcu_log_noc_data = {noc_rx_data0_i[12:0], 1'b1, noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_INVMODE};
                             end else begin
-                                `TCU_DEBUG(("NOC packet with invalid mode received. src-modid: 0x%x, mode: %d, addr: 0x%x, burst flag: 0. Packet dropped!", noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i));
+                                `TCU_DEBUG(("NOC packet with invalid mode received. src-(chip:mod): %d:0x%x, mode: %d, addr: 0x%x, burst flag: 0. Packet dropped!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i));
                                 tcu_log_noc_data = {13'h8, 1'b0, noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_INVMODE};
                             end
                         end
@@ -2435,10 +2454,12 @@ module tcu_ctrl #(
                             rin_noc_error_flit_count = r_noc_error_flit_count + 1;
 
                             if (noc_rx_burst_i) begin
-                                `TCU_DEBUG(("NOC invalid packet received. src-modid: 0x%x, mode: %d, addr: 0x%x, burst flag: 1, burst length: %d. Packet dropped!", noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i, noc_rx_data0_i[12:0]));
+                                `TCU_DEBUG(("NOC invalid packet received. src-(chip:mod): %d:0x%x, mode: %d, addr: 0x%x, burst flag: 1, burst length: %d. Packet dropped!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i, noc_rx_data0_i[12:0]));
                                 tcu_log_noc_data = {noc_rx_data0_i[12:0], 1'b1, noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_INVFLIT};
                             end else begin
-                                `TCU_DEBUG(("NOC invalid packet received. src-modid: 0x%x, mode: %d, addr: 0x%x, burst flag: 0. Packet dropped!", noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i));
+                                `TCU_DEBUG(("NOC invalid packet received. src-(chip:mod): %d:0x%x, mode: %d, addr: 0x%x, burst flag: 0. Packet dropped!",
+                                    noc_rx_src_chipid_i, noc_rx_src_modid_i, noc_rx_mode_i, noc_rx_addr_i));
                                 tcu_log_noc_data = {13'h8, 1'b0, noc_rx_addr_i, noc_rx_mode_i, noc_rx_src_modid_i, TCU_LOG_NOC_INVFLIT};
                             end
                         end
@@ -2487,7 +2508,8 @@ module tcu_ctrl #(
                             tcu_log_noc_data = {mar_error, marq_noc_modid, TCU_LOG_NOC_READ_RSP_DONE};
                         end
 
-                        `TCU_DEBUG(("NOC_MEM_WRITE response received from modid 0x%x, error: %0d", marq_noc_modid, mar_error));
+                        `TCU_DEBUG(("NOC_MEM_WRITE response received from (chip:mod): %d:0x%x, error: %0d",
+                            marq_noc_chipid, marq_noc_modid, mar_error));
                     end
 
                     //todo: if something went wrong during normal write
@@ -2528,7 +2550,8 @@ module tcu_ctrl #(
                             tcu_log_noc_data = {mar_error, marq_noc_modid, TCU_LOG_NOC_READ_RSP_DONE};
                         end
 
-                        `TCU_DEBUG(("NOC_MEM_WRITE response received from modid 0x%x, error: %0d", marq_noc_modid, mar_error));
+                        `TCU_DEBUG(("NOC_MEM_WRITE response received from (chip:mod): %d:0x%x, error: %0d",
+                            marq_noc_chipid, marq_noc_modid, mar_error));
                     end
 
                     //todo: if something went wrong during normal write
@@ -3014,6 +3037,7 @@ module tcu_ctrl #(
             //---------------
             //for logging
             .rpm_log_valid_o         (rpm_log_valid),
+            .rpm_log_rpl_chip_o      (rpm_log_rpl_chip),
             .rpm_log_rpl_pe_o        (rpm_log_rpl_pe),
 
             //---------------
@@ -3230,8 +3254,9 @@ module tcu_ctrl #(
         assign ext_invep_error  = TCU_ERROR_NONE;
         assign ext_invep_arg    = {TCU_EXT_ARG_SIZE{1'b0}};
 
-        assign rpm_log_valid  = 1'b0;
-        assign rpm_log_rpl_pe = {TCU_PEID_SIZE{1'b0}};
+        assign rpm_log_valid    = 1'b0;
+        assign rpm_log_rpl_chip = {TCU_CHIPID_SIZE{1'b0}};
+        assign rpm_log_rpl_pe   = {TCU_PEID_SIZE{1'b0}};
     end
     endgenerate
 

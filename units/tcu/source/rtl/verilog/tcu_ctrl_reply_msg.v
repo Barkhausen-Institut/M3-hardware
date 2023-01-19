@@ -78,6 +78,7 @@ module tcu_ctrl_reply_msg #(
     //---------------
     //log
     output reg                              rpm_log_valid_o,
+    output wire       [TCU_CHIPID_SIZE-1:0] rpm_log_rpl_chip_o,
     output wire         [TCU_PEID_SIZE-1:0] rpm_log_rpl_pe_o,
 
     //---------------
@@ -813,6 +814,7 @@ module tcu_ctrl_reply_msg #(
     assign rpm_noc_active_o = rpm_active_o && (ctrl_rpm_state < S_CTRL_RPM_WAIT_ACK);
     assign rpm_done_o = (ctrl_rpm_state == S_CTRL_RPM_FINISH);
 
+    assign rpm_log_rpl_chip_o = sep_chip;
     assign rpm_log_rpl_pe_o = sep_pe;
 
     //always send to original send pe and its send ep
