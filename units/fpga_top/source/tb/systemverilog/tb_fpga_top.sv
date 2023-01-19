@@ -13,6 +13,7 @@ module tb_fpga_top #(
     ,`include "mod_ids.vh"
     ,`include "noc_parameter.vh"
     ,`include "tcu_parameter.vh"
+    ,parameter HOME_CHIPID = {NOC_CHIPID_SIZE{1'b0}}
 )();
 
 
@@ -39,6 +40,7 @@ reg sysclk1_n;
 reg user_clk_n;
 
 wire [7:0] GPIO_LED;
+wire [3:0] GPIO_DIP_SW = HOME_CHIPID[3:0];  //SW12 - determines chip-id
 
 wire eth_link_status = GPIO_LED[1];
 
@@ -106,7 +108,7 @@ fpga_top #(
 `endif
 
     // *** Switches ***
-    .GPIO_DIP_SW                (4'h0),          //SW12
+    .GPIO_DIP_SW                (GPIO_DIP_SW),   //SW12
     .GPIO_SW_N                  (1'b0),          //user pushbuttons
     .GPIO_SW_W                  (1'b0),
     .GPIO_SW_S                  (1'b0),

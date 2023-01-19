@@ -1273,18 +1273,6 @@ endtask //calc_ip_checksum
 
 // task to send a single NoC WRITE packet via ethernet
 task write8b_noc;
-    input [NOC_MODID_SIZE-1:0] trg_modid;
-    input [NOC_BSEL_SIZE-1:0] bsel;
-    input [NOC_ADDR_SIZE-1:0] addr;
-    input [NOC_DATA_SIZE-1:0] data;
-begin
-    send_noc({NOC_CHIPID_SIZE{1'b0}}, trg_modid, MODE_WRITE_POSTED, bsel, 1'b0, addr, data);
-end
-endtask //write8b_noc
-
-
-// task to send a single NoC WRITE packet via ethernet with given chipid
-task write8b_noc_chip;
     input [NOC_CHIPID_SIZE-1:0] trg_chipid;
     input [NOC_MODID_SIZE-1:0] trg_modid;
     input [NOC_BSEL_SIZE-1:0] bsel;
@@ -1293,40 +1281,31 @@ task write8b_noc_chip;
 begin
     send_noc(trg_chipid, trg_modid, MODE_WRITE_POSTED, bsel, 1'b0, addr, data);
 end
-endtask //write8b_noc_chip
+endtask //write8b_noc
 
 
 // task to send a single NoC WRITE packet via ethernet with ARQ enabled
 task write8b_arq_noc;
+    input [NOC_CHIPID_SIZE-1:0] trg_chipid;
     input [NOC_MODID_SIZE-1:0] trg_modid;
     input [NOC_BSEL_SIZE-1:0] bsel;
     input [NOC_ADDR_SIZE-1:0] addr;
     input [NOC_DATA_SIZE-1:0] data;
 begin
-    send_noc({NOC_CHIPID_SIZE{1'b0}}, trg_modid, MODE_WRITE_POSTED, bsel, 1'b1, addr, data);
+    send_noc(trg_chipid, trg_modid, MODE_WRITE_POSTED, bsel, 1'b1, addr, data);
 end
 endtask //write8b_noc
 
 
 // task to read 8 bytes via ethernet
 task read8b_noc;
-    input [NOC_MODID_SIZE-1:0] trg_modid;
-    input [NOC_ADDR_SIZE-1:0] trg_addr;
-begin
-    read_noc({NOC_CHIPID_SIZE{1'b0}}, trg_modid, trg_addr, 32'd8, 0);
-end
-endtask //read8b_noc
-
-
-// task to read 8 bytes via ethernet with given chipid
-task read8b_noc_chip;
     input [NOC_CHIPID_SIZE-1:0] trg_chipid;
     input [NOC_MODID_SIZE-1:0] trg_modid;
     input [NOC_ADDR_SIZE-1:0] trg_addr;
 begin
     read_noc(trg_chipid, trg_modid, trg_addr, 32'd8, 0);
 end
-endtask //read8b_noc_chip
+endtask //read8b_noc
 
 
 // task to send a NoC READ request packet via ethernet
@@ -1792,10 +1771,11 @@ begin
     end else if (protocol == 16'h0800) begin //IP frame
         //check dst info
         if (dst_mac != HOST_MAC_ADDR || dst_IP != HOST_IP || dst_port != HOST_PORT) begin
-            $display("ERROR: Recevied IP frame is not addressed to this host! MAC 0x%h, IP %0d.%0d.%0d.%0d:%0d", dst_mac, dst_IP[31:24], dst_IP[23:16], dst_IP[15:8], dst_IP[7:0], dst_port);
-            $display("ERROR: Expected: MAC 0x%h, IP %0d.%0d.%0d.%0d:%0d", HOST_MAC_ADDR, HOST_IP[31:24], HOST_IP[23:16], HOST_IP[15:8], HOST_IP[7:0], HOST_PORT);
+            $display("Received IP frame is not addressed to this host. Frame will be ignored! Destination: MAC 0x%h, IP %0d.%0d.%0d.%0d:%0d",
+                dst_mac, dst_IP[31:24], dst_IP[23:16], dst_IP[15:8], dst_IP[7:0], dst_port);
         end else begin
-            $display("Received IP frame from MAC 0x%h, IP: %0d.%0d.%0d.%0d:%0d, checksum: 0x%h", src_mac, src_IP[31:24], src_IP[23:16], src_IP[15:8], src_IP[7:0], src_port, checksum);
+            $display("Received IP frame from MAC 0x%h, IP: %0d.%0d.%0d.%0d:%0d, checksum: 0x%h",
+                src_mac, src_IP[31:24], src_IP[23:16], src_IP[15:8], src_IP[7:0], src_port, checksum);
 
             if (burst == 0) begin
                 $display("NoC packet from modid 0x%h:", src_modid);

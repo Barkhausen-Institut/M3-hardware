@@ -27,11 +27,11 @@ begin : testcase
     //---------------
     //start testcase-specific stimulus here
 
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h1000, 64'hABC);
-    write8b_noc(MODID_DRAM2, 8'hFF, 32'h2000, 64'hCDF);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h1000, 64'hABC);
+    write8b_noc(HOME_CHIPID, MODID_DRAM2, 8'hFF, 32'h2000, 64'hCDF);
 
-    read8b_noc(MODID_DRAM1, 32'h1000);
-    read8b_noc(MODID_DRAM2, 32'h2000);
+    read8b_noc(HOME_CHIPID, MODID_DRAM1, 32'h1000);
+    read8b_noc(HOME_CHIPID, MODID_DRAM2, 32'h2000);
 
     repeat(500)
         send_I2;

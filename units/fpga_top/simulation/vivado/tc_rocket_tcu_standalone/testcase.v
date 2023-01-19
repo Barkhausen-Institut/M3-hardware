@@ -151,43 +151,43 @@ begin : testcase
 
 
     //reset core
-    write8b_noc(MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START, 64'h1);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START, 64'h1);
 
     //set EP for PMP (EP0)
-    write8b_noc(MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0, {MODID_DRAM1, TCU_MEMFLAG_RW, TCU_VPEID_INVALID, TCU_EP_TYPE_MEMORY});
-    write8b_noc(MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0 + 16, `MEM_SIZE);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0, {MODID_DRAM1, TCU_MEMFLAG_RW, TCU_VPEID_INVALID, TCU_EP_TYPE_MEMORY});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0 + 16, `MEM_SIZE);
 
     //init environment
 `ifndef PMP
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d0, 64'h0000106f);     //j _start (+0x1000)
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d8, 64'h1);            //platform = HW
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d16, 64'h0);           //pe_id
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d24, `PE_DESC);
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d32, 64'd1);           //len(args)
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d40, 32'h10000408);    //argv
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d48, `HEAP_SIZE);
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d56, `KENV);
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000000+'d64, 64'h0);           //lambda
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
-    write8b_noc(MODID_PM0, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
-    write8b_noc(MODID_PM0, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d0, 64'h0000106f);     //j _start (+0x1000)
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d8, 64'h1);            //platform = HW
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d16, 64'h0);           //pe_id
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d24, `PE_DESC);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d32, 64'd1);           //len(args)
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d40, 32'h10000408);    //argv
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d48, `HEAP_SIZE);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d56, `KENV);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d64, 64'h0);           //lambda
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
 `else
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d0, 64'h0000106f);     //j _start (+0x1000)
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d8, 64'h1);            //platform = HW
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d16, 64'h0);           //pe_id
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d24, `PE_DESC);
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d32, 64'd1);           //len(args)
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d40, 32'h10000408);    //argv
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d48, `HEAP_SIZE);
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d56, `KENV);
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h00000000+'d64, 64'h0);           //lambda
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
-    write8b_noc(MODID_DRAM1, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
-    write8b_noc(MODID_DRAM1, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d0, 64'h0000106f);     //j _start (+0x1000)
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d8, 64'h1);            //platform = HW
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d16, 64'h0);           //pe_id
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d24, `PE_DESC);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d32, 64'd1);           //len(args)
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d40, 32'h10000408);    //argv
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d48, `HEAP_SIZE);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d56, `KENV);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d64, 64'h0);           //lambda
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
 `endif
 
     //trigger interrupt
-    write8b_noc(MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START+'h8, 64'h1);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START+'h8, 64'h1);
 
 
 
