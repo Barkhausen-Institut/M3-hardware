@@ -289,7 +289,7 @@ module tcu_priv_ctrl #(
                 if (!tlb_active && !unpriv_tlb_en) begin
                     ctrl_tlb_en = 1'b1;
                     ctrl_tlb_cmd = TCU_TLB_CMD_DEL_ENTRY;
-                    ctrl_tlb_wdata = {TCU_MEMFLAG_R, {TCU_TLB_PHYSPAGE_SIZE{1'b0}}, priv_cmd_virtpage, priv_cmd_inv_page_vpeid};
+                    ctrl_tlb_wdata = {{TCU_TLB_PERM_SIZE{1'b0}}, {TCU_TLB_PHYSPAGE_SIZE{1'b0}}, priv_cmd_virtpage, priv_cmd_inv_page_vpeid};
 
                     next_priv_ctrl_state = S_PRIV_CTRL_INV_PAGE_WAIT;
                 end
