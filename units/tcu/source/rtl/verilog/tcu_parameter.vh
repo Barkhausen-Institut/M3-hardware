@@ -20,6 +20,7 @@ parameter TCU_LOG_DATA_SIZE = 128-32,   //32 bit already taken by time stamp
 
 //---------------
 //registers
+parameter TCU_VERSION          = 8'h1,
 parameter TCU_EP_REG_COUNT     = 'd128,
 parameter TCU_CFG_REG_COUNT    = 'd32,  //max count, could be less
 parameter TCU_STATUS_REG_COUNT = 'd5,

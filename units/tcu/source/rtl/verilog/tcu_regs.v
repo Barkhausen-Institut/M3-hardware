@@ -209,7 +209,8 @@ module tcu_regs #(
 
         //---------------
         //register
-        reg [63:0] r_tcu_reg_features, rin_tcu_reg_features;
+        reg [63:0] r_tcu_reg_features;
+        reg [31:0] rin_tcu_reg_features;    //upper 32 bits cannot be changed
         reg [63:0] r_tcu_reg_ext_cmd, rin_tcu_reg_ext_cmd;
 
         reg [63:0] r_tcu_reg_command, rin_tcu_reg_command;
@@ -237,11 +238,11 @@ module tcu_regs #(
         //global reset: do not reset features reg and cur_time
         always @(posedge clk_i or negedge reset_n_i) begin
             if (reset_n_i == 1'b0) begin
-                r_tcu_reg_features <= 64'h1;
+                r_tcu_reg_features <= {{(64-32-TCU_VERSION){1'b0}}, TCU_VERSION, 32'h1};
                 r_tcu_reg_cur_time <= {(64+TIMER_SCALE){1'b0}};
             end
             else begin
-                r_tcu_reg_features <= rin_tcu_reg_features;
+                r_tcu_reg_features <= {r_tcu_reg_features[63:32], rin_tcu_reg_features};
                 r_tcu_reg_cur_time <= cur_time;
             end
         end
@@ -294,7 +295,7 @@ module tcu_regs #(
             rin_print_buf_en = 1'b0;
             rin_print_buf_addr = {PRINT_BUF_ADDRWIDTH{1'b0}};
 
-            rin_tcu_reg_features = r_tcu_reg_features;
+            rin_tcu_reg_features = r_tcu_reg_features[31:0];
             rin_tcu_reg_ext_cmd = r_tcu_reg_ext_cmd;
             
             rin_tcu_reg_command = r_tcu_reg_command;
@@ -319,7 +320,7 @@ module tcu_regs #(
                 case (reg_addr_i)
                     TCU_REGADDR_FEATURES: begin
                         if (reg_ext_en) begin
-                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE/2; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
                                     rin_tcu_reg_features[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
@@ -575,7 +576,8 @@ module tcu_regs #(
 
         //---------------
         //register
-        reg [63:0] r_tcu_reg_features, rin_tcu_reg_features;
+        reg [63:0] r_tcu_reg_features;
+        reg [31:0] rin_tcu_reg_features;    //upper 32 bits cannot be changed
         reg [63:0] r_tcu_reg_ext_cmd, rin_tcu_reg_ext_cmd;
 
         reg [63:0] r_tcu_reg_command, rin_tcu_reg_command;
@@ -611,11 +613,11 @@ module tcu_regs #(
         //global reset: do not reset features reg and cur_time
         always @(posedge clk_i or negedge reset_n_i) begin
             if (reset_n_i == 1'b0) begin
-                r_tcu_reg_features <= 64'h1;
+                r_tcu_reg_features <= {{(64-32-TCU_VERSION){1'b0}}, TCU_VERSION, 32'h1};
                 r_tcu_reg_cur_time <= {(64+TIMER_SCALE){1'b0}};
             end
             else begin
-                r_tcu_reg_features <= rin_tcu_reg_features;
+                r_tcu_reg_features <= {r_tcu_reg_features[63:32], rin_tcu_reg_features};
                 r_tcu_reg_cur_time <= cur_time;
             end
         end
@@ -680,7 +682,7 @@ module tcu_regs #(
             rin_print_buf_en = 1'b0;
             rin_print_buf_addr = {PRINT_BUF_ADDRWIDTH{1'b0}};
 
-            rin_tcu_reg_features = r_tcu_reg_features;
+            rin_tcu_reg_features = r_tcu_reg_features[31:0];
             rin_tcu_reg_ext_cmd = r_tcu_reg_ext_cmd;
             
             rin_tcu_reg_command = r_tcu_reg_command;
@@ -710,7 +712,7 @@ module tcu_regs #(
                 case (reg_addr_i)
                     TCU_REGADDR_FEATURES: begin
                         if (reg_ext_en) begin
-                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE/2; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
                                     rin_tcu_reg_features[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
