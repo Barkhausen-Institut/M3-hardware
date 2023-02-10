@@ -247,7 +247,8 @@ module tcu_priv_ctrl #(
 
                         TCU_OPCODE_PRIV_INS_TLB: begin
                             `TCU_DEBUG(("CMD_PRIV_INS_TLB, vpeid: %0d, virt: 0x%x, phys: 0x%x", priv_cmd_ins_tlb_vpeid, priv_cmd_virtpage, priv_cmd_physpage));
-                            tcu_log_priv_cmd_data = {priv_cmd_physpage, priv_cmd_virtpage, priv_cmd_ins_tlb_vpeid, TCU_LOG_CMD_PRIV_INS_TLB};
+                            //only log 20 bits of virt. page due to limited log-buffer size
+                            tcu_log_priv_cmd_data = {priv_cmd_physpage, priv_cmd_virtpage[19:0], priv_cmd_ins_tlb_vpeid, TCU_LOG_CMD_PRIV_INS_TLB};
 
                             next_priv_ctrl_state = S_PRIV_CTRL_INS_TLB;
                         end
