@@ -982,7 +982,8 @@ module tcu_ctrl #(
 
                 S_CTRL_MEM_WRITE_WAIT_INITEP: begin
                     if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_WRITE, trg-modid: 0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d", mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
+                        `TCU_DEBUG(("CMD_WRITE, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
                         tcu_log_unpriv_data = {mep_pe, r_firecmd_data_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_WRITE};
 
                         next_ctrl_state = S_CTRL_MEM_WRITE_CHECK_INITEP;
@@ -1120,7 +1121,8 @@ module tcu_ctrl #(
 
                 S_CTRL_MEM_READ_WAIT_INITEP: begin
                     if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_READ, trg-modid: 0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d", mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
+                        `TCU_DEBUG(("CMD_READ, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
                         tcu_log_unpriv_data = {mep_pe, r_firecmd_data_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_READ};
 
                         next_ctrl_state = S_CTRL_MEM_READ_CHECK_INITEP;
@@ -1261,7 +1263,8 @@ module tcu_ctrl #(
                         next_ctrl_state = S_CTRL_SEND_MSG_READ_INITEP;
                     end
                     else if (read_initep_done) begin
-                        `TCU_DEBUG(("CMD_SEND, trg-modid: 0x%x, send-ep: %0d, local addr: 0x%x, size: %0d", epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_data_addr, r_firecmd_data_size));
+                        `TCU_DEBUG(("CMD_SEND, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, size: %0d",
+                            epdata_1[TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_PEID_SIZE+TCU_EP_SIZE], epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_data_addr, r_firecmd_data_size));
                         tcu_log_unpriv_data = {epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_data_size, r_firecmd_data_addr[31:0], r_firecmd_ep, TCU_LOG_CMD_SEND};
 
                         next_ctrl_state = S_CTRL_SEND_MSG_START;
@@ -1361,7 +1364,8 @@ module tcu_ctrl #(
 
                 S_CTRL_REPLY_MSG: begin
                     if (rpm_log_valid) begin
-                        `TCU_DEBUG(("CMD_REPLY, trg-modid: 0x%x, send-ep: %0d, local addr: 0x%x, msg offset: 0x%x, size: %0d", rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_msgoffset, r_firecmd_data_size));
+                        `TCU_DEBUG(("CMD_REPLY, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, msg offset: 0x%x, size: %0d",
+                            rpm_log_rpl_chip, rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_msgoffset, r_firecmd_data_size));
                         tcu_log_unpriv_data = {rpm_log_rpl_pe, r_firecmd_data_size[19:0], r_firecmd_msgoffset[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_REPLY};
                     end
 
