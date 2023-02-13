@@ -60,6 +60,7 @@ module noc_arq_rx #(
     reg  [NOC_MODID_SIZE-1:0] r_rxf_trg_modid, rin_rxf_trg_modid;
     reg [NOC_CHIPID_SIZE-1:0] r_rxf_trg_chipid, rin_rxf_trg_chipid;
     reg   [NOC_ADDR_SIZE-1:0] r_rxf_addr, rin_rxf_addr;
+    reg   [NOC_MODE_SIZE-1:0] r_rxf_mode, rin_rxf_mode;
 
     //number of dropped packets
     reg [31:0] r_noc_rx_drop, rin_noc_rx_drop;
@@ -147,6 +148,7 @@ module noc_arq_rx #(
             r_rxf_trg_modid <= {NOC_MODID_SIZE{1'b0}};
             r_rxf_trg_chipid <= {NOC_CHIPID_SIZE{1'b0}};
             r_rxf_addr <= {NOC_ADDR_SIZE{1'b0}};
+            r_rxf_mode <= {NOC_MODE_SIZE{1'b0}};
 
             r_noc_rx_drop <= 32'h0;
 
@@ -170,6 +172,7 @@ module noc_arq_rx #(
             r_rxf_trg_modid <= rin_rxf_trg_modid;
             r_rxf_trg_chipid <= rin_rxf_trg_chipid;
             r_rxf_addr <= rin_rxf_addr;
+            r_rxf_mode <= rin_rxf_mode;
 
             r_noc_rx_drop <= rin_noc_rx_drop;
 
@@ -230,6 +233,7 @@ module noc_arq_rx #(
         rin_rxf_trg_modid = r_rxf_trg_modid;
         rin_rxf_trg_chipid = r_rxf_trg_chipid;
         rin_rxf_addr = r_rxf_addr;
+        rin_rxf_mode = r_rxf_mode;
 
         rin_noc_rx_drop = r_noc_rx_drop;
 
@@ -256,6 +260,7 @@ module noc_arq_rx #(
                     rin_rxf_trg_modid = rxf_trg_modid_out;
                     rin_rxf_trg_chipid = rxf_trg_chipid_out;
                     rin_rxf_addr = rxf_addr_out;
+                    rin_rxf_mode = rxf_mode_out;
 
                     //check if it is an ARQ config packet (must not be a burst)
                     if (rxf_mode_arq_config && !rxf_burst_out) begin
@@ -410,6 +415,7 @@ module noc_arq_rx #(
                             rin_rxf_trg_modid = rxf_trg_modid_out;
                             rin_rxf_trg_chipid = rxf_trg_chipid_out;
                             rin_rxf_addr = rxf_addr_out;
+                            rin_rxf_mode = rxf_mode_out;
 
                             next_rxf_state = S_RXF_DROP;
                         end
@@ -440,7 +446,7 @@ module noc_arq_rx #(
                             r_rxf_src_chipid};
     assign ack_payload_o = {MODE_ARQ_ACK,                           //mode
                             r_rxf_addr,                             //addr
-                            {{(NOC_DATA_SIZE-1){1'b0}}, arq_type}}; //data
+                            {{(NOC_DATA_SIZE-NOC_MODE_SIZE-1){1'b0}}, arq_type, r_rxf_mode}}; //data
 
 
     assign noc_rx_count_o = r_noc_packet_id;

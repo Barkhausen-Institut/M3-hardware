@@ -33,9 +33,9 @@ module noc_arq_tx #(
 
     //one more bit to detect when ptr wraps around in buffer
     localparam PTR_ADDR_WIDTH = ARQ_TX_BUFFER_ADDR_WIDTH + 1;
-    localparam BVT_DATA_SIZE = 2*ARQ_TX_BUFFER_ADDR_WIDTH + NOC_MODID_SIZE + NOC_CHIPID_SIZE + NOC_ADDR_SIZE;
+    localparam BVT_DATA_SIZE = 2*ARQ_TX_BUFFER_ADDR_WIDTH + NOC_MODID_SIZE + NOC_CHIPID_SIZE + NOC_ADDR_SIZE + NOC_MODE_SIZE;
     localparam ARQ_TX_BUFFER_DEPTH = 1 << ARQ_TX_BUFFER_ADDR_WIDTH;
-    localparam ACK_FIFO_DATA_SIZE = NOC_MODID_SIZE + NOC_CHIPID_SIZE + NOC_ADDR_SIZE + 1;
+    localparam ACK_FIFO_DATA_SIZE = NOC_MODID_SIZE + NOC_CHIPID_SIZE + NOC_ADDR_SIZE + NOC_MODE_SIZE + 1;
 
     //FSM to write to tx_buffer
     localparam S_TXB_WRITE_FILL_BUF = 1'b0;
@@ -87,6 +87,7 @@ module noc_arq_tx #(
     reg            [NOC_MODID_SIZE-1:0] r_bvt_wdata_modid, rin_bvt_wdata_modid;
     reg           [NOC_CHIPID_SIZE-1:0] r_bvt_wdata_chipid, rin_bvt_wdata_chipid;
     reg             [NOC_ADDR_SIZE-1:0] r_bvt_wdata_addr, rin_bvt_wdata_addr;
+    reg             [NOC_MODE_SIZE-1:0] r_bvt_wdata_mode, rin_bvt_wdata_mode;
 
     //mark valid entries in BVT
     reg [ARQ_TX_BUFFER_DEPTH-1:0] r_bvt_valid_entry, rin_bvt_valid_entry;
@@ -106,6 +107,7 @@ module noc_arq_tx #(
     wire           [NOC_MODID_SIZE-1:0] bvt_rdata_modid;
     wire          [NOC_CHIPID_SIZE-1:0] bvt_rdata_chipid;
     wire            [NOC_ADDR_SIZE-1:0] bvt_rdata_addr;
+    wire            [NOC_MODE_SIZE-1:0] bvt_rdata_mode;
 
 
     //indicate packet forwarding when ACK is disabled
@@ -118,6 +120,7 @@ module noc_arq_tx #(
     wire                       mod_arq = mod_header_i[2*NOC_MODID_SIZE+2*NOC_CHIPID_SIZE+NOC_BSEL_SIZE +: NOC_ARQ_SIZE];
     wire  [NOC_MODID_SIZE-1:0] mod_trg_modid = mod_header_i[NOC_MODID_SIZE+NOC_CHIPID_SIZE-1 : NOC_CHIPID_SIZE];
     wire [NOC_CHIPID_SIZE-1:0] mod_trg_chipid = mod_header_i[NOC_CHIPID_SIZE-1:0];
+    wire   [NOC_MODE_SIZE-1:0] mod_mode = mod_payload_i[NOC_MODE_SIZE+NOC_ADDR_SIZE+NOC_DATA_SIZE-1 : NOC_ADDR_SIZE+NOC_DATA_SIZE];
     wire   [NOC_ADDR_SIZE-1:0] mod_addr = mod_payload_i[NOC_ADDR_SIZE+NOC_DATA_SIZE-1 : NOC_DATA_SIZE];
 
 
@@ -140,13 +143,14 @@ module noc_arq_tx #(
 
     wire [ARQ_TX_BUFFER_DEPTH-1:0] ptr_to_bit_mask = 1 << bvt_wr_ptr;
 
-    //take addr and src-ids from ACK
+    //take addr, src-ids, and mode from ACK
     wire  [NOC_MODID_SIZE-1:0] ack_src_modid = ack_header_i[NOC_MODID_SIZE+2*NOC_CHIPID_SIZE +: NOC_MODID_SIZE];
     wire [NOC_CHIPID_SIZE-1:0] ack_src_chipid = ack_header_i[NOC_MODID_SIZE+NOC_CHIPID_SIZE +: NOC_CHIPID_SIZE];
     wire   [NOC_ADDR_SIZE-1:0] ack_addr = ack_payload_i[NOC_ADDR_SIZE+NOC_DATA_SIZE-1 : NOC_DATA_SIZE];
+    wire   [NOC_MODE_SIZE-1:0] ack_mode = ack_payload_i[NOC_MODE_SIZE-1:0];
 
     //0: NACK, 1: ACK
-    wire ack_type = ack_payload_i[0];
+    wire ack_type = ack_payload_i[NOC_MODE_SIZE];
 
     //signals to read from ACK FIFO
     reg                        ack_fifo_pop;
@@ -154,6 +158,7 @@ module noc_arq_tx #(
     wire  [NOC_MODID_SIZE-1:0] ack_fifo_src_modid;
     wire [NOC_CHIPID_SIZE-1:0] ack_fifo_src_chipid;
     wire   [NOC_ADDR_SIZE-1:0] ack_fifo_addr;
+    wire   [NOC_MODE_SIZE-1:0] ack_fifo_mode;
     wire                       ack_fifo_type;
 
 
@@ -195,7 +200,7 @@ module noc_arq_tx #(
 
         .enb     (bvt_rd_en),
         .addrb   (r_bvt_rd_ptr),
-        .doutb   ({bvt_rdata_pos, bvt_rdata_length, bvt_rdata_modid, bvt_rdata_chipid, bvt_rdata_addr})
+        .doutb   ({bvt_rdata_pos, bvt_rdata_length, bvt_rdata_modid, bvt_rdata_chipid, bvt_rdata_addr, bvt_rdata_mode})
     );
 
 
@@ -208,11 +213,11 @@ module noc_arq_tx #(
         .resetn_i	(reset_q_i),
 
         .wr_en_i	(ack_wrreq_i),
-        .wdata_i	({ack_src_modid, ack_src_chipid, ack_addr, ack_type}),
+        .wdata_i	({ack_src_modid, ack_src_chipid, ack_addr, ack_mode, ack_type}),
         .wfull_o	(ack_stall_o),
 
         .rd_en_i	(ack_fifo_pop),
-        .rdata_o	({ack_fifo_src_modid, ack_fifo_src_chipid, ack_fifo_addr, ack_fifo_type}),
+        .rdata_o	({ack_fifo_src_modid, ack_fifo_src_chipid, ack_fifo_addr, ack_fifo_mode, ack_fifo_type}),
         .rempty_o	(ack_fifo_empty)
     );
 
@@ -246,6 +251,7 @@ module noc_arq_tx #(
             r_bvt_wdata_modid <= {NOC_MODID_SIZE{1'b0}};
             r_bvt_wdata_chipid <= {NOC_CHIPID_SIZE{1'b0}};
             r_bvt_wdata_addr <= {NOC_ADDR_SIZE{1'b0}};
+            r_bvt_wdata_mode <= {NOC_MODE_SIZE{1'b0}};
 
             r_bvt_valid_entry <= {ARQ_TX_BUFFER_DEPTH{1'b0}};
 
@@ -283,6 +289,7 @@ module noc_arq_tx #(
             r_bvt_wdata_modid <= rin_bvt_wdata_modid;
             r_bvt_wdata_chipid <= rin_bvt_wdata_chipid;
             r_bvt_wdata_addr <= rin_bvt_wdata_addr;
+            r_bvt_wdata_mode <= rin_bvt_wdata_mode;
 
             r_bvt_valid_entry <= rin_bvt_valid_entry;
 
@@ -314,6 +321,7 @@ module noc_arq_tx #(
         rin_bvt_wdata_modid = r_bvt_wdata_modid;
         rin_bvt_wdata_chipid = r_bvt_wdata_chipid;
         rin_bvt_wdata_addr = r_bvt_wdata_addr;
+        rin_bvt_wdata_mode = r_bvt_wdata_mode;
 
         case(txb_write_state)
             S_TXB_WRITE_FILL_BUF: begin
@@ -330,6 +338,7 @@ module noc_arq_tx #(
                         rin_bvt_wdata_modid = mod_trg_modid;
                         rin_bvt_wdata_chipid = mod_trg_chipid;
                         rin_bvt_wdata_addr = mod_addr;
+                        rin_bvt_wdata_mode = mod_mode;
 
                         //burst starts
                         if (mod_burst) begin
@@ -555,7 +564,8 @@ module noc_arq_tx #(
                 if (r_bvt_valid_entry[bvt_rd_ptr_decr] &&
                     (ack_fifo_src_modid == bvt_rdata_modid) &&
                     (ack_fifo_src_chipid == bvt_rdata_chipid) &&
-                    (ack_fifo_addr == bvt_rdata_addr)) begin
+                    (ack_fifo_addr == bvt_rdata_addr) &&
+                    (ack_fifo_mode == bvt_rdata_mode)) begin
                     ack_fifo_pop = 1'b1;
 
                     //ack packet in buffer
@@ -660,7 +670,7 @@ module noc_arq_tx #(
         else if (txb_write_state == S_TXB_WRITE_SET_BVT) begin
             bvt_wr_en = 1'b1;
             bvt_wr_ptr = r_bvt_mod_wr_ptr;
-            bvt_wdata = {r_bvt_wdata_pos, r_bvt_wdata_length, r_bvt_wdata_modid, r_bvt_wdata_chipid, r_bvt_wdata_addr};
+            bvt_wdata = {r_bvt_wdata_pos, r_bvt_wdata_length, r_bvt_wdata_modid, r_bvt_wdata_chipid, r_bvt_wdata_addr, r_bvt_wdata_mode};
 
             //set bit at ptr
             rin_bvt_valid_entry = r_bvt_valid_entry ^ ptr_to_bit_mask;
