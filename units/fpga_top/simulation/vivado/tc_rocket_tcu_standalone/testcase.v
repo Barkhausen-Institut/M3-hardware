@@ -25,22 +25,22 @@
 `define IMEM_ADDR_WIDTH  17
 `define DMEM_ADDR_WIDTH  17
 
-`define ROCKET_CORE 8
-`define BOOM_CORE   7
+`define ROCKET_CORE 0
+`define BOOM_CORE   1
+`define NIC         2
+`define Serial      3
 
 `ifdef VM
-`define PE_DESC		(('h1 << `ROCKET_CORE) | ('h3 << 3) | 'h1)
-`define HEAP_SIZE   'h10000
 `define PMP_SIZE    'h800000
+`define PE_DESC		(3 << 6) | (('h1 << `ROCKET_CORE) << 20)
 `else
-`define PE_DESC		(`MEM_SIZE | ('h1 << `ROCKET_CORE) | ('h3 << 3))
-`define HEAP_SIZE   'h0
 `define PMP_SIZE    `MEM_SIZE
+`define PE_DESC		((`PMP_SIZE >> 12) << 28) | ((1 << 5) << 20) | (3 << 6) | (('h1 << `ROCKET_CORE) << 20)
 `endif
 
 `define MEMTILE     8
 `define MAX_FS_SIZE (256*1024*1024)
-`define KENV        ((64'h80 + `MEMTILE) << 56 | (`MAX_FS_SIZE+8*`PMP_SIZE))
+`define KENV        ((64'h4000 + `MEMTILE) << 49 | (`MAX_FS_SIZE+8*`PMP_SIZE))
 
 
 reg [63:0] mem_content [`DMEM_START_ADDR:`MEM_END_ADDR-1];
@@ -154,7 +154,7 @@ begin : testcase
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START, 64'h1);
 
     //set EP for PMP (EP0)
-    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0, {MODID_DRAM1, TCU_MEMFLAG_RW, TCU_VPEID_INVALID, TCU_EP_TYPE_MEMORY});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0, {HOME_CHIPID, MODID_DRAM1, TCU_MEMFLAG_RW, TCU_VPEID_INVALID, TCU_EP_TYPE_MEMORY});
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_EP_START + (8 * 3) * 0 + 16, `MEM_SIZE);
 
     //init environment
@@ -165,9 +165,18 @@ begin : testcase
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d24, `PE_DESC);
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d32, 64'd1);           //len(args)
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d40, 32'h10000408);    //argv
-    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d48, `HEAP_SIZE);
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d48, 64'h0);           //envp
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d56, `KENV);
-    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d64, 64'h0);           //lambda
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d64, 64'd9);           //raw tile count
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d72,  {HOME_CHIPID, MODID_PM0});  //tile ids
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d80,  {HOME_CHIPID, MODID_PM1});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d88,  {HOME_CHIPID, MODID_PM2});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d96,  {HOME_CHIPID, MODID_PM3});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d104, {HOME_CHIPID, MODID_PM4});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d112, {HOME_CHIPID, MODID_PM5});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d120, {HOME_CHIPID, MODID_PM6});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d128, {HOME_CHIPID, MODID_PM7});
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000000+'d136, {HOME_CHIPID, MODID_DRAM1});
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
@@ -178,12 +187,21 @@ begin : testcase
     write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d24, `PE_DESC);
     write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d32, 64'd1);           //len(args)
     write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d40, 32'h10000408);    //argv
-    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d48, `HEAP_SIZE);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d48, 64'h0);           //envp
     write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d56, `KENV);
-    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d64, 64'h0);           //lambda
-    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h10000400+'d8, 64'h10000410);          //arguments
-    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h10000400+'d16, 64'h6f6c61646e617473); //"standalone"
-    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'h0F, 32'h10000400+'d24, 64'h000000000000656e);
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d64, 64'd9);           //raw tile count
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d72,  {HOME_CHIPID, MODID_PM0});  //tile ids
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d80,  {HOME_CHIPID, MODID_PM1});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d88,  {HOME_CHIPID, MODID_PM2});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d96,  {HOME_CHIPID, MODID_PM3});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d104, {HOME_CHIPID, MODID_PM4});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d112, {HOME_CHIPID, MODID_PM5});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d120, {HOME_CHIPID, MODID_PM6});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d128, {HOME_CHIPID, MODID_PM7});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000000+'d136, {HOME_CHIPID, MODID_DRAM1});
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000400+'d8, 64'h10000410);          //arguments
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'hFF, 32'h00000400+'d16, 64'h6f6c61646e617473); //"standalone"
+    write8b_noc(HOME_CHIPID, MODID_DRAM1, 8'h0F, 32'h00000400+'d24, 64'h000000000000656e);
 `endif
 
     //trigger interrupt
