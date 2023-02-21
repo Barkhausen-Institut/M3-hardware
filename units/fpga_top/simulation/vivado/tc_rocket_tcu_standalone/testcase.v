@@ -25,8 +25,8 @@
 `define IMEM_ADDR_WIDTH  17
 `define DMEM_ADDR_WIDTH  17
 
-`define ROCKET_CORE 0
-`define BOOM_CORE   1
+`define BOOM_CORE   0
+`define ROCKET_CORE 1
 `define NIC         2
 `define Serial      3
 
