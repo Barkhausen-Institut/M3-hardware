@@ -389,7 +389,7 @@ module mem_axi4_bridge #(
 
     //always check if first data has already arrived in auxmem
     assign mem_rdata_avail_o = mem_rdata_avail;
-    assign mem_wdata_infifo_o = (r_write_count > 'd0) || (r_tmp_write_count > 'd0) ||
+    assign mem_wdata_infifo_o = (r_write_count > 'd0) || (r_tmp_write_count > 'd0) || !req_wfifo_empty ||
                                 (state_wfifo == S_WFIFO_WAIT_BRESP);  //if something must still be written to AXI interface
     assign mem_wstall_o = req_wfifo_full || r_wabort;
     assign mem_rstall_o = req_rfifo_full || (r_read_stall && mem_rdata_avail);
@@ -506,6 +506,7 @@ module mem_axi4_bridge #(
                         axi4_aw_valid_o = 1'b1;
                         axi4_aw_len_o = 8'h0;    //1 beat -> len = 0
                         axi4_aw_addr_o = mem_addr_wout;
+                        rin_tmp_write_count = 'd1;
 
                         if (axi4_aw_ready_i) begin
                             //if write channel is also ready, send data now
@@ -517,7 +518,6 @@ module mem_axi4_bridge #(
                                 next_state_wfifo = S_WFIFO_WAIT_BRESP;
                             end
                             else if (r_wabort) begin
-                                rin_tmp_write_count = 'd1;
                                 next_state_wfifo = S_WFIFO_ABORT;
                             end
                             else begin
@@ -542,7 +542,6 @@ module mem_axi4_bridge #(
                     next_state_wfifo = S_WFIFO_WAIT_BRESP;
                 end
                 else if (r_wabort) begin
-                    rin_tmp_write_count = 'd1;
                     next_state_wfifo = S_WFIFO_ABORT;
                 end
             end
@@ -601,6 +600,7 @@ module mem_axi4_bridge #(
             //wait for incoming write ack
             S_WFIFO_WAIT_BRESP: begin
                 if (axi4_b_valid_i && (axi4_b_id_i == 'h1)) begin
+                    rin_tmp_write_count = 'd0;
                     if (axi4_b_resp_i == AXI_RESP_TYPE_OKAY) begin
                         if (r_wabort) begin
                             next_state_wfifo = S_WFIFO_ERROR;
