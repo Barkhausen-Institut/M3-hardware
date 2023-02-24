@@ -48,6 +48,7 @@ module tcu_ctrl_mem_access_recv #(
 
     `include "tcu_functions.v"
 
+    localparam DELAY_SIZE = 2;
 
     localparam CTRL_MAR_STATES_SIZE        = 4;
     localparam S_CTRL_MAR_IDLE             = 4'h0;
@@ -94,6 +95,9 @@ module tcu_ctrl_mem_access_recv #(
     //timeout
     reg [31:0] r_mar_timeout, rin_mar_timeout;
 
+    //some delay
+    reg [DELAY_SIZE-1:0] r_dram_delay, rin_dram_delay;
+
 
     wire  [3:0] start_shift  = ~noc_bsel_i[3:0];
     wire  [4:0] end_shift    = noc_bsel_i[7:4] + 5'd1;
@@ -133,6 +137,7 @@ module tcu_ctrl_mem_access_recv #(
             r_burst_length <= 13'h0;
 
             r_mar_error <= TCU_ERROR_NONE;
+            r_dram_delay <= {DELAY_SIZE{1'b1}};
 
             r_mar_timeout <= 32'h0;
         end
@@ -161,6 +166,7 @@ module tcu_ctrl_mem_access_recv #(
             r_burst_length <= rin_burst_length;
 
             r_mar_error <= rin_mar_error;
+            r_dram_delay <= rin_dram_delay;
 
             r_mar_timeout <= rin_mar_timeout;
         end
@@ -196,6 +202,7 @@ module tcu_ctrl_mem_access_recv #(
         mar_done_o = 1'b0;
 
         rin_mar_timeout = 32'h0;
+        rin_dram_delay = {DELAY_SIZE{1'b1}};
 
         mar_mem_wabort_o = 1'b0;
 
@@ -321,7 +328,12 @@ module tcu_ctrl_mem_access_recv #(
                             else begin
                                 noc_fifo_pop_o = 1'b1;
                                 rin_size = 'd0;
-                                next_ctrl_mar_state = S_CTRL_MAR_FINISH;
+                                if (TCU_ENABLE_DRAM) begin
+                                    next_ctrl_mar_state = S_CTRL_MAR_WAIT_DRAM;
+                                end
+                                else begin
+                                    next_ctrl_mar_state = S_CTRL_MAR_FINISH;
+                                end
                             end
                         end
                     end
@@ -342,7 +354,12 @@ module tcu_ctrl_mem_access_recv #(
                 if (!mar_mem_stall_i) begin
                     noc_fifo_pop_o = 1'b1;
                     rin_size = 'd0;
-                    next_ctrl_mar_state = S_CTRL_MAR_FINISH;
+                    if (TCU_ENABLE_DRAM) begin
+                        next_ctrl_mar_state = S_CTRL_MAR_WAIT_DRAM;
+                    end
+                    else begin
+                        next_ctrl_mar_state = S_CTRL_MAR_FINISH;
+                    end
                 end
             end
 
@@ -512,7 +529,12 @@ module tcu_ctrl_mem_access_recv #(
 
             //---------------
             S_CTRL_MAR_WAIT_DRAM: begin
-                if (!mar_mem_wdata_infifo_i) begin
+                //additionally wait a few cycles until write data has arrived in bridge to DRAM-like interface
+                rin_dram_delay = r_dram_delay;
+                if (r_dram_delay != {DELAY_SIZE{1'b0}}) begin
+                    rin_dram_delay = r_dram_delay - 1;
+                end
+                else if (!mar_mem_wdata_infifo_i) begin
                     next_ctrl_mar_state = S_CTRL_MAR_FINISH;
                 end
 
