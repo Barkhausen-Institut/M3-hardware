@@ -2,6 +2,7 @@
 module pm_boom #(
     `include "noc_parameter.vh"
     ,parameter HOME_MODID = {NOC_MODID_SIZE{1'b0}},
+    parameter PM_UART_ATTACHED = 0,
     parameter CLKFREQ_MHZ = 100
 )
 (
@@ -35,6 +36,7 @@ module pm_boom #(
 
 boom_wrap #(
     .HOME_MODID                 (HOME_MODID),
+    .PM_UART_ATTACHED           (PM_UART_ATTACHED),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ)
 ) i_boom_wrap (
     .clk_pm_i                   (clk_pm_i),

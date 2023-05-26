@@ -30,6 +30,7 @@ module fpga_top #(
                                                PM_TYPE_NONE,
                                                PM_TYPE_NONE},
     parameter int CLKFREQ_PM_MHZ[PM_COUNT] = '{100, 100, 100, 100, 100, 100, 100, 100},
+    parameter int PM_UART_ATTACHED[PM_COUNT] = '{1, 0, 0, 0, 0, 0, 0, 0},   //only one PM can be connected to UART
 
     parameter SIMULATION_ETH      = 0,
     parameter SIMULATION_DDR4     = 0
@@ -379,26 +380,21 @@ module fpga_top #(
     wire pm7_jtag_tdo_en;
     wire pm7_jtag_sel;
 
-    wire pm0_uart_tx;
-    wire pm1_uart_tx;
-    wire pm2_uart_tx;
-    wire pm3_uart_tx;
-    wire pm4_uart_tx;
-    wire pm5_uart_tx;
-    wire pm6_uart_tx;
-    wire pm7_uart_tx;
+    wire [PM_COUNT-1:0] pm_uart_tx;
+    wire [PM_COUNT-1:0] pm_uart_rx;
 
-    //only PM0 is connected to UART
-    wire pm0_uart_rx = UART_RX;
-    assign UART_TX = pm0_uart_tx;
-
-    wire pm1_uart_rx = 1'b1;
-    wire pm2_uart_rx = 1'b1;
-    wire pm3_uart_rx = 1'b1;
-    wire pm4_uart_rx = 1'b1;
-    wire pm5_uart_rx = 1'b1;
-    wire pm6_uart_rx = 1'b1;
-    wire pm7_uart_rx = 1'b1;
+    //only one PM is connected to UART
+    genvar pm;
+    generate
+        for (pm=0; pm<PM_COUNT; pm=pm+1) begin
+            if (PM_UART_ATTACHED[pm]) begin
+                assign pm_uart_rx[pm] = UART_RX;
+                assign UART_TX = pm_uart_tx[pm];
+            end else begin
+                assign pm_uart_rx[pm] = 1'b1;
+            end
+        end
+    endgenerate
 
 
 
@@ -828,6 +824,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),
             .HOME_MODID               (MODID_PM0),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[0]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[0])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm0_clk),
@@ -864,8 +861,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm0_jtag_tdo),
             .jtag_tdo_en_o        (pm0_jtag_tdo_en),
 
-            .uart_tx_o            (pm0_uart_tx),
-            .uart_rx_i            (pm0_uart_rx)
+            .uart_tx_o            (pm_uart_tx[0]),
+            .uart_rx_i            (pm_uart_rx[0])
         );
 `endif
     end
@@ -873,6 +870,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM0),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[0]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[0]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[0])
         ) i_pm_domain (
             .clk_pm_i                   (pm0_clk),
@@ -890,8 +888,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm0_jtag_tdi),
             .jtag_tdo_o                 (pm0_jtag_tdo),
             .jtag_tdo_en_o              (pm0_jtag_tdo_en),
-            .uart_tx_o                  (pm0_uart_tx),
-            .uart_rx_i                  (pm0_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[0]),
+            .uart_rx_i                  (pm_uart_rx[0])
         );
     end
     endgenerate
@@ -902,6 +900,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (0),
             .HOME_MODID               (MODID_PM1),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[1]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[1])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm1_clk),
@@ -938,8 +937,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm1_jtag_tdo),
             .jtag_tdo_en_o        (pm1_jtag_tdo_en),
 
-            .uart_tx_o            (pm1_uart_tx),
-            .uart_rx_i            (pm1_uart_rx)
+            .uart_tx_o            (pm_uart_tx[1]),
+            .uart_rx_i            (pm_uart_rx[1])
         );
 `endif
     end
@@ -947,6 +946,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM1),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[1]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[1]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[1])
         ) i_pm_domain (
             .clk_pm_i                   (pm1_clk),
@@ -964,8 +964,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm1_jtag_tdi),
             .jtag_tdo_o                 (pm1_jtag_tdo),
             .jtag_tdo_en_o              (pm1_jtag_tdo_en),
-            .uart_tx_o                  (pm1_uart_tx),
-            .uart_rx_i                  (pm1_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[1]),
+            .uart_rx_i                  (pm_uart_rx[1])
         );
     end
     endgenerate
@@ -976,6 +976,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (0),
             .HOME_MODID               (MODID_PM2),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[2]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[2])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm2_clk),
@@ -1012,8 +1013,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm2_jtag_tdo),
             .jtag_tdo_en_o        (pm2_jtag_tdo_en),
 
-            .uart_tx_o            (pm2_uart_tx),
-            .uart_rx_i            (pm2_uart_rx)
+            .uart_tx_o            (pm_uart_tx[2]),
+            .uart_rx_i            (pm_uart_rx[2])
         );
 `endif
     end
@@ -1021,6 +1022,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM2),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[2]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[2]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[2])
         ) i_pm_domain (
             .clk_pm_i                   (pm2_clk),
@@ -1038,8 +1040,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm2_jtag_tdi),
             .jtag_tdo_o                 (pm2_jtag_tdo),
             .jtag_tdo_en_o              (pm2_jtag_tdo_en),
-            .uart_tx_o                  (pm2_uart_tx),
-            .uart_rx_i                  (pm2_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[2]),
+            .uart_rx_i                  (pm_uart_rx[2])
         );
     end
     endgenerate
@@ -1050,6 +1052,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (0),
             .HOME_MODID               (MODID_PM3),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[3]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[3])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm3_clk),
@@ -1086,8 +1089,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm3_jtag_tdo),
             .jtag_tdo_en_o        (pm3_jtag_tdo_en),
 
-            .uart_tx_o            (pm3_uart_tx),
-            .uart_rx_i            (pm3_uart_rx)
+            .uart_tx_o            (pm_uart_tx[3]),
+            .uart_rx_i            (pm_uart_rx[3])
         );
 `endif
     end
@@ -1095,6 +1098,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM3),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[3]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[3]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[3])
         ) i_pm_domain (
             .clk_pm_i                   (pm3_clk),
@@ -1112,8 +1116,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm3_jtag_tdi),
             .jtag_tdo_o                 (pm3_jtag_tdo),
             .jtag_tdo_en_o              (pm3_jtag_tdo_en),
-            .uart_tx_o                  (pm3_uart_tx),
-            .uart_rx_i                  (pm3_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[3]),
+            .uart_rx_i                  (pm_uart_rx[3])
         );
     end
     endgenerate
@@ -1124,6 +1128,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),
             .HOME_MODID               (MODID_PM4),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[4]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[4])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm4_clk),
@@ -1160,8 +1165,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm4_jtag_tdo),
             .jtag_tdo_en_o        (pm4_jtag_tdo_en),
 
-            .uart_tx_o            (pm4_uart_tx),
-            .uart_rx_i            (pm4_uart_rx)
+            .uart_tx_o            (pm_uart_tx[4]),
+            .uart_rx_i            (pm_uart_rx[4])
         );
 `endif
     end
@@ -1169,6 +1174,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM4),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[4]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[4]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[4])
         ) i_pm_domain (
             .clk_pm_i                   (pm4_clk),
@@ -1186,8 +1192,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm4_jtag_tdi),
             .jtag_tdo_o                 (pm4_jtag_tdo),
             .jtag_tdo_en_o              (pm4_jtag_tdo_en),
-            .uart_tx_o                  (pm4_uart_tx),
-            .uart_rx_i                  (pm4_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[4]),
+            .uart_rx_i                  (pm_uart_rx[4])
         );
     end
     endgenerate
@@ -1198,6 +1204,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (0),
             .HOME_MODID               (MODID_PM5),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[5]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[5])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm5_clk),
@@ -1234,8 +1241,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm5_jtag_tdo),
             .jtag_tdo_en_o        (pm5_jtag_tdo_en),
 
-            .uart_tx_o            (pm5_uart_tx),
-            .uart_rx_i            (pm5_uart_rx)
+            .uart_tx_o            (pm_uart_tx[5]),
+            .uart_rx_i            (pm_uart_rx[5])
         );
 `endif
     end
@@ -1243,6 +1250,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM5),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[5]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[5]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[5])
         ) i_pm_domain (
             .clk_pm_i                   (pm5_clk),
@@ -1260,8 +1268,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm5_jtag_tdi),
             .jtag_tdo_o                 (pm5_jtag_tdo),
             .jtag_tdo_en_o              (pm5_jtag_tdo_en),
-            .uart_tx_o                  (pm5_uart_tx),
-            .uart_rx_i                  (pm5_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[5]),
+            .uart_rx_i                  (pm_uart_rx[5])
         );
     end
     endgenerate
@@ -1272,6 +1280,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),
             .HOME_MODID               (MODID_PM6),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[6]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[6])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm6_clk),
@@ -1308,8 +1317,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm6_jtag_tdo),
             .jtag_tdo_en_o        (pm6_jtag_tdo_en),
 
-            .uart_tx_o            (pm6_uart_tx),
-            .uart_rx_i            (pm6_uart_rx)
+            .uart_tx_o            (pm_uart_tx[6]),
+            .uart_rx_i            (pm_uart_rx[6])
         );
 `endif
     end
@@ -1317,6 +1326,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM6),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[6]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[6]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[6])
         ) i_pm_domain (
             .clk_pm_i                   (pm6_clk),
@@ -1334,8 +1344,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm6_jtag_tdi),
             .jtag_tdo_o                 (pm6_jtag_tdo),
             .jtag_tdo_en_o              (pm6_jtag_tdo_en),
-            .uart_tx_o                  (pm6_uart_tx),
-            .uart_rx_i                  (pm6_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[6]),
+            .uart_rx_i                  (pm_uart_rx[6])
         );
     end
     endgenerate
@@ -1346,6 +1356,7 @@ module fpga_top #(
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (0),
             .HOME_MODID               (MODID_PM7),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[7]),
             .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[7])
         ) i_ethernet_fmc_domain (
             .clk_axi_i            (pm7_clk),
@@ -1382,8 +1393,8 @@ module fpga_top #(
             .jtag_tdo_o           (pm7_jtag_tdo),
             .jtag_tdo_en_o        (pm7_jtag_tdo_en),
 
-            .uart_tx_o            (pm7_uart_tx),
-            .uart_rx_i            (pm7_uart_rx)
+            .uart_tx_o            (pm_uart_tx[7]),
+            .uart_rx_i            (pm_uart_rx[7])
         );
 `endif
     end
@@ -1391,6 +1402,7 @@ module fpga_top #(
         pm_domain #(
             .HOME_MODID                 (MODID_PM7),
             .PM_CORE_SELECT             (PM_DOMAIN_TYPE[7]),
+            .PM_UART_ATTACHED           (PM_UART_ATTACHED[7]),
             .CLKFREQ_MHZ                (CLKFREQ_PM_MHZ[7])
         ) i_pm_domain (
             .clk_pm_i                   (pm7_clk),
@@ -1408,8 +1420,8 @@ module fpga_top #(
             .jtag_tdi_i                 (pm7_jtag_tdi),
             .jtag_tdo_o                 (pm7_jtag_tdo),
             .jtag_tdo_en_o              (pm7_jtag_tdo_en),
-            .uart_tx_o                  (pm7_uart_tx),
-            .uart_rx_i                  (pm7_uart_rx)
+            .uart_tx_o                  (pm_uart_tx[7]),
+            .uart_rx_i                  (pm_uart_rx[7])
         );
     end
     endgenerate

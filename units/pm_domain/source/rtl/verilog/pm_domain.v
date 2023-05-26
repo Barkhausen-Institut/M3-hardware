@@ -4,6 +4,7 @@ module pm_domain #(
     ,`include "noc_parameter.vh"
     ,parameter [NOC_MODID_SIZE-1:0] HOME_MODID = 0,
     parameter                       PM_CORE_SELECT = PM_TYPE_NONE,
+    parameter                       PM_UART_ATTACHED = 0,
     parameter                       CLKFREQ_MHZ = 100
 )
 (
@@ -33,6 +34,7 @@ generate
 if (PM_CORE_SELECT == PM_TYPE_ROCKET) begin: rocket
     pm_rocket #(
         .HOME_MODID                 (HOME_MODID),
+        .PM_UART_ATTACHED           (PM_UART_ATTACHED),
         .CLKFREQ_MHZ                (CLKFREQ_MHZ)
     ) i_pm_rocket (
         .clk_pm_i                   (clk_pm_i),
@@ -59,6 +61,7 @@ end
 else if (PM_CORE_SELECT == PM_TYPE_BOOM) begin: boom
     pm_boom #(
         .HOME_MODID                 (HOME_MODID),
+        .PM_UART_ATTACHED           (PM_UART_ATTACHED),
         .CLKFREQ_MHZ                (CLKFREQ_MHZ)
     ) i_pm_boom (
         .clk_pm_i                   (clk_pm_i),

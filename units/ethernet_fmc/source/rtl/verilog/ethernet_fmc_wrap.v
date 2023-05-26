@@ -4,6 +4,7 @@ module ethernet_fmc_wrap #(
     ,`include "tcu_parameter.vh"
     ,`include "mod_ids.vh"
     ,parameter ETH_INCLUDE_SHARED_LOGIC = 1,
+    parameter PM_UART_ATTACHED          = 0,
     parameter HOME_MODID                = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ               = 100,
     parameter ROCKET_USE_LOCAL_MEM      = 0,
@@ -601,6 +602,14 @@ tcu_top #(
     .TCU_REGADDR_TIMER_INT      (TCU_REGADDR_CORE_CFG_START + 'h10), //second ext. interrupt
     .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ),
+    .TILE_TYPE                  ('d0),      //processing tile with NIC
+    .TILE_ISA                   ('d1),
+`ifdef ETHFMC_USE_BOOM
+    .TILE_ATTR                  ('d1 | 'd4 | (PM_UART_ATTACHED ? 'd8 : 'd0)),
+`else
+    .TILE_ATTR                  ('d2 | 'd4 | (PM_UART_ATTACHED ? 'd8 : 'd0)),
+`endif
+    .TILE_MEMSIZE               ('d0),
     .CORE_DMEM_DATA_SIZE        (CORE_DMEM_DATA_SIZE),
     .CORE_DMEM_ADDR_SIZE        (CORE_DMEM_ADDR_SIZE),
     .CORE_DMEM_BSEL_SIZE        (CORE_DMEM_BSEL_SIZE),
