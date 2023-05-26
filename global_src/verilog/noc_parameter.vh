@@ -31,7 +31,7 @@ parameter Z_COORD_MAX                = 1 << MOD_Z_COORD_SIZE,
 parameter CNT_SIZE                   = 48,
 
 parameter MAX_BURST_LENGTH           = 32,     //number of 16-byte packets
-parameter MAX_BURST_LENGTH_MSG       = 128+1,  //number of 16-byte packets for TCU messages (128 msg payload + 1 msg header)
+parameter MAX_BURST_LENGTH_MSG       = 128+2,  //number of 16-byte packets for TCU messages (128 msg payload + 2 msg header)
 
 parameter MODE_READ_REQ              = 4'h0,
 parameter MODE_READ_RSP              = 4'h1,

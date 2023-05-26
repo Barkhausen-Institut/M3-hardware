@@ -67,7 +67,7 @@ module tcu_ctrl_send_msg #(
     input  wire           [TCU_EP_SIZE-1:0] sm_sendep_i,   //send ep which is used to send now, from cmd_ep
     input  wire                  [3*64-1:0] sm_epdata_i,
     input  wire           [TCU_EP_SIZE-1:0] sm_replyep_i,  //from cmd_arg0
-    input  wire                      [31:0] sm_replylabel_i,   //from arg1 reg
+    input  wire                      [63:0] sm_replylabel_i,   //from arg1 reg
     input  wire        [TCU_VPEID_SIZE-1:0] sm_cur_vpeid_i,
     input  wire                             sm_abort_i,
     input  wire                             sm_crd_update_stall_i,
@@ -100,12 +100,13 @@ module tcu_ctrl_send_msg #(
     localparam S_CTRL_SM_PREPARE_MEM2  = 5'h07;
     localparam S_CTRL_SM_SEND_HD1      = 5'h08;
     localparam S_CTRL_SM_SEND_HD2      = 5'h09;
-    localparam S_CTRL_SM_SEND_PL       = 5'h0A;
-    localparam S_CTRL_SM_ABORT         = 5'h0B;
-    localparam S_CTRL_SM_WAIT_ACK      = 5'h0C;
-    localparam S_CTRL_SM_UPDATE_EP1    = 5'h0D;
-    localparam S_CTRL_SM_UPDATE_EP2    = 5'h0E;
-    localparam S_CTRL_SM_UPDATE_EP3    = 5'h0F;
+    localparam S_CTRL_SM_SEND_HD3      = 5'h0A;
+    localparam S_CTRL_SM_SEND_PL       = 5'h0B;
+    localparam S_CTRL_SM_ABORT         = 5'h0C;
+    localparam S_CTRL_SM_WAIT_ACK      = 5'h0D;
+    localparam S_CTRL_SM_UPDATE_EP1    = 5'h0E;
+    localparam S_CTRL_SM_UPDATE_EP2    = 5'h0F;
+    localparam S_CTRL_SM_UPDATE_EP3    = 5'h10;
     localparam S_CTRL_SM_FINISH        = 5'h1F;
 
     reg [CTRL_SM_STATES_SIZE-1:0] ctrl_sm_state, next_ctrl_sm_state;
@@ -122,7 +123,7 @@ module tcu_ctrl_send_msg #(
     reg    [TCU_CRD_SIZE-1:0] r_curcrd, rin_curcrd;
     reg     [TCU_EP_SIZE-1:0] r_replyep, rin_replyep;
     reg  [TCU_RSIZE_SIZE-1:0] r_replysize, rin_replysize;
-    reg                [31:0] r_replylabel, rin_replylabel;
+    reg                [63:0] r_replylabel, rin_replylabel;
 
     reg r_stall;
 
@@ -179,7 +180,7 @@ module tcu_ctrl_send_msg #(
             r_curcrd     <= {TCU_CRD_SIZE{1'b0}};
             r_replyep    <= {TCU_EP_SIZE{1'b0}};
             r_replysize  <= {TCU_RSIZE_SIZE{1'b0}};
-            r_replylabel <= 32'h0;
+            r_replylabel <= 64'h0;
 
             r_stall <= 1'b0;
             r_sm_mem_en <= 1'b0;
@@ -474,7 +475,7 @@ module tcu_ctrl_send_msg #(
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {(r_size[3:0] - 1), {(NOC_BSEL_SIZE/2){1'b1}}};   //aligned msg header (laddr[3:0]==0), last valid byte: size[3:0] - 1
-                    noc_data0_o = r_size[15:4] + |r_size[3:0] + 1;  //burst length: palyoad + header
+                    noc_data0_o = r_size[15:4] + |r_size[3:0] + 2;  //burst length: palyoad + header
 
                     next_ctrl_sm_state = S_CTRL_SM_SEND_HD2;
                 end
@@ -482,12 +483,24 @@ module tcu_ctrl_send_msg #(
 
             S_CTRL_SM_SEND_HD2: begin
                 if (!noc_stall_i) begin
-                    //send flit with msg header
+                    //send first flit with msg header
                     noc_wrreq_o = 1'b1;
                     noc_burst_o = 1'b1;
                     noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
                     noc_data0_o = {r_replyep, r_crdep, r_size[TCU_MSGLEN_SIZE-1:0], home_chipid_i, HOME_MODID, r_replysize, {TCU_HD_FLAG_SIZE{1'b0}}};
-                    noc_data1_o = {sep_label, r_replylabel};
+                    noc_data1_o = r_replylabel;
+
+                    next_ctrl_sm_state = S_CTRL_SM_SEND_HD3;
+                end
+            end
+
+            S_CTRL_SM_SEND_HD3: begin
+                if (!noc_stall_i) begin
+                    //send second flit with msg header
+                    noc_wrreq_o = 1'b1;
+                    noc_burst_o = 1'b1;
+                    noc_bsel_o = {NOC_BSEL_SIZE{1'b1}};
+                    noc_data0_o = sep_label;
 
                     //skip payload for empty msg
                     if (r_size == 'd0) begin

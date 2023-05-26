@@ -81,29 +81,31 @@ module tcu_ctrl_recv_msg #(
     localparam S_CTRL_RM_READ_EP2           = 5'h02;
     localparam S_CTRL_RM_READ_EP3           = 5'h03;
     localparam S_CTRL_RM_READ_EP4           = 5'h04;
-    localparam S_CTRL_RM_TAKE_HD            = 5'h05;
+    localparam S_CTRL_RM_TAKE_HD1           = 5'h05;
     localparam S_CTRL_RM_CHECK_EP           = 5'h06;
     localparam S_CTRL_RM_FIND_SLOT          = 5'h07;
     localparam S_CTRL_RM_WRITE_PREPARE_MEM1 = 6'h08;
     localparam S_CTRL_RM_WRITE_PREPARE_MEM2 = 6'h09;
-    localparam S_CTRL_RM_WRITE_MEM_HD       = 5'h0A;
-    localparam S_CTRL_RM_WRITE_MEM_PL1      = 5'h0B;
-    localparam S_CTRL_RM_WRITE_MEM_PL2      = 5'h0C;
-    localparam S_CTRL_RM_UPDATE_EP3         = 5'h0D;
-    localparam S_CTRL_RM_UPDATE_EP4         = 5'h0E;
-    localparam S_CTRL_RM_CREATE_REPLYEP1    = 5'h0F;
-    localparam S_CTRL_RM_CREATE_REPLYEP2    = 5'h10;
-    localparam S_CTRL_RM_CREATE_REPLYEP3    = 5'h11;
-    localparam S_CTRL_RM_CREATE_REPLYEP4    = 5'h12;
-    localparam S_CTRL_RM_READ_SEP1          = 5'h13;
-    localparam S_CTRL_RM_READ_SEP2          = 5'h14;
-    localparam S_CTRL_RM_READ_SEP3          = 5'h15;
-    localparam S_CTRL_RM_UPDATE_SEP1        = 5'h16;
-    localparam S_CTRL_RM_UPDATE_SEP2        = 5'h17;
-    localparam S_CTRL_RM_CHECK_VPE          = 5'h18;
-    localparam S_CTRL_RM_UPDATE_VPE         = 5'h19;
-    localparam S_CTRL_RM_WAIT_DRAM          = 5'h1A;
-    localparam S_CTRL_RM_ERROR              = 5'h1B;
+    localparam S_CTRL_RM_WRITE_MEM_HD1      = 5'h0A;
+    localparam S_CTRL_RM_WRITE_MEM_HD2      = 5'h0B;
+    localparam S_CTRL_RM_WRITE_MEM_PL1      = 5'h0C;
+    localparam S_CTRL_RM_WRITE_MEM_PL2      = 5'h0D;
+    localparam S_CTRL_RM_UPDATE_EP3         = 5'h0E;
+    localparam S_CTRL_RM_UPDATE_EP4         = 5'h0F;
+    localparam S_CTRL_RM_CREATE_REPLYEP1    = 5'h10;
+    localparam S_CTRL_RM_CREATE_REPLYEP2    = 5'h11;
+    localparam S_CTRL_RM_CREATE_REPLYEP3    = 5'h12;
+    localparam S_CTRL_RM_CREATE_REPLYEP4    = 5'h13;
+    localparam S_CTRL_RM_READ_SEP1          = 5'h14;
+    localparam S_CTRL_RM_READ_SEP2          = 5'h15;
+    localparam S_CTRL_RM_READ_SEP3          = 5'h16;
+    localparam S_CTRL_RM_UPDATE_SEP1        = 5'h17;
+    localparam S_CTRL_RM_UPDATE_SEP2        = 5'h18;
+    localparam S_CTRL_RM_CHECK_VPE          = 5'h19;
+    localparam S_CTRL_RM_UPDATE_VPE         = 5'h1A;
+    localparam S_CTRL_RM_WAIT_DRAM          = 5'h1B;
+    localparam S_CTRL_RM_DROP_MSG           = 5'h1C;
+    localparam S_CTRL_RM_ERROR              = 5'h1D;
     localparam S_CTRL_RM_FINISH             = 5'h1F;
 
     reg [CTRL_RM_STATES_SIZE-1:0] ctrl_rm_state, next_ctrl_rm_state;
@@ -120,6 +122,7 @@ module tcu_ctrl_recv_msg #(
     //temp hd reg
     reg [63:0] r_hd_0, rin_hd_0;
     reg [63:0] r_hd_1, rin_hd_1;
+    reg [63:0] r_hd_2, rin_hd_2;
 
 
     reg [31:0] r_laddr, rin_laddr;  //addr to store incoming data to memory
@@ -174,8 +177,8 @@ module tcu_ctrl_recv_msg #(
     wire  [TCU_MSGLEN_SIZE-1:0] hd_length     = r_hd_0[TCU_MSGLEN_SIZE+TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_RSIZE_SIZE+TCU_HD_FLAG_SIZE-1 : TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_RSIZE_SIZE+TCU_HD_FLAG_SIZE];
     wire      [TCU_EP_SIZE-1:0] hd_sendep     = r_hd_0[TCU_EP_SIZE+32-1 : 32];
     wire      [TCU_EP_SIZE-1:0] hd_recvep     = r_hd_0[2*TCU_EP_SIZE+32-1 : TCU_EP_SIZE+32];
-    wire                 [31:0] hd_replylabel = r_hd_1[31:0];
-    wire                 [31:0] hd_label      = r_hd_1[63:32];
+    wire                 [63:0] hd_replylabel = r_hd_1;
+    wire                 [63:0] hd_label      = r_hd_2;
 
 
     //some helper wires
@@ -223,6 +226,7 @@ module tcu_ctrl_recv_msg #(
 
             r_hd_0 <= 64'h0;
             r_hd_1 <= 64'h0;
+            r_hd_2 <= 64'h0;
 
             r_rep_0 <= 64'h0;
             r_rep_1 <= 64'h0;
@@ -256,6 +260,7 @@ module tcu_ctrl_recv_msg #(
 
             r_hd_0 <= rin_hd_0;
             r_hd_1 <= rin_hd_1;
+            r_hd_2 <= rin_hd_2;
             
             r_rep_0 <= rin_rep_0;
             r_rep_1 <= rin_rep_1;
@@ -298,6 +303,7 @@ module tcu_ctrl_recv_msg #(
 
         rin_hd_0 = r_hd_0;
         rin_hd_1 = r_hd_1;
+        rin_hd_2 = r_hd_2;
             
         rin_rep_0 = r_rep_0;
         rin_rep_1 = r_rep_1;
@@ -368,13 +374,13 @@ module tcu_ctrl_recv_msg #(
             S_CTRL_RM_READ_EP4: begin
                 //just take read data
                 rin_rep_2 = rm_reg_rdata_i;
-                next_ctrl_rm_state = S_CTRL_RM_TAKE_HD;
+                next_ctrl_rm_state = S_CTRL_RM_TAKE_HD1;
             end
 
             //---------------
-            S_CTRL_RM_TAKE_HD: begin
+            S_CTRL_RM_TAKE_HD1: begin
                 if (noc_wrreq_i) begin
-                    //take incoming header
+                    //take first part of header
                     rin_hd_0 = rm_header_i[63:0];
                     rin_hd_1 = rm_header_i[127:64];
                     next_ctrl_rm_state = S_CTRL_RM_CHECK_EP;
@@ -406,17 +412,20 @@ module tcu_ctrl_recv_msg #(
                         end
                         else begin
                             rin_rm_error = TCU_ERROR_RECV_INV_RPL_EPS;
-                            next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                            noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                            next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                         end
                     end
                     else begin
                         rin_rm_error = TCU_ERROR_RECV_OUT_OF_BOUNDS;
-                        next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                        noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                        next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                     end
                 end
                 else begin
                     rin_rm_error = TCU_ERROR_RECV_GONE;  //invalid ep, drop payload
-                    next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                    noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                    next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                 end
             end
 
@@ -444,7 +453,8 @@ module tcu_ctrl_recv_msg #(
                     //no slot found
                     else begin
                         rin_rm_error = TCU_ERROR_RECV_NO_SPACE;   //error, drop message
-                        next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                        noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                        next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                     end
                 end
                 else begin
@@ -470,7 +480,7 @@ module tcu_ctrl_recv_msg #(
 
                     //only little data, do not prepare mem
                     else begin
-                        next_ctrl_rm_state = S_CTRL_RM_WRITE_MEM_HD;
+                        next_ctrl_rm_state = S_CTRL_RM_WRITE_MEM_HD1;
                     end
                 end
 
@@ -487,7 +497,7 @@ module tcu_ctrl_recv_msg #(
             //if it is a burst, also use burst interface to memory
             S_CTRL_RM_WRITE_PREPARE_MEM2: begin
                 if (!rm_mem_stall_i) begin
-                    next_ctrl_rm_state = S_CTRL_RM_WRITE_MEM_HD;
+                    next_ctrl_rm_state = S_CTRL_RM_WRITE_MEM_HD1;
                 end
 
                 //timeout
@@ -496,7 +506,8 @@ module tcu_ctrl_recv_msg #(
                     if (r_rm_timeout > TIMEOUT_RECV_CYCLES) begin
                         rm_mem_wabort_o = 1'b1;
                         rin_rm_error = TCU_ERROR_TIMEOUT_MEM;
-                        next_ctrl_rm_state = S_CTRL_RM_ERROR;
+                        noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                        next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                     end
                 end
             end
@@ -504,9 +515,43 @@ module tcu_ctrl_recv_msg #(
 
             //---------------
             //write msg header to memory
-            S_CTRL_RM_WRITE_MEM_HD: begin
+            S_CTRL_RM_WRITE_MEM_HD1: begin
                 if (noc_wrreq_i) begin
                     if (!rm_mem_stall_i) begin
+                        noc_fifo_pop_o = 1'b1;
+
+                        //abort receive if bsel is zero
+                        if (noc_bsel_i == {NOC_BSEL_SIZE{1'b0}}) begin
+                            rm_mem_wabort_o = 1'b1;
+                            rin_rm_error = TCU_ERROR_ABORT;
+                            next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                        end
+                        else begin
+                            rin_laddr = r_laddr + 'd16;
+                            rin_size = r_size - 5'd16;     //there is the second part of header which always there
+
+                            next_ctrl_rm_state = S_CTRL_RM_WRITE_MEM_HD2;
+                        end
+                    end
+
+                    //timeout
+                    else if (TIMEOUT_RECV_CYCLES != 32'h0) begin
+                        rin_rm_timeout = r_rm_timeout + 32'd1;
+                        if (r_rm_timeout > TIMEOUT_RECV_CYCLES) begin
+                            rm_mem_wabort_o = 1'b1;
+                            rin_rm_error = TCU_ERROR_TIMEOUT_MEM;
+                            noc_fifo_pop_o = 1'b1;  //drop first part of header to get access to second part
+                            next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
+                        end
+                    end
+                end
+            end
+
+            S_CTRL_RM_WRITE_MEM_HD2: begin
+                if (noc_wrreq_i) begin
+                    if (!rm_mem_stall_i) begin
+                        //take second part of header
+                        rin_hd_2 = rm_header_i[63:0];
                         noc_fifo_pop_o = 1'b1;
 
                         //abort receive if bsel is zero
@@ -543,7 +588,7 @@ module tcu_ctrl_recv_msg #(
                         if (r_rm_timeout > TIMEOUT_RECV_CYCLES) begin
                             rm_mem_wabort_o = 1'b1;
                             rin_rm_error = TCU_ERROR_TIMEOUT_MEM;
-                            next_ctrl_rm_state = S_CTRL_RM_ERROR;
+                            next_ctrl_rm_state = S_CTRL_RM_DROP_MSG;
                         end
                     end
                 end
@@ -808,6 +853,27 @@ module tcu_ctrl_recv_msg #(
             end
 
             //---------------
+            //end up here when error occured before message could be stored
+            //read second part of header before dropping NoC flits
+            S_CTRL_RM_DROP_MSG: begin
+                if (noc_wrreq_i) begin
+                    //take second part of header
+                    rin_hd_2 = rm_header_i[63:0];
+                    noc_fifo_pop_o = 1'b1;
+                    next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                end
+
+                //timeout
+                else if (TIMEOUT_RECV_CYCLES != 32'h0) begin
+                    rin_rm_timeout = r_rm_timeout + 32'd1;
+                    if (r_rm_timeout > TIMEOUT_RECV_CYCLES) begin
+                        rin_rm_error = TCU_ERROR_TIMEOUT_NOC;
+                        next_ctrl_rm_state = S_CTRL_RM_ERROR;
+                    end
+                end
+            end
+
+            //---------------
             //end up here when timeout occured
             S_CTRL_RM_ERROR: begin
                 if (!noc_stall_i && !rm_mem_stall_i) begin
@@ -891,14 +957,15 @@ module tcu_ctrl_recv_msg #(
                 rin_mem_wben = {TCU_MEM_BSEL_SIZE{1'b1}};
             end
 
-            //write msg header
-            else if (noc_wrreq_i && (ctrl_rm_state == S_CTRL_RM_WRITE_MEM_HD)) begin
+            //write first part of msg header
+            else if (noc_wrreq_i && (ctrl_rm_state == S_CTRL_RM_WRITE_MEM_HD1)) begin
                 rin_mem_en = 3'b001;
                 rin_mem_wben = {TCU_MEM_BSEL_SIZE{1'b1}} << r_laddr[3:0];
             end
 
-            //write msg payload
-            else if (noc_wrreq_i && (ctrl_rm_state == S_CTRL_RM_WRITE_MEM_PL1) && !rm_mem_wabort_o) begin
+            //write second part of msg header or msg payload
+            else if (noc_wrreq_i && !rm_mem_wabort_o &&
+                    ((ctrl_rm_state == S_CTRL_RM_WRITE_MEM_HD2) || (ctrl_rm_state == S_CTRL_RM_WRITE_MEM_PL1))) begin
                 if (r_laddr[3:0] == 4'h0) begin
                     rin_mem_en = 3'b001;
                 end else begin

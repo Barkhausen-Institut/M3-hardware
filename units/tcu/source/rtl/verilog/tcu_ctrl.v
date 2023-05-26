@@ -76,7 +76,8 @@ module tcu_ctrl #(
     //triggers from regs
     input  wire                    [2:0] tcu_fire_i,    //Bit 0: fire TCU (unpriv cmd), Bit 1: ext cmd, Bit 3: priv cmd
     input  wire                   [63:0] tcu_fire_cmd_i,
-    input  wire                   [63:0] tcu_fire_data_i,
+    input  wire                   [63:0] tcu_fire_data_addr_i,
+    input  wire                   [63:0] tcu_fire_data_size_i,
     input  wire                   [63:0] tcu_fire_arg1_i,
     input  wire                   [63:0] tcu_fire_cur_vpe_i,
 
@@ -530,10 +531,6 @@ module tcu_ctrl #(
 
 
     //---------------
-    //split data reg
-    wire [31:0] cmd_data_addr = tcu_fire_data_i[31:0];
-    wire [31:0] cmd_data_size = tcu_fire_data_i[63:32];
-
     //split unpriv command reg
     wire   [TCU_OPCODE_SIZE-1:0] cmd_cmd_op   = tcu_fire_cmd_i[TCU_OPCODE_SIZE-1 : 0];
     wire       [TCU_EP_SIZE-1:0] cmd_cmd_ep   = tcu_fire_cmd_i[TCU_EP_SIZE+TCU_OPCODE_SIZE-1 : TCU_OPCODE_SIZE];
@@ -722,14 +719,14 @@ module tcu_ctrl #(
         
         reg          [TCU_EP_SIZE-1:0] r_firecmd_ep, rin_firecmd_ep;                 //currently used ep for command
         reg          [TCU_EP_SIZE-1:0] r_firecmd_replyep, rin_firecmd_replyep;
-        reg                     [31:0] r_firecmd_addr, rin_firecmd_addr;             //data reg
-        reg                     [31:0] r_firecmd_size, rin_firecmd_size;             //data reg
+        reg                     [63:0] r_firecmd_data_addr, rin_firecmd_data_addr;
+        reg                     [31:0] r_firecmd_data_size, rin_firecmd_data_size;
         reg                      [1:0] r_firecmd_perm, rin_firecmd_perm;
         reg                     [31:0] r_firecmd_msgoffset, rin_firecmd_msgoffset;
         reg                     [31:0] r_firecmd_recvaddr, rin_firecmd_recvaddr;
         reg      [TCU_CHIPID_SIZE-1:0] r_firecmd_recvchip, rin_firecmd_recvchip;
         reg        [TCU_PEID_SIZE-1:0] r_firecmd_recvpe, rin_firecmd_recvpe;
-        reg                     [31:0] r_firecmd_replylabel, rin_firecmd_replylabel;
+        reg                     [63:0] r_firecmd_replylabel, rin_firecmd_replylabel;
         reg     [TCU_EXT_ARG_SIZE-1:0] r_firecmd_ext_arg, rin_firecmd_ext_arg;
 
         reg       [TCU_ERROR_SIZE-1:0] r_error_type, rin_error_type;
@@ -786,14 +783,14 @@ module tcu_ctrl #(
 
                 r_firecmd_ep         <= {TCU_EP_SIZE{1'b0}};
                 r_firecmd_replyep    <= {TCU_EP_SIZE{1'b0}};
-                r_firecmd_addr       <= 32'h0;
-                r_firecmd_size       <= 32'h0;
+                r_firecmd_data_addr  <= 64'h0;
+                r_firecmd_data_size  <= 32'h0;
                 r_firecmd_perm       <= 2'h0;
                 r_firecmd_msgoffset  <= 32'h0;
                 r_firecmd_recvaddr   <= 32'h0;
                 r_firecmd_recvchip   <= {TCU_CHIPID_SIZE{1'b0}};
                 r_firecmd_recvpe     <= {TCU_PEID_SIZE{1'b0}};
-                r_firecmd_replylabel <= 32'h0;
+                r_firecmd_replylabel <= 64'h0;
                 r_firecmd_ext_arg    <= {TCU_EXT_ARG_SIZE{1'b0}};
 
                 r_error_type <= {TCU_ERROR_SIZE{1'b0}};
@@ -814,8 +811,8 @@ module tcu_ctrl #(
 
                 r_firecmd_ep         <= rin_firecmd_ep;
                 r_firecmd_replyep    <= rin_firecmd_replyep;
-                r_firecmd_addr       <= rin_firecmd_addr;
-                r_firecmd_size       <= rin_firecmd_size;
+                r_firecmd_data_addr  <= rin_firecmd_data_addr;
+                r_firecmd_data_size  <= rin_firecmd_data_size;
                 r_firecmd_perm       <= rin_firecmd_perm;
                 r_firecmd_msgoffset  <= rin_firecmd_msgoffset;
                 r_firecmd_recvaddr   <= rin_firecmd_recvaddr;
@@ -837,17 +834,17 @@ module tcu_ctrl #(
 
         assign mas_start  = r_firecmd_start ? 1'b1 : noc_req_start_noc_send;
         assign mas_opcode = r_firecmd_start ? r_firecmd_opcode : ((reqfifo_mode == MODE_READ_REQ_2) ? TCU_OPCODE_WRITE_RSP_2 : TCU_OPCODE_WRITE_RSP);
-        assign mas_laddr  = r_firecmd_start ? r_firecmd_addr : reqfifo_addr;
+        assign mas_laddr  = r_firecmd_start ? r_firecmd_data_addr[31:0] : reqfifo_addr;
         assign mas_raddr  = r_firecmd_start ? r_firecmd_recvaddr : reqfifo_retaddr;
-        assign mas_size   = r_firecmd_start ? r_firecmd_size : reqfifo_read_size;
+        assign mas_size   = r_firecmd_start ? r_firecmd_data_size : reqfifo_read_size;
         assign mas_chipid = r_firecmd_start ? r_firecmd_recvchip : reqfifo_chipid;
         assign mas_modid  = r_firecmd_start ? r_firecmd_recvpe : reqfifo_modid;
 
         assign marq_start  = r_firecmd_start;
         assign marq_opcode = r_firecmd_opcode;
-        assign marq_laddr  = r_firecmd_addr;
+        assign marq_laddr  = r_firecmd_data_addr[31:0];
         assign marq_raddr  = r_firecmd_recvaddr;
-        assign marq_size   = r_firecmd_size;
+        assign marq_size   = r_firecmd_data_size;
         assign marq_chipid = r_firecmd_recvchip;
         assign marq_modid  = r_firecmd_recvpe;
 
@@ -879,8 +876,8 @@ module tcu_ctrl #(
             rin_firecmd_opcode     = r_firecmd_opcode;
             rin_firecmd_ep         = r_firecmd_ep;
             rin_firecmd_replyep    = r_firecmd_replyep;
-            rin_firecmd_addr       = r_firecmd_addr;
-            rin_firecmd_size       = r_firecmd_size;
+            rin_firecmd_data_addr  = r_firecmd_data_addr;
+            rin_firecmd_data_size  = r_firecmd_data_size;
             rin_firecmd_perm       = r_firecmd_perm;
             rin_firecmd_msgoffset  = r_firecmd_msgoffset;
             rin_firecmd_recvaddr   = r_firecmd_recvaddr;
@@ -906,8 +903,8 @@ module tcu_ctrl #(
                     if (tcu_fire_i == 3'b001) begin
 
                         rin_firecmd_ep = cmd_cmd_ep;
-                        rin_firecmd_addr = cmd_data_addr;
-                        rin_firecmd_size = cmd_data_size;
+                        rin_firecmd_data_addr = tcu_fire_data_addr_i;
+                        rin_firecmd_data_size = tcu_fire_data_size_i[31:0];
                         rin_firecmd_perm = 2'h0;
 
                         //read opcode
@@ -986,8 +983,8 @@ module tcu_ctrl #(
                 S_CTRL_MEM_WRITE_WAIT_INITEP: begin
                     if (read_initep_done) begin
                         `TCU_DEBUG(("CMD_WRITE, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
-                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
-                        tcu_log_unpriv_data = {mep_pe, r_firecmd_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_WRITE};
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
+                        tcu_log_unpriv_data = {mep_pe, r_firecmd_data_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_WRITE};
 
                         next_ctrl_state = S_CTRL_MEM_WRITE_CHECK_INITEP;
                     end
@@ -1004,12 +1001,12 @@ module tcu_ctrl #(
                             if (mep_memflag & TCU_MEMFLAG_W) begin
 
                                 //check if data fits to mem at ep
-                                if ((r_firecmd_size + r_firecmd_recvaddr) <= mep_size) begin
+                                if ((r_firecmd_data_size + r_firecmd_recvaddr) <= mep_size) begin
 
                                     //check if there is a page boundary in addr range
                                     if (!(TCU_ENABLE_VIRT_ADDR && tcu_features_virt_addr_i) ||
-                                        (({{TCU_TLB_PHYSPAGE_SIZE{1'b0}}, r_firecmd_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]} + r_firecmd_size) <= TCU_PAGE_SIZE_4KB)) begin
-                                        if (r_firecmd_size != 'd0) begin
+                                        (({{TCU_TLB_PHYSPAGE_SIZE{1'b0}}, r_firecmd_data_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]} + r_firecmd_data_size) <= TCU_PAGE_SIZE_4KB)) begin
+                                        if (r_firecmd_data_size != 'd0) begin
                                             rin_firecmd_recvaddr = mep_addr + r_firecmd_recvaddr;
                                             rin_firecmd_recvpe = mep_pe;
                                             rin_firecmd_recvchip = mep_chip;
@@ -1072,7 +1069,7 @@ module tcu_ctrl #(
                     if (TCU_ENABLE_VIRT_ADDR) begin
                         if (unpriv_tlb_read_done) begin
                             if (unpriv_tlb_read_error == TCU_ERROR_NONE) begin
-                                rin_firecmd_addr = {unpriv_tlb_physpage, r_firecmd_addr[TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE-1 : 0]}; //keep lower bits from virt addr
+                                rin_firecmd_data_addr = {unpriv_tlb_physpage, r_firecmd_data_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]}; //keep lower bits from virt addr
                                 next_ctrl_state = S_CTRL_MEM_WRITE_START;
                             end
                             else begin
@@ -1125,8 +1122,8 @@ module tcu_ctrl #(
                 S_CTRL_MEM_READ_WAIT_INITEP: begin
                     if (read_initep_done) begin
                         `TCU_DEBUG(("CMD_READ, trg-(chip:mod): %d:0x%x, ep: %0d, local addr: 0x%x, addr offset: 0x%x, size: %0d",
-                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_recvaddr, r_firecmd_size));
-                        tcu_log_unpriv_data = {mep_pe, r_firecmd_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_READ};
+                            mep_chip, mep_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_recvaddr, r_firecmd_data_size));
+                        tcu_log_unpriv_data = {mep_pe, r_firecmd_data_size[19:0], r_firecmd_recvaddr[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_READ};
 
                         next_ctrl_state = S_CTRL_MEM_READ_CHECK_INITEP;
                     end
@@ -1143,12 +1140,12 @@ module tcu_ctrl #(
                             if (mep_memflag & TCU_MEMFLAG_R) begin
 
                                 //check if data fits to mem at ep
-                                if ((r_firecmd_size + r_firecmd_recvaddr) <= mep_size) begin
+                                if ((r_firecmd_data_size + r_firecmd_recvaddr) <= mep_size) begin
 
                                     //check if there is a page boundary in addr range
                                     if (!(TCU_ENABLE_VIRT_ADDR && tcu_features_virt_addr_i) ||
-                                        (({{TCU_TLB_PHYSPAGE_SIZE{1'b0}}, r_firecmd_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]} + r_firecmd_size) <= TCU_PAGE_SIZE_4KB)) begin
-                                        if (r_firecmd_size != 'd0) begin
+                                        (({{TCU_TLB_PHYSPAGE_SIZE{1'b0}}, r_firecmd_data_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]} + r_firecmd_data_size) <= TCU_PAGE_SIZE_4KB)) begin
+                                        if (r_firecmd_data_size != 'd0) begin
                                             rin_firecmd_recvaddr = mep_addr + r_firecmd_recvaddr;
                                             rin_firecmd_recvpe = mep_pe;
                                             rin_firecmd_recvchip = mep_chip;
@@ -1211,7 +1208,7 @@ module tcu_ctrl #(
                     if (TCU_ENABLE_VIRT_ADDR) begin
                         if (unpriv_tlb_read_done) begin
                             if (unpriv_tlb_read_error == TCU_ERROR_NONE) begin
-                                rin_firecmd_addr = {unpriv_tlb_physpage, r_firecmd_addr[TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE-1 : 0]}; //keep lower bits from virt addr
+                                rin_firecmd_data_addr = {unpriv_tlb_physpage, r_firecmd_data_addr[TCU_PAGEOFFSET_SIZE_4KB-1:0]}; //keep lower bits from virt addr
                                 next_ctrl_state = S_CTRL_MEM_READ_START;
                             end
                             else begin
@@ -1267,8 +1264,8 @@ module tcu_ctrl #(
                     end
                     else if (read_initep_done) begin
                         `TCU_DEBUG(("CMD_SEND, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, size: %0d",
-                            epdata_1[TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_PEID_SIZE+TCU_EP_SIZE], epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_addr, r_firecmd_size));
-                        tcu_log_unpriv_data = {epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_size, r_firecmd_addr, r_firecmd_ep, TCU_LOG_CMD_SEND};
+                            epdata_1[TCU_CHIPID_SIZE+TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_PEID_SIZE+TCU_EP_SIZE], epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_ep, r_firecmd_data_addr, r_firecmd_data_size));
+                        tcu_log_unpriv_data = {epdata_1[TCU_PEID_SIZE+TCU_EP_SIZE-1:TCU_EP_SIZE], r_firecmd_data_size, r_firecmd_data_addr[31:0], r_firecmd_ep, TCU_LOG_CMD_SEND};
 
                         next_ctrl_state = S_CTRL_SEND_MSG_START;
                     end
@@ -1368,8 +1365,8 @@ module tcu_ctrl #(
                 S_CTRL_REPLY_MSG: begin
                     if (rpm_log_valid) begin
                         `TCU_DEBUG(("CMD_REPLY, trg-(chip:mod): %d:0x%x, send-ep: %0d, local addr: 0x%x, msg offset: 0x%x, size: %0d",
-                            rpm_log_rpl_chip, rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_addr, r_firecmd_msgoffset, r_firecmd_size));
-                        tcu_log_unpriv_data = {rpm_log_rpl_pe, r_firecmd_size[19:0], r_firecmd_msgoffset[19:0], r_firecmd_addr, r_firecmd_ep[7:0], TCU_LOG_CMD_REPLY};
+                            rpm_log_rpl_chip, rpm_log_rpl_pe, r_firecmd_ep, r_firecmd_data_addr, r_firecmd_msgoffset, r_firecmd_data_size));
+                        tcu_log_unpriv_data = {rpm_log_rpl_pe, r_firecmd_data_size[19:0], r_firecmd_msgoffset[19:0], r_firecmd_data_addr[31:0], r_firecmd_ep[7:0], TCU_LOG_CMD_REPLY};
                     end
 
                     rin_error_type = rpm_error;
@@ -2329,8 +2326,8 @@ module tcu_ctrl #(
                         //receive new message
                         else if (TCU_ENABLE_CMDS && (noc_rx_mode_i == MODE_TCU_MSG)) begin
 
-                            //should be a burst of at least 1 flit (header + payload)
-                            if (noc_rx_burst_i && (noc_rx_data0_i >= 64'h1)) begin
+                            //should be a burst of at least 2 flit (header + payload)
+                            if (noc_rx_burst_i && (noc_rx_data0_i >= 64'h2)) begin
                                 rin_tmp_recvep = noc_rx_addr_i[TCU_EP_SIZE-1:0];  //read recv ep
                                 noc_rx_stall_o = 1'b0;  //already release packet, because we need the NoC payload
 
@@ -2870,8 +2867,8 @@ module tcu_ctrl #(
             //trigger
             .sm_start_i              (CMD_CTRL.r_firecmd_start),
             .sm_opcode_i             (CMD_CTRL.r_firecmd_opcode),
-            .sm_laddr_i              (CMD_CTRL.r_firecmd_addr),
-            .sm_size_i               (CMD_CTRL.r_firecmd_size),
+            .sm_laddr_i              (CMD_CTRL.r_firecmd_data_addr[31:0]),
+            .sm_size_i               (CMD_CTRL.r_firecmd_data_size),
             .sm_sendep_i             (CMD_CTRL.r_firecmd_ep),
             .sm_epdata_i             ({CMD_CTRL.epdata_2, CMD_CTRL.epdata_1, CMD_CTRL.epdata_0}),
             .sm_replyep_i            (CMD_CTRL.r_firecmd_replyep),
@@ -3022,8 +3019,8 @@ module tcu_ctrl #(
             .rpm_start_i             (CMD_CTRL.r_firecmd_start),
             .rpm_opcode_i            (CMD_CTRL.r_firecmd_opcode),
             .rpm_rmsgoffset_i        (CMD_CTRL.r_firecmd_msgoffset),
-            .rpm_laddr_i             (CMD_CTRL.r_firecmd_addr),
-            .rpm_size_i              (CMD_CTRL.r_firecmd_size),
+            .rpm_laddr_i             (CMD_CTRL.r_firecmd_data_addr[31:0]),
+            .rpm_size_i              (CMD_CTRL.r_firecmd_data_size),
             .rpm_recvep_i            (CMD_CTRL.r_firecmd_ep),
             .rpm_epdata_i            ({CMD_CTRL.epdata_2, CMD_CTRL.epdata_1, CMD_CTRL.epdata_0}),
             .rpm_cur_vpe_i           (tcu_fire_cur_vpe_i[31:0]),
@@ -3294,7 +3291,7 @@ module tcu_ctrl #(
             //TLB IF
             .unpriv_tlb_read_i       (CMD_CTRL.unpriv_tlb_read),
             .unpriv_tlb_vpeid_i      (tcu_fire_cur_vpe_i[TCU_TLB_VPEID_SIZE-1:0]),
-            .unpriv_tlb_virtpage_i   (CMD_CTRL.r_firecmd_addr[TCU_VIRTADDR_SIZE-1 : TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE]), //only need virt page number
+            .unpriv_tlb_virtpage_i   (CMD_CTRL.r_firecmd_data_addr[TCU_VIRTADDR_SIZE-1 : TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE]), //only need virt page number
             .unpriv_tlb_read_perm_i  (CMD_CTRL.r_firecmd_perm),
             .unpriv_tlb_physpage_o   (unpriv_tlb_physpage),
             .unpriv_tlb_active_o     (unpriv_tlb_active),

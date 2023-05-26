@@ -236,7 +236,8 @@ module tcu_top #(
 
     wire                    [2:0] tcu_fire_s;
     wire                   [63:0] tcu_fire_cmd_s;
-    wire                   [63:0] tcu_fire_data_s;
+    wire                   [63:0] tcu_fire_data_addr_s;
+    wire                   [63:0] tcu_fire_data_size_s;
     wire                   [63:0] tcu_fire_arg1_s;
     wire                   [63:0] tcu_fire_cur_vpe_s;
 
@@ -375,7 +376,8 @@ module tcu_top #(
 
         .tcu_fire_o               (tcu_fire_s),
         .tcu_fire_cmd_o           (tcu_fire_cmd_s),
-        .tcu_fire_data_o          (tcu_fire_data_s),
+        .tcu_fire_data_addr_o     (tcu_fire_data_addr_s),
+        .tcu_fire_data_size_o     (tcu_fire_data_size_s),
         .tcu_fire_arg1_o          (tcu_fire_arg1_s),
         .tcu_fire_cur_vpe_o       (tcu_fire_cur_vpe_s),
 
@@ -947,7 +949,8 @@ module tcu_top #(
         //tcu trigger
         .tcu_fire_i               (tcu_fire_s),
         .tcu_fire_cmd_i           (tcu_fire_cmd_s),
-        .tcu_fire_data_i          (tcu_fire_data_s),
+        .tcu_fire_data_addr_i     (tcu_fire_data_addr_s),
+        .tcu_fire_data_size_i     (tcu_fire_data_size_s),
         .tcu_fire_arg1_i          (tcu_fire_arg1_s),
         .tcu_fire_cur_vpe_i       (tcu_fire_cur_vpe_s),
 

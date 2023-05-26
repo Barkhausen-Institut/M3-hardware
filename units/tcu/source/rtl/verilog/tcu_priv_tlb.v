@@ -23,16 +23,18 @@ module tcu_priv_tlb #(
     localparam TLB_STATES_SIZE       = 4;
     localparam S_TLB_IDLE            = 4'h0;
     localparam S_TLB_WRITE_START     = 4'h1;
-    localparam S_TLB_WRITE_OCCUP     = 4'h2;
-    localparam S_TLB_WRITE_OVERWRITE = 4'h3;
-    localparam S_TLB_READ_START      = 4'h4;
-    localparam S_TLB_READ_CHECK      = 4'h5;
-    localparam S_TLB_DEL_START       = 4'h6;
-    localparam S_TLB_DEL_CHECK       = 4'h7;
-    localparam S_TLB_DEL_REMOVE      = 4'h8;
-    localparam S_TLB_CLEAR_START     = 4'h9;
-    localparam S_TLB_CLEAR_CHECK     = 4'hA;
-    localparam S_TLB_CLEAR_REMOVE    = 4'hB;
+    localparam S_TLB_WRITE_CHECK     = 4'h2;
+    localparam S_TLB_WRITE_NEW       = 4'h3;
+    localparam S_TLB_WRITE_OCCUP     = 4'h4;
+    localparam S_TLB_WRITE_OVERWRITE = 4'h5;
+    localparam S_TLB_READ_START      = 4'h6;
+    localparam S_TLB_READ_CHECK      = 4'h7;
+    localparam S_TLB_DEL_START       = 4'h8;
+    localparam S_TLB_DEL_CHECK       = 4'h9;
+    localparam S_TLB_DEL_REMOVE      = 4'hA;
+    localparam S_TLB_CLEAR_START     = 4'hB;
+    localparam S_TLB_CLEAR_CHECK     = 4'hC;
+    localparam S_TLB_CLEAR_REMOVE    = 4'hD;
     localparam S_TLB_FINISH          = 4'hF;
 
     reg [TLB_STATES_SIZE-1:0] tlb_state, next_tlb_state;
@@ -74,7 +76,7 @@ module tcu_priv_tlb #(
     endfunction
 
 
-    //hold already used entries in reg
+    //hold already used entries in reg (todo: store permission flags in reg and use them instead)
     reg [TLB_DEPTH-1:0] r_tlb_valid_entry, rin_tlb_valid_entry;
 
     reg    [TLB_ADDR_WIDTH-1:0] r_tlb_mem_addr, rin_tlb_mem_addr;
@@ -219,8 +221,13 @@ module tcu_priv_tlb #(
 
                     case(tlb_cmd_i)
                         TCU_TLB_CMD_WRITE_ENTRY: begin
-                            rin_tlb_mem_addr = tlb_empty ? {TLB_ADDR_WIDTH{1'b0}} : last_valid_entry_incr;
-                            next_tlb_state = S_TLB_WRITE_START;
+                            if (tlb_empty) begin
+                                rin_tlb_mem_addr = {TLB_ADDR_WIDTH{1'b0}};
+                                next_tlb_state = S_TLB_WRITE_OVERWRITE;
+                            end else begin
+                                rin_tlb_mem_addr = first_valid_entry;
+                                next_tlb_state = S_TLB_WRITE_START;
+                            end
                         end
 
                         TCU_TLB_CMD_READ_ENTRY: begin
@@ -245,6 +252,41 @@ module tcu_priv_tlb #(
             //---------------
             //create new entry
             S_TLB_WRITE_START: begin
+                tlb_mem_en = 1'b1;
+                rin_tlb_mem_addr = r_tlb_mem_addr + 1;
+                next_tlb_state = S_TLB_WRITE_CHECK;
+            end
+
+            //check if there is already an entry with this virt. page
+            S_TLB_WRITE_CHECK: begin
+                //only load next entry if there is one
+                if (r_tlb_valid_entry[r_tlb_mem_addr]) begin
+                    tlb_mem_en = 1'b1;
+                end
+
+                //check vpeid and virt addr
+                if (r2_tlb_valid_entry_bit &&
+                    (!(TCU_ENABLE_VIRT_PES && tcu_features_virt_pes_i) || (tlb_rdata_vpeid == tlb_wdata_vpeid)) &&
+                    (tlb_rdata_virtpage == tlb_wdata_virtpage)) begin
+                    //TLB hit - update entry
+                    rin_tlb_mem_addr = r_tlb_mem_addr - 1;    //decr because we already incr the addr
+                    next_tlb_state = S_TLB_WRITE_OVERWRITE;
+                end
+
+                //check next entry within range of valid entries
+                //first valid entry is always checked first, this stops wrapping around
+                else if ((r_tlb_mem_addr > first_valid_entry) && (r_tlb_mem_addr <= last_valid_entry)) begin
+                    rin_tlb_mem_addr = r_tlb_mem_addr + 1;
+                end
+
+                //entry not found, create new one
+                else begin
+                    rin_tlb_mem_addr = last_valid_entry_incr;
+                    next_tlb_state = S_TLB_WRITE_NEW;
+                end
+            end
+
+            S_TLB_WRITE_NEW: begin
                 tlb_mem_en = 1'b1;
 
                 //start with the (most likely) first free entry in TLB
@@ -382,7 +424,7 @@ module tcu_priv_tlb #(
                     tlb_mem_en = 1'b1;
                 end
 
-                //check vpeid and virt addr
+                //check vpeid, virt addr
                 if (r2_tlb_valid_entry_bit &&
                     (!(TCU_ENABLE_VIRT_PES && tcu_features_virt_pes_i) || (tlb_rdata_vpeid == tlb_wdata_vpeid)) &&
                     (tlb_rdata_virtpage == tlb_wdata_virtpage)) begin
@@ -442,9 +484,7 @@ module tcu_priv_tlb #(
             end
 
             S_TLB_CLEAR_REMOVE: begin
-                //tlb_mem_en = 1'b1;
                 rin_tlb_mem_addr = r_tlb_mem_addr + 1;
-
                 rin_tlb_valid_entry[r_tlb_mem_addr] = 1'b0;
                 next_tlb_state = S_TLB_CLEAR_START;
             end

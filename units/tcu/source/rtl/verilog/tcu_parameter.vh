@@ -20,6 +20,7 @@ parameter TCU_LOG_DATA_SIZE = 128-32,   //32 bit already taken by time stamp
 
 //---------------
 //registers
+parameter TCU_VERSION          = 8'h1,
 parameter TCU_EP_REG_COUNT     = 'd128,
 parameter TCU_CFG_REG_COUNT    = 'd32,  //max count, could be less
 parameter TCU_STATUS_REG_COUNT = 'd5,
@@ -27,7 +28,7 @@ parameter TCU_LOG_REG_COUNT    = 1<<17, //do not edit, fixed block RAM
 parameter TCU_PRINT_REG_COUNT  = 'd32,
 
 parameter TCU_EP_REG_SIZE      = 'h18,
-parameter TCU_HD_REG_SIZE      = 'h10,
+parameter TCU_HD_REG_SIZE      = 'h20,
 parameter TCU_CFG_REG_SIZE     = 'h8,
 parameter TCU_STATUS_REG_SIZE  = 'h8,
 parameter TCU_PRINT_REG_SIZE   = 'h8,
@@ -40,13 +41,14 @@ parameter TCU_REGADDR_EXT_CMD   = TCU_REGADDR_START + 32'h0000_0008,
 
 //unpriv. regs
 parameter TCU_REGADDR_COMMAND   = TCU_REGADDR_START + 32'h0000_0010,
-parameter TCU_REGADDR_DATA      = TCU_REGADDR_START + 32'h0000_0018,
-parameter TCU_REGADDR_ARG1      = TCU_REGADDR_START + 32'h0000_0020,
-parameter TCU_REGADDR_CUR_TIME  = TCU_REGADDR_START + 32'h0000_0028,
-parameter TCU_REGADDR_PRINT     = TCU_REGADDR_START + 32'h0000_0030,
+parameter TCU_REGADDR_DATA_ADDR = TCU_REGADDR_START + 32'h0000_0018,
+parameter TCU_REGADDR_DATA_SIZE = TCU_REGADDR_START + 32'h0000_0020,
+parameter TCU_REGADDR_ARG1      = TCU_REGADDR_START + 32'h0000_0028,
+parameter TCU_REGADDR_CUR_TIME  = TCU_REGADDR_START + 32'h0000_0030,
+parameter TCU_REGADDR_PRINT     = TCU_REGADDR_START + 32'h0000_0038,
 
 //ep regs
-parameter TCU_REGADDR_EP_START = TCU_REGADDR_START + 32'h0000_0038,
+parameter TCU_REGADDR_EP_START = TCU_REGADDR_START + 32'h0000_0040,
 
 //print buffer
 parameter TCU_REGADDR_PRINT_BUF = TCU_REGADDR_EP_START + TCU_EP_REG_COUNT*TCU_EP_REG_SIZE,
@@ -225,17 +227,21 @@ parameter TCU_STATUS_SIZE = 64,
 
 parameter TCU_FLITCOUNT_SIZE = 32,
 
-parameter TCU_VIRTADDR_SIZE = 32,
+parameter TCU_VIRTADDR_SIZE = 64,
 parameter TCU_PHYSADDR_SIZE = 32,
 
 parameter TCU_TLB_VPEID_SIZE    = TCU_VPEID_SIZE,
-parameter TCU_TLB_VIRTPAGE_SIZE = 20,
+parameter TCU_TLB_VIRTPAGE_SIZE = 52,
 parameter TCU_TLB_PHYSPAGE_SIZE = 20,
-parameter TCU_TLB_PERM_SIZE     = 5,
+parameter TCU_TLB_PERM_SIZE     = 3,
 parameter TCU_TLB_DATA_SIZE     = TCU_TLB_PERM_SIZE+TCU_TLB_PHYSPAGE_SIZE+TCU_TLB_VIRTPAGE_SIZE+TCU_TLB_VPEID_SIZE,
 
+parameter TCU_TLB_PERM_READ  = TCU_MEMFLAG_R[TCU_TLB_PERM_SIZE-1:0],
+parameter TCU_TLB_PERM_WRITE = TCU_MEMFLAG_W[TCU_TLB_PERM_SIZE-1:0],
+parameter TCU_TLB_PERM_FIXED = 3'b100,
+
 parameter TCU_PAGE_SIZE_4KB       = 32'h1000, //4096
-parameter TCU_PAGEOFFSET_SIZE_4KB = TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE,    //12
+parameter TCU_PAGEOFFSET_SIZE_4KB = TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE,    //12 (same for virt. addr.)
 
 //data width of core request, without type field
 parameter TCU_CORE_REQ_FORMSG_SIZE = TCU_VPEID_SIZE+TCU_EP_SIZE  //32

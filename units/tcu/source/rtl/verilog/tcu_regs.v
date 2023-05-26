@@ -23,7 +23,8 @@ module tcu_regs #(
     //triggers to tcu_ctrl
     output wire                    [2:0] tcu_fire_o,    //Bit 0: fire TCU (unpriv cmd), Bit 1: ext cmd, Bit 3: priv cmd
     output wire                   [63:0] tcu_fire_cmd_o,
-    output wire                   [63:0] tcu_fire_data_o,
+    output wire                   [63:0] tcu_fire_data_addr_o,
+    output wire                   [63:0] tcu_fire_data_size_o,
     output wire                   [63:0] tcu_fire_arg1_o,
     output wire                   [63:0] tcu_fire_cur_vpe_o,
 
@@ -208,18 +209,21 @@ module tcu_regs #(
 
         //---------------
         //register
-        reg [63:0] r_tcu_reg_features, rin_tcu_reg_features;
+        reg [63:0] r_tcu_reg_features;
+        reg [31:0] rin_tcu_reg_features;    //upper 32 bits cannot be changed
         reg [63:0] r_tcu_reg_ext_cmd, rin_tcu_reg_ext_cmd;
 
         reg [63:0] r_tcu_reg_command, rin_tcu_reg_command;
-        reg [63:0] r_tcu_reg_data, rin_tcu_reg_data;
+        reg [63:0] r_tcu_reg_data_addr, rin_tcu_reg_data_addr;
+        reg [63:0] r_tcu_reg_data_size, rin_tcu_reg_data_size;
         reg [63:0] r_tcu_reg_arg1, rin_tcu_reg_arg1;
         reg [64+TIMER_SCALE-1:0] r_tcu_reg_cur_time;
         reg [63:0] r_tcu_reg_print, rin_tcu_reg_print;
 
         reg  [2:0] r_tcu_fire, rin_tcu_fire;
         reg [63:0] r_tcu_fire_cmd, rin_tcu_fire_cmd;
-        reg [63:0] r_tcu_fire_data, rin_tcu_fire_data;
+        reg [63:0] r_tcu_fire_data_addr, rin_tcu_fire_data_addr;
+        reg [63:0] r_tcu_fire_data_size, rin_tcu_fire_data_size;
         reg [63:0] r_tcu_fire_arg1, rin_tcu_fire_arg1;
 
         wire tcu_features_kernel = r_tcu_reg_features[0];
@@ -234,11 +238,11 @@ module tcu_regs #(
         //global reset: do not reset features reg and cur_time
         always @(posedge clk_i or negedge reset_n_i) begin
             if (reset_n_i == 1'b0) begin
-                r_tcu_reg_features <= 64'h1;
+                r_tcu_reg_features <= {{(64-32-TCU_VERSION){1'b0}}, TCU_VERSION, 32'h1};
                 r_tcu_reg_cur_time <= {(64+TIMER_SCALE){1'b0}};
             end
             else begin
-                r_tcu_reg_features <= rin_tcu_reg_features;
+                r_tcu_reg_features <= {r_tcu_reg_features[63:32], rin_tcu_reg_features};
                 r_tcu_reg_cur_time <= cur_time;
             end
         end
@@ -248,28 +252,32 @@ module tcu_regs #(
             if (reset_sync_n == 1'b0) begin
                 r_tcu_reg_ext_cmd <= 64'h0;
 
-                r_tcu_reg_command <= 64'h0;
-                r_tcu_reg_data    <= 64'h0;
-                r_tcu_reg_arg1    <= 64'h0;
-                r_tcu_reg_print   <= 64'h0;
+                r_tcu_reg_command   <= 64'h0;
+                r_tcu_reg_data_addr <= 64'h0;
+                r_tcu_reg_data_size <= 64'h0;
+                r_tcu_reg_arg1      <= 64'h0;
+                r_tcu_reg_print     <= 64'h0;
 
-                r_tcu_fire      <= 3'h0;
-                r_tcu_fire_cmd  <= 64'h0;
-                r_tcu_fire_data <= 64'h0;
-                r_tcu_fire_arg1 <= 64'h0;
+                r_tcu_fire           <= 3'h0;
+                r_tcu_fire_cmd       <= 64'h0;
+                r_tcu_fire_data_addr <= 64'h0;
+                r_tcu_fire_data_size <= 64'h0;
+                r_tcu_fire_arg1      <= 64'h0;
             end
             else begin
                 r_tcu_reg_ext_cmd <= rin_tcu_reg_ext_cmd;
 
-                r_tcu_reg_command <= rin_tcu_reg_command;
-                r_tcu_reg_data    <= rin_tcu_reg_data;
-                r_tcu_reg_arg1    <= rin_tcu_reg_arg1;
-                r_tcu_reg_print   <= rin_tcu_reg_print;
+                r_tcu_reg_command   <= rin_tcu_reg_command;
+                r_tcu_reg_data_addr <= rin_tcu_reg_data_addr;
+                r_tcu_reg_data_size <= rin_tcu_reg_data_size;
+                r_tcu_reg_arg1      <= rin_tcu_reg_arg1;
+                r_tcu_reg_print     <= rin_tcu_reg_print;
 
-                r_tcu_fire      <= rin_tcu_fire;
-                r_tcu_fire_cmd  <= rin_tcu_fire_cmd;
-                r_tcu_fire_data <= rin_tcu_fire_data;
-                r_tcu_fire_arg1 <= rin_tcu_fire_arg1;
+                r_tcu_fire           <= rin_tcu_fire;
+                r_tcu_fire_cmd       <= rin_tcu_fire_cmd;
+                r_tcu_fire_data_addr <= rin_tcu_fire_data_addr;
+                r_tcu_fire_data_size <= rin_tcu_fire_data_size;
+                r_tcu_fire_arg1      <= rin_tcu_fire_arg1;
             end
         end
 
@@ -278,7 +286,8 @@ module tcu_regs #(
         always @* begin
             rin_tcu_fire = 3'h0;
             rin_tcu_fire_cmd = r_tcu_fire_cmd;
-            rin_tcu_fire_data = r_tcu_fire_data;
+            rin_tcu_fire_data_addr = r_tcu_fire_data_addr;
+            rin_tcu_fire_data_size = r_tcu_fire_data_size;
             rin_tcu_fire_arg1 = r_tcu_fire_arg1;           
             EP_MEM.rin_ep_mem_en = 1'b0;
             EP_MEM.rin_ep_mem_addr = {EP_MEM_ADDRWIDTH{1'b0}};
@@ -286,11 +295,12 @@ module tcu_regs #(
             rin_print_buf_en = 1'b0;
             rin_print_buf_addr = {PRINT_BUF_ADDRWIDTH{1'b0}};
 
-            rin_tcu_reg_features = r_tcu_reg_features;
+            rin_tcu_reg_features = r_tcu_reg_features[31:0];
             rin_tcu_reg_ext_cmd = r_tcu_reg_ext_cmd;
             
             rin_tcu_reg_command = r_tcu_reg_command;
-            rin_tcu_reg_data = r_tcu_reg_data;
+            rin_tcu_reg_data_addr = r_tcu_reg_data_addr;
+            rin_tcu_reg_data_size = r_tcu_reg_data_size;
             rin_tcu_reg_arg1 = r_tcu_reg_arg1;
             rin_tcu_reg_print = r_tcu_reg_print;
 
@@ -310,7 +320,7 @@ module tcu_regs #(
                 case (reg_addr_i)
                     TCU_REGADDR_FEATURES: begin
                         if (reg_ext_en) begin
-                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE/2; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
                                     rin_tcu_reg_features[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
@@ -352,7 +362,8 @@ module tcu_regs #(
                                 end
                             end
 
-                            rin_tcu_fire_data = r_tcu_reg_data;
+                            rin_tcu_fire_data_addr = r_tcu_reg_data_addr;
+                            rin_tcu_fire_data_size = r_tcu_reg_data_size;
                             rin_tcu_fire_arg1 = r_tcu_reg_arg1;
 
                             //command is started when lower 32 bit of cmd reg are written with valid opcode
@@ -372,11 +383,21 @@ module tcu_regs #(
                         end
                     end
 
-                    TCU_REGADDR_DATA: begin
+                    TCU_REGADDR_DATA_ADDR: begin
                         if (!reg_ext_en) begin
                             for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
-                                    rin_tcu_reg_data[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
+                                    rin_tcu_reg_data_addr[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
+                                end
+                            end
+                        end
+                    end
+
+                    TCU_REGADDR_DATA_SIZE: begin
+                        if (!reg_ext_en) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                                if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
+                                    rin_tcu_reg_data_size[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
                             end
                         end
@@ -462,8 +483,12 @@ module tcu_regs #(
                         rin_reg_rdata = r_tcu_reg_command;
                     end
 
-                    TCU_REGADDR_DATA: begin
-                        rin_reg_rdata = r_tcu_reg_data;
+                    TCU_REGADDR_DATA_ADDR: begin
+                        rin_reg_rdata = r_tcu_reg_data_addr;
+                    end
+
+                    TCU_REGADDR_DATA_SIZE: begin
+                        rin_reg_rdata = r_tcu_reg_data_size;
                     end
 
                     TCU_REGADDR_ARG1: begin
@@ -528,11 +553,12 @@ module tcu_regs #(
         end
 
 
-        assign tcu_fire_o         = r_tcu_fire;
-        assign tcu_fire_cmd_o     = r_tcu_fire_cmd;
-        assign tcu_fire_data_o    = r_tcu_fire_data;
-        assign tcu_fire_arg1_o    = r_tcu_fire_arg1;
-        assign tcu_fire_cur_vpe_o = TCU_VPEID_INVALID;
+        assign tcu_fire_o           = r_tcu_fire;
+        assign tcu_fire_cmd_o       = r_tcu_fire_cmd;
+        assign tcu_fire_data_addr_o = r_tcu_fire_data_addr;
+        assign tcu_fire_data_size_o = r_tcu_fire_data_size;
+        assign tcu_fire_arg1_o      = r_tcu_fire_arg1;
+        assign tcu_fire_cur_vpe_o   = TCU_VPEID_INVALID;
 
         assign tcu_log_cur_vpe_o = TCU_LOG_NONE;
 
@@ -550,11 +576,13 @@ module tcu_regs #(
 
         //---------------
         //register
-        reg [63:0] r_tcu_reg_features, rin_tcu_reg_features;
+        reg [63:0] r_tcu_reg_features;
+        reg [31:0] rin_tcu_reg_features;    //upper 32 bits cannot be changed
         reg [63:0] r_tcu_reg_ext_cmd, rin_tcu_reg_ext_cmd;
 
         reg [63:0] r_tcu_reg_command, rin_tcu_reg_command;
-        reg [63:0] r_tcu_reg_data, rin_tcu_reg_data;
+        reg [63:0] r_tcu_reg_data_addr, rin_tcu_reg_data_addr;
+        reg [63:0] r_tcu_reg_data_size, rin_tcu_reg_data_size;
         reg [63:0] r_tcu_reg_arg1, rin_tcu_reg_arg1;
         reg [64+TIMER_SCALE-1:0] r_tcu_reg_cur_time;
         reg [63:0] r_tcu_reg_print, rin_tcu_reg_print;
@@ -567,7 +595,8 @@ module tcu_regs #(
 
         reg  [2:0] r_tcu_fire, rin_tcu_fire;
         reg [63:0] r_tcu_fire_cmd, rin_tcu_fire_cmd;
-        reg [63:0] r_tcu_fire_data, rin_tcu_fire_data;
+        reg [63:0] r_tcu_fire_data_addr, rin_tcu_fire_data_addr;
+        reg [63:0] r_tcu_fire_data_size, rin_tcu_fire_data_size;
         reg [63:0] r_tcu_fire_arg1, rin_tcu_fire_arg1;
 
         wire tcu_features_kernel = r_tcu_reg_features[0];
@@ -584,11 +613,11 @@ module tcu_regs #(
         //global reset: do not reset features reg and cur_time
         always @(posedge clk_i or negedge reset_n_i) begin
             if (reset_n_i == 1'b0) begin
-                r_tcu_reg_features <= 64'h1;
+                r_tcu_reg_features <= {{(64-32-TCU_VERSION){1'b0}}, TCU_VERSION, 32'h1};
                 r_tcu_reg_cur_time <= {(64+TIMER_SCALE){1'b0}};
             end
             else begin
-                r_tcu_reg_features <= rin_tcu_reg_features;
+                r_tcu_reg_features <= {r_tcu_reg_features[63:32], rin_tcu_reg_features};
                 r_tcu_reg_cur_time <= cur_time;
             end
         end
@@ -598,10 +627,11 @@ module tcu_regs #(
             if (reset_sync_n == 1'b0) begin
                 r_tcu_reg_ext_cmd <= 64'h0;
 
-                r_tcu_reg_command <= 64'h0;
-                r_tcu_reg_data    <= 64'h0;
-                r_tcu_reg_arg1    <= 64'h0;
-                r_tcu_reg_print   <= 64'h0;
+                r_tcu_reg_command   <= 64'h0;
+                r_tcu_reg_data_addr <= 64'h0;
+                r_tcu_reg_data_size <= 64'h0;
+                r_tcu_reg_arg1      <= 64'h0;
+                r_tcu_reg_print     <= 64'h0;
 
                 r_tcu_reg_core_req     <= 64'h0;
                 r_tcu_reg_priv_cmd     <= 64'h0;
@@ -609,18 +639,20 @@ module tcu_regs #(
                 r_tcu_reg_cur_vpe      <= TCU_VPEID_INVALID;
                 r2_tcu_reg_cur_vpe     <= TCU_VPEID_INVALID;
 
-                r_tcu_fire      <= 3'h0;
-                r_tcu_fire_cmd  <= 64'h0;
-                r_tcu_fire_data <= 64'h0;
-                r_tcu_fire_arg1 <= 64'h0;
+                r_tcu_fire           <= 3'h0;
+                r_tcu_fire_cmd       <= 64'h0;
+                r_tcu_fire_data_addr <= 64'h0;
+                r_tcu_fire_data_size <= 64'h0;
+                r_tcu_fire_arg1      <= 64'h0;
             end
             else begin
                 r_tcu_reg_ext_cmd <= rin_tcu_reg_ext_cmd;
 
-                r_tcu_reg_command <= rin_tcu_reg_command;
-                r_tcu_reg_data    <= rin_tcu_reg_data;
-                r_tcu_reg_arg1    <= rin_tcu_reg_arg1;
-                r_tcu_reg_print   <= rin_tcu_reg_print;
+                r_tcu_reg_command   <= rin_tcu_reg_command;
+                r_tcu_reg_data_addr <= rin_tcu_reg_data_addr;
+                r_tcu_reg_data_size <= rin_tcu_reg_data_size;
+                r_tcu_reg_arg1      <= rin_tcu_reg_arg1;
+                r_tcu_reg_print     <= rin_tcu_reg_print;
 
                 r_tcu_reg_core_req     <= rin_tcu_reg_core_req;
                 r_tcu_reg_priv_cmd     <= rin_tcu_reg_priv_cmd;
@@ -628,10 +660,11 @@ module tcu_regs #(
                 r_tcu_reg_cur_vpe      <= rin_tcu_reg_cur_vpe;
                 r2_tcu_reg_cur_vpe     <= r_tcu_reg_cur_vpe;
 
-                r_tcu_fire      <= rin_tcu_fire;
-                r_tcu_fire_cmd  <= rin_tcu_fire_cmd;
-                r_tcu_fire_data <= rin_tcu_fire_data;
-                r_tcu_fire_arg1 <= rin_tcu_fire_arg1;
+                r_tcu_fire           <= rin_tcu_fire;
+                r_tcu_fire_cmd       <= rin_tcu_fire_cmd;
+                r_tcu_fire_data_addr <= rin_tcu_fire_data_addr;
+                r_tcu_fire_data_size <= rin_tcu_fire_data_size;
+                r_tcu_fire_arg1      <= rin_tcu_fire_arg1;
             end
         end
 
@@ -640,7 +673,8 @@ module tcu_regs #(
         always @* begin
             rin_tcu_fire = 3'h0;
             rin_tcu_fire_cmd = r_tcu_fire_cmd;
-            rin_tcu_fire_data = r_tcu_fire_data;
+            rin_tcu_fire_data_addr = r_tcu_fire_data_addr;
+            rin_tcu_fire_data_size = r_tcu_fire_data_size;
             rin_tcu_fire_arg1 = r_tcu_fire_arg1;
             EP_MEM.rin_ep_mem_en = 1'b0;
             EP_MEM.rin_ep_mem_addr = {EP_MEM_ADDRWIDTH{1'b0}};
@@ -648,11 +682,12 @@ module tcu_regs #(
             rin_print_buf_en = 1'b0;
             rin_print_buf_addr = {PRINT_BUF_ADDRWIDTH{1'b0}};
 
-            rin_tcu_reg_features = r_tcu_reg_features;
+            rin_tcu_reg_features = r_tcu_reg_features[31:0];
             rin_tcu_reg_ext_cmd = r_tcu_reg_ext_cmd;
             
             rin_tcu_reg_command = r_tcu_reg_command;
-            rin_tcu_reg_data = r_tcu_reg_data;
+            rin_tcu_reg_data_addr = r_tcu_reg_data_addr;
+            rin_tcu_reg_data_size = r_tcu_reg_data_size;
             rin_tcu_reg_arg1 = r_tcu_reg_arg1;
             rin_tcu_reg_print = r_tcu_reg_print;
 
@@ -677,7 +712,7 @@ module tcu_regs #(
                 case (reg_addr_i)
                     TCU_REGADDR_FEATURES: begin
                         if (reg_ext_en) begin
-                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE/2; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
                                     rin_tcu_reg_features[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
@@ -719,7 +754,8 @@ module tcu_regs #(
                                 end
                             end
                             
-                            rin_tcu_fire_data = r_tcu_reg_data;
+                            rin_tcu_fire_data_addr = r_tcu_reg_data_addr;
+                            rin_tcu_fire_data_size = r_tcu_reg_data_size;
                             rin_tcu_fire_arg1 = r_tcu_reg_arg1;
 
                             //command is started when lower 32 bit of cmd reg are written with valid opcode
@@ -739,11 +775,21 @@ module tcu_regs #(
                         end
                     end
 
-                    TCU_REGADDR_DATA: begin
+                    TCU_REGADDR_DATA_ADDR: begin
                         if (!reg_ext_en) begin
                             for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
                                 if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
-                                    rin_tcu_reg_data[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
+                                    rin_tcu_reg_data_addr[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
+                                end
+                            end
+                        end
+                    end
+
+                    TCU_REGADDR_DATA_SIZE: begin
+                        if (!reg_ext_en) begin
+                            for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
+                                if(reg_wben_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE]) begin
+                                    rin_tcu_reg_data_size[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE] = reg_wdata_i[i*TCU_REG_BSEL_SIZE +: TCU_REG_BSEL_SIZE];
                                 end
                             end
                         end
@@ -886,8 +932,12 @@ module tcu_regs #(
                         rin_reg_rdata = r_tcu_reg_command;
                     end
 
-                    TCU_REGADDR_DATA: begin
-                        rin_reg_rdata = r_tcu_reg_data;
+                    TCU_REGADDR_DATA_ADDR: begin
+                        rin_reg_rdata = r_tcu_reg_data_addr;
+                    end
+
+                    TCU_REGADDR_DATA_SIZE: begin
+                        rin_reg_rdata = r_tcu_reg_data_size;
                     end
 
                     TCU_REGADDR_ARG1: begin
@@ -968,11 +1018,12 @@ module tcu_regs #(
         end
 
 
-        assign tcu_fire_o         = r_tcu_fire;
-        assign tcu_fire_cmd_o     = r_tcu_fire_cmd;
-        assign tcu_fire_data_o    = r_tcu_fire_data;
-        assign tcu_fire_arg1_o    = r_tcu_fire_arg1;
-        assign tcu_fire_cur_vpe_o = tcu_features_virt_pes ? r_tcu_reg_cur_vpe : TCU_VPEID_INVALID;
+        assign tcu_fire_o           = r_tcu_fire;
+        assign tcu_fire_cmd_o       = r_tcu_fire_cmd;
+        assign tcu_fire_data_addr_o = r_tcu_fire_data_addr;
+        assign tcu_fire_data_size_o = r_tcu_fire_data_size;
+        assign tcu_fire_arg1_o      = r_tcu_fire_arg1;
+        assign tcu_fire_cur_vpe_o   = tcu_features_virt_pes ? r_tcu_reg_cur_vpe : TCU_VPEID_INVALID;
 
         assign tcu_log_cur_vpe_o = (r_tcu_reg_cur_vpe[31:0] != r2_tcu_reg_cur_vpe[31:0]) ?
                                     {r2_tcu_reg_cur_vpe[31:0], r_tcu_reg_cur_vpe[31:0], TCU_LOG_PRIV_CUR_VPE_CHANGE} :
@@ -1051,11 +1102,12 @@ module tcu_regs #(
         end
 
 
-        assign tcu_fire_o         = 3'h0;
-        assign tcu_fire_cmd_o     = 64'h0;
-        assign tcu_fire_data_o    = 64'h0;
-        assign tcu_fire_arg1_o    = 64'h0;
-        assign tcu_fire_cur_vpe_o = TCU_VPEID_INVALID;
+        assign tcu_fire_o           = 3'h0;
+        assign tcu_fire_cmd_o       = 64'h0;
+        assign tcu_fire_data_addr_o = 64'h0;
+        assign tcu_fire_data_size_o = 64'h0;
+        assign tcu_fire_arg1_o      = 64'h0;
+        assign tcu_fire_cur_vpe_o   = TCU_VPEID_INVALID;
 
         assign tcu_log_cur_vpe_o = TCU_LOG_NONE;
 
