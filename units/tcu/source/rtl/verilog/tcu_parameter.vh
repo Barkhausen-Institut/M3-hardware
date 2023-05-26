@@ -20,7 +20,6 @@ parameter TCU_LOG_DATA_SIZE = 128-32,   //32 bit already taken by time stamp
 
 //---------------
 //registers
-parameter TCU_VERSION          = 8'h1,
 parameter TCU_EP_REG_COUNT     = 'd128,
 parameter TCU_CFG_REG_COUNT    = 'd32,  //max count, could be less
 parameter TCU_STATUS_REG_COUNT = 'd5,
@@ -206,6 +205,9 @@ parameter TCU_LOG_PMP_ACCESS_DENIED           = 8'd42,
 //---------------
 //constants
 
+parameter TCU_VMAJOR_SIZE = 16,
+parameter TCU_VMINOR_SIZE = 8,
+parameter TCU_VPATCH_SIZE = 8,
 parameter TCU_EP_SIZE = 16,
 parameter TCU_ARG0_SIZE = 32,
 parameter TCU_EXT_ARG_SIZE = 64-TCU_ERROR_SIZE-TCU_OPCODE_SIZE,  //55
@@ -244,4 +246,9 @@ parameter TCU_PAGE_SIZE_4KB       = 32'h1000, //4096
 parameter TCU_PAGEOFFSET_SIZE_4KB = TCU_PHYSADDR_SIZE-TCU_TLB_PHYSPAGE_SIZE,    //12 (same for virt. addr.)
 
 //data width of core request, without type field
-parameter TCU_CORE_REQ_FORMSG_SIZE = TCU_VPEID_SIZE+TCU_EP_SIZE  //32
+parameter TCU_CORE_REQ_FORMSG_SIZE = TCU_VPEID_SIZE+TCU_EP_SIZE,  //32
+
+//TCU version
+parameter [TCU_VMAJOR_SIZE-1:0] TCU_VMAJOR = 2,
+parameter [TCU_VMINOR_SIZE-1:0] TCU_VMINOR = 0,
+parameter [TCU_VPATCH_SIZE-1:0] TCU_VPATCH = 0
