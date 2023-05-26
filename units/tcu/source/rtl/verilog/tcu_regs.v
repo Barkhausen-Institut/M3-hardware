@@ -1,11 +1,15 @@
 
 module tcu_regs #(
     `include "tcu_parameter.vh"
-    ,parameter TCU_ENABLE_CMDS      = 1,
-    parameter TCU_ENABLE_PRIV_CMDS  = 0,
-    parameter TCU_ENABLE_LOG        = 0,
-    parameter TCU_ENABLE_PRINT      = 0,
-    parameter CLKFREQ_MHZ           = 100
+    ,parameter TCU_ENABLE_CMDS                     = 1,
+    parameter TCU_ENABLE_PRIV_CMDS                 = 0,
+    parameter TCU_ENABLE_LOG                       = 0,
+    parameter TCU_ENABLE_PRINT                     = 0,
+    parameter CLKFREQ_MHZ                          = 100,
+    parameter    [TILE_TYPE_SIZE-1:0] TILE_TYPE    = 0,
+    parameter     [TILE_ISA_SIZE-1:0] TILE_ISA     = 0,
+    parameter    [TILE_ATTR_SIZE-1:0] TILE_ATTR    = 0,
+    parameter [TILE_MEMSIZE_SIZE-1:0] TILE_MEMSIZE = 0
 )(
     input  wire                          clk_i,
     input  wire                          reset_n_i,
@@ -43,6 +47,7 @@ module tcu_regs #(
     //TCU feature settings
     output wire                          tcu_features_virt_addr_o,
     output wire                          tcu_features_virt_pes_o,
+    output wire                          tcu_priv_rpt_pmpfail_o,
 
     //---------------
     //TCU print
@@ -76,6 +81,7 @@ module tcu_regs #(
     localparam EP_MEM_ADDRWIDTH = $clog2(TCU_EP_REG_COUNT*3);
     localparam PRINT_BUF_ADDRWIDTH = $clog2(TCU_PRINT_REG_COUNT);
 
+    localparam TILE_DESC = {TILE_MEMSIZE, TILE_ATTR, TILE_ISA, TILE_TYPE};
 
     reg [63:0] r_reg_rdata, rin_reg_rdata;
 
@@ -472,6 +478,10 @@ module tcu_regs #(
                         rin_reg_rdata = {TCU_VPATCH, TCU_VMINOR, TCU_VMAJOR, 29'h0, r_tcu_reg_features};
                     end
 
+                    TCU_REGADDR_TILE_DESC: begin
+                        rin_reg_rdata = TILE_DESC;
+                    end
+
                     TCU_REGADDR_EXT_CMD: begin
                         rin_reg_rdata = r_tcu_reg_ext_cmd;
                     end
@@ -563,6 +573,7 @@ module tcu_regs #(
 
         assign tcu_features_virt_addr_o = 1'b0;
         assign tcu_features_virt_pes_o = 1'b0;
+        assign tcu_priv_rpt_pmpfail_o = 1'b0;
 
         assign tcu_print_valid_o = (TCU_ENABLE_PRINT && (r_tcu_reg_print != 'h0)) ? 1'b1 : 1'b0;
     end
@@ -584,6 +595,7 @@ module tcu_regs #(
         reg [63:0] r_tcu_reg_print, rin_tcu_reg_print;
 
         reg [63:0] r_tcu_reg_core_req, rin_tcu_reg_core_req;
+        reg        r_tcu_reg_priv_ctrl, rin_tcu_reg_priv_ctrl;   //currently only 1 bit in use
         reg [63:0] r_tcu_reg_priv_cmd, rin_tcu_reg_priv_cmd;
         reg [63:0] r_tcu_reg_priv_cmd_arg, rin_tcu_reg_priv_cmd_arg;
         reg [63:0] r_tcu_reg_cur_vpe, rin_tcu_reg_cur_vpe;
@@ -630,6 +642,7 @@ module tcu_regs #(
                 r_tcu_reg_print     <= 64'h0;
 
                 r_tcu_reg_core_req     <= 64'h0;
+                r_tcu_reg_priv_ctrl    <= 1'b0;
                 r_tcu_reg_priv_cmd     <= 64'h0;
                 r_tcu_reg_priv_cmd_arg <= 64'h0;
                 r_tcu_reg_cur_vpe      <= TCU_VPEID_INVALID;
@@ -651,6 +664,7 @@ module tcu_regs #(
                 r_tcu_reg_print     <= rin_tcu_reg_print;
 
                 r_tcu_reg_core_req     <= rin_tcu_reg_core_req;
+                r_tcu_reg_priv_ctrl    <= rin_tcu_reg_priv_ctrl;
                 r_tcu_reg_priv_cmd     <= rin_tcu_reg_priv_cmd;
                 r_tcu_reg_priv_cmd_arg <= rin_tcu_reg_priv_cmd_arg;
                 r_tcu_reg_cur_vpe      <= rin_tcu_reg_cur_vpe;
@@ -688,6 +702,7 @@ module tcu_regs #(
             rin_tcu_reg_print = r_tcu_reg_print;
 
             rin_tcu_reg_core_req     = r_tcu_reg_core_req;
+            rin_tcu_reg_priv_ctrl    = r_tcu_reg_priv_ctrl;
             rin_tcu_reg_priv_cmd     = r_tcu_reg_priv_cmd;
             rin_tcu_reg_priv_cmd_arg = r_tcu_reg_priv_cmd_arg;
             rin_tcu_reg_cur_vpe      = r_tcu_reg_cur_vpe;
@@ -819,6 +834,14 @@ module tcu_regs #(
                         end
                     end
 
+                    TCU_REGADDR_PRIV_CTRL: begin
+                        if (tcu_features_virt_addr || tcu_features_virt_pes) begin
+                            if (reg_wben_i[0]) begin
+                                rin_tcu_reg_priv_ctrl = reg_wdata_i[0];
+                            end
+                        end
+                    end
+
                     TCU_REGADDR_PRIV_CMD: begin
                         if (tcu_features_virt_addr || tcu_features_virt_pes) begin
                             for (i=0; i<TCU_REG_BSEL_SIZE; i=i+1) begin
@@ -918,6 +941,10 @@ module tcu_regs #(
                         rin_reg_rdata = {TCU_VPATCH, TCU_VMINOR, TCU_VMAJOR, 29'h0, r_tcu_reg_features};
                     end
 
+                    TCU_REGADDR_TILE_DESC: begin
+                        rin_reg_rdata = TILE_DESC;
+                    end
+
                     TCU_REGADDR_EXT_CMD: begin
                         rin_reg_rdata = r_tcu_reg_ext_cmd;
                     end
@@ -948,6 +975,10 @@ module tcu_regs #(
 
                     TCU_REGADDR_CORE_REQ: begin
                         rin_reg_rdata = r_tcu_reg_core_req;
+                    end
+
+                    TCU_REGADDR_PRIV_CTRL: begin
+                        rin_reg_rdata = r_tcu_reg_priv_ctrl;
                     end
 
                     TCU_REGADDR_PRIV_CMD: begin
@@ -1027,6 +1058,7 @@ module tcu_regs #(
 
         assign tcu_features_virt_addr_o = tcu_features_virt_addr;
         assign tcu_features_virt_pes_o = tcu_features_virt_pes;
+        assign tcu_priv_rpt_pmpfail_o = r_tcu_reg_priv_ctrl;
 
         assign tcu_print_valid_o = (TCU_ENABLE_PRINT && (r_tcu_reg_print != 'h0)) ? 1'b1 : 1'b0;
     end
@@ -1066,6 +1098,10 @@ module tcu_regs #(
             //register read
             else if (reg_r_en) begin
                 case (reg_addr_i)
+                    TCU_REGADDR_TILE_DESC: begin
+                        rin_reg_rdata = TILE_DESC;
+                    end
+
                     TCU_REGADDR_TCU_STATUS: begin
                         rin_reg_rdata = tcu_status_i;
                     end
@@ -1109,6 +1145,7 @@ module tcu_regs #(
 
         assign tcu_features_virt_addr_o = 1'b0;
         assign tcu_features_virt_pes_o = 1'b0;
+        assign tcu_priv_rpt_pmpfail_o = 1'b0;
 
         assign tcu_print_valid_o = 1'b0;
     end

@@ -81,6 +81,13 @@ module tcu_pmp #(
     output reg                           noc_out_rx_stall_o,
 
     //---------------
+    //PMP failures
+    input  wire                                 core_req_enable_i,
+    output reg                                  core_req_push_o,
+    output reg  [TCU_CORE_REQ_PMPFAIL_SIZE-1:0] core_req_data_o,
+    input  wire                                 core_req_stall_i,
+
+    //---------------
     //logging
     output reg   [TCU_LOG_DATA_SIZE-1:0] tcu_log_pmp_o
 );
@@ -89,17 +96,21 @@ module tcu_pmp #(
 
     localparam FIFO_WIDTH = NOC_HEADER_SIZE + NOC_PAYLOAD_SIZE;
 
-    localparam PMP_STATES_SIZE   = 4;
-    localparam S_PMP_IDLE        = 4'h0;
-    localparam S_PMP_READEP_REG1 = 4'h1;
-    localparam S_PMP_READEP_REG2 = 4'h2;
-    localparam S_PMP_READEP_REG3 = 4'h3;
-    localparam S_PMP_READEP_REG4 = 4'h4;
-    localparam S_PMP_CHECK_EP    = 4'h5;
-    localparam S_PMP_RUN         = 4'h6;
-    localparam S_PMP_ERROR_RSP   = 4'h7;
-    localparam S_PMP_DROP_PACKET = 4'h8;
-    localparam S_PMP_FINISH      = 4'hF;
+    localparam PMP_STATES_SIZE    = 4;
+    localparam S_PMP_IDLE         = 4'h0;
+    localparam S_PMP_READEP_REG1  = 4'h1;
+    localparam S_PMP_READEP_REG2  = 4'h2;
+    localparam S_PMP_READEP_REG3  = 4'h3;
+    localparam S_PMP_READEP_REG4  = 4'h4;
+    localparam S_PMP_CHECK_EP     = 4'h5;
+    localparam S_PMP_CHECK_ACCESS = 4'h6;
+    localparam S_PMP_CHECK_OFFSET = 4'h7;
+    localparam S_PMP_FAIL1        = 4'h8;
+    localparam S_PMP_FAIL2        = 4'h9;
+    localparam S_PMP_RUN          = 4'hA;
+    localparam S_PMP_ERROR_RSP    = 4'hB;
+    localparam S_PMP_DROP_PACKET  = 4'hC;
+    localparam S_PMP_FINISH       = 4'hF;
 
     reg [PMP_STATES_SIZE-1:0] pmp_state, next_pmp_state;
 
@@ -120,6 +131,8 @@ module tcu_pmp #(
     //number of dropped flits
     reg [TCU_FLITCOUNT_SIZE-1:0] r_drop_flit_count, rin_drop_flit_count;
 
+    //error code
+    reg [TCU_ERROR_SIZE-1:0] r_pmp_error, rin_pmp_error;
 
     reg  fifo_pop;
     wire fifo_push = noc_in_tx_wrreq_i && !noc_in_tx_stall_o;
@@ -210,6 +223,8 @@ module tcu_pmp #(
             r_size <= 16'h0;
 
             r_drop_flit_count <= {TCU_FLITCOUNT_SIZE{1'b0}};
+
+            r_pmp_error <= TCU_ERROR_NONE;
         end
         else begin
             pmp_state <= next_pmp_state;
@@ -227,6 +242,8 @@ module tcu_pmp #(
             r_size <= rin_size;
 
             r_drop_flit_count <= rin_drop_flit_count;
+
+            r_pmp_error <= rin_pmp_error;
         end
     end
 
@@ -277,11 +294,16 @@ module tcu_pmp #(
 
         rin_size = r_size;
 
+        rin_pmp_error = r_pmp_error;
+
         fifo_pop = 1'b0;
 
         noc_out_tx_wrreq_o = 1'b0;
 
         tcu_log_pmp_o = TCU_LOG_NONE;
+
+        core_req_push_o = 1'b0;
+        core_req_data_o = {TCU_CORE_REQ_PMPFAIL_SIZE{1'b0}};
 
 
         case (pmp_state)
@@ -292,6 +314,7 @@ module tcu_pmp #(
                 if (!fifo_empty) begin
                     rin_reg_addr = TCU_REGADDR_EP_START + epidx*TCU_EP_REG_SIZE;
                     rin_size = 'd0;
+                    rin_pmp_error = TCU_ERROR_NONE;
 
                     //write
                     if (access_rw & TCU_MEMFLAG_W) begin
@@ -358,24 +381,61 @@ module tcu_pmp #(
             //---------------
             //check if memory access is allowed
             S_PMP_CHECK_EP: begin
-                if ((mep_type == TCU_EP_TYPE_MEMORY) &&
-                    (mep_memflag & access_rw) &&
-                    ((pmp_offset + r_size) <= mep_size)) begin
+                if (mep_type == TCU_EP_TYPE_MEMORY) begin
+                    next_pmp_state = S_PMP_CHECK_ACCESS;
+                end
+                else begin
+                    rin_pmp_error = TCU_ERROR_NO_MEP;
+                    next_pmp_state = S_PMP_FAIL1;
+                end
+            end
+
+            S_PMP_CHECK_ACCESS: begin
+                if (mep_memflag & access_rw) begin
+                    next_pmp_state = S_PMP_CHECK_OFFSET;
+                end
+                else begin
+                    rin_pmp_error = TCU_ERROR_NO_PERM;
+                    next_pmp_state = S_PMP_FAIL1;
+                end
+            end
+
+            S_PMP_CHECK_OFFSET: begin
+                if ((pmp_offset + r_size) <= mep_size) begin
                     next_pmp_state = S_PMP_RUN;
                 end
-
-                //access not allowed
                 else begin
-                    `TCU_DEBUG(("PMP_ACCESS_DENIED, mode: %d, addr: 0x%x, size: %0d", pmp_mode, fifo_dataout_addr, r_size));
-                    tcu_log_pmp_o = {r_size, fifo_dataout_addr, pmp_mode, TCU_LOG_PMP_ACCESS_DENIED};
+                    rin_pmp_error = TCU_ERROR_OUT_OF_BOUNDS;
+                    next_pmp_state = S_PMP_FAIL1;
+                end
+            end
 
-                    //send error only for read
-                    if (access_rw & TCU_MEMFLAG_R) begin
-                        next_pmp_state = S_PMP_ERROR_RSP;
+            S_PMP_FAIL1: begin
+                //if enabled, set core request
+                if (core_req_enable_i) begin
+                    if (!core_req_stall_i) begin
+                        core_req_push_o = 1'b1;
+                        core_req_data_o = {fifo_dataout_addr,
+                                            r_pmp_error,
+                                            (access_rw & TCU_MEMFLAG_W) ? 1'b1 : 1'b0};
+                        next_pmp_state = S_PMP_FAIL2;
                     end
-                    else begin
-                        next_pmp_state = S_PMP_DROP_PACKET;
-                    end
+                end
+                else begin
+                    next_pmp_state = S_PMP_FAIL2;
+                end
+            end
+
+            S_PMP_FAIL2: begin
+                `TCU_DEBUG(("PMP_ACCESS_DENIED, mode: %d, addr: 0x%x, size: %0d", pmp_mode, fifo_dataout_addr, r_size));
+                tcu_log_pmp_o = {r_size, fifo_dataout_addr, pmp_mode, TCU_LOG_PMP_ACCESS_DENIED};
+
+                //send error only for read
+                if (access_rw & TCU_MEMFLAG_R) begin
+                    next_pmp_state = S_PMP_ERROR_RSP;
+                end
+                else begin
+                    next_pmp_state = S_PMP_DROP_PACKET;
                 end
             end
 

@@ -89,6 +89,12 @@ module tcu_ctrl #(
     input  wire  [TCU_LOG_DATA_SIZE-1:0] tcu_log_pmp_i,
 
     //---------------
+    //PMP failures
+    input  wire                                 core_req_pmpfail_push_i,
+    input  wire [TCU_CORE_REQ_PMPFAIL_SIZE-1:0] core_req_pmpfail_data_i,
+    output wire                                 core_req_pmpfail_stall_o,
+
+    //---------------
     //TCU status
     output wire    [TCU_STATUS_SIZE-1:0] tcu_status_o,
     output wire [TCU_FLITCOUNT_SIZE-1:0] noc_error_flit_count_o,
@@ -3268,73 +3274,79 @@ module tcu_ctrl #(
     if (TCU_ENABLE_CMDS && TCU_ENABLE_PRIV_CMDS) begin: PRIV_CMDS
 
         tcu_priv_ctrl #(
-            .TCU_ENABLE_VIRT_PES     (TCU_ENABLE_VIRT_PES),
-            .TCU_REGADDR_CORE_REQ_INT(TCU_REGADDR_CORE_REQ_INT),
-            .TCU_REGADDR_TIMER_INT   (TCU_REGADDR_TIMER_INT),
-            .TCU_ENABLE_LOG          (TCU_ENABLE_LOG),
-            .HOME_MODID              (HOME_MODID),
-            .CLKFREQ_MHZ             (CLKFREQ_MHZ)
+            .TCU_ENABLE_VIRT_PES      (TCU_ENABLE_VIRT_PES),
+            .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT),
+            .TCU_REGADDR_TIMER_INT    (TCU_REGADDR_TIMER_INT),
+            .TCU_ENABLE_LOG           (TCU_ENABLE_LOG),
+            .HOME_MODID               (HOME_MODID),
+            .CLKFREQ_MHZ              (CLKFREQ_MHZ)
         ) i_tcu_priv_ctrl (
-            .clk_i                   (clk_i),
-            .reset_n_i               (reset_ctrl_n),
+            .clk_i                    (clk_i),
+            .reset_n_i                (reset_ctrl_n),
 
             //---------------
             //reg IF
-            .priv_reg_en_o           (priv_reg_en),
-            .priv_reg_wben_o         (priv_reg_wben),
-            .priv_reg_addr_o         (priv_reg_addr),
-            .priv_reg_wdata_o        (priv_reg_wdata),
-            .priv_reg_rdata_i        (reg_rdata_i),
-            .priv_reg_stall_i        (reg_stall_i || ctrl_reg_access || ctrl_ext_reg_access),  //unpriv and ext cmds have prio over priv cmds
+            .priv_reg_en_o            (priv_reg_en),
+            .priv_reg_wben_o          (priv_reg_wben),
+            .priv_reg_addr_o          (priv_reg_addr),
+            .priv_reg_wdata_o         (priv_reg_wdata),
+            .priv_reg_rdata_i         (reg_rdata_i),
+            .priv_reg_stall_i         (reg_stall_i || ctrl_reg_access || ctrl_ext_reg_access),  //unpriv and ext cmds have prio over priv cmds
 
             //---------------
             //TLB IF
-            .unpriv_tlb_read_i       (CMD_CTRL.unpriv_tlb_read),
-            .unpriv_tlb_vpeid_i      (tcu_fire_cur_vpe_i[TCU_TLB_VPEID_SIZE-1:0]),
-            .unpriv_tlb_virtpage_i   (CMD_CTRL.r_firecmd_data_addr[TCU_VIRTADDR_SIZE-1 : TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE]), //only need virt page number
-            .unpriv_tlb_read_perm_i  (CMD_CTRL.r_firecmd_perm),
-            .unpriv_tlb_physpage_o   (unpriv_tlb_physpage),
-            .unpriv_tlb_active_o     (unpriv_tlb_active),
-            .unpriv_tlb_read_done_o  (unpriv_tlb_read_done),
-            .unpriv_tlb_read_error_o (unpriv_tlb_read_error),
+            .unpriv_tlb_read_i        (CMD_CTRL.unpriv_tlb_read),
+            .unpriv_tlb_vpeid_i       (tcu_fire_cur_vpe_i[TCU_TLB_VPEID_SIZE-1:0]),
+            .unpriv_tlb_virtpage_i    (CMD_CTRL.r_firecmd_data_addr[TCU_VIRTADDR_SIZE-1 : TCU_VIRTADDR_SIZE-TCU_TLB_VIRTPAGE_SIZE]), //only need virt page number
+            .unpriv_tlb_read_perm_i   (CMD_CTRL.r_firecmd_perm),
+            .unpriv_tlb_physpage_o    (unpriv_tlb_physpage),
+            .unpriv_tlb_active_o      (unpriv_tlb_active),
+            .unpriv_tlb_read_done_o   (unpriv_tlb_read_done),
+            .unpriv_tlb_read_error_o  (unpriv_tlb_read_error),
 
             //---------------
             //core req (from RECEIVE)
-            .core_req_formsg_push_i  (rm_core_req_push),
-            .core_req_formsg_data_i  (rm_core_req_data),
-            .core_req_formsg_stall_o (rm_core_req_stall),
+            .core_req_formsg_push_i   (rm_core_req_push),
+            .core_req_formsg_data_i   (rm_core_req_data),
+            .core_req_formsg_stall_o  (rm_core_req_stall),
+
+            //---------------
+            //PMP failures
+            .core_req_pmpfail_push_i  (core_req_pmpfail_push_i),
+            .core_req_pmpfail_data_i  (core_req_pmpfail_data_i),
+            .core_req_pmpfail_stall_o (core_req_pmpfail_stall_o),
 
             //---------------
             //abort cmd
-            .unpriv_cmd_opcode_i     (CMD_CTRL.r_firecmd_opcode),
-            .unpriv_write_abort_o    (unpriv_write_abort),
-            .unpriv_read_abort_o     (unpriv_read_abort),
-            .unpriv_send_abort_o     (unpriv_send_abort),
-            .unpriv_reply_abort_o    (unpriv_reply_abort),
+            .unpriv_cmd_opcode_i      (CMD_CTRL.r_firecmd_opcode),
+            .unpriv_write_abort_o     (unpriv_write_abort),
+            .unpriv_read_abort_o      (unpriv_read_abort),
+            .unpriv_send_abort_o      (unpriv_send_abort),
+            .unpriv_reply_abort_o     (unpriv_reply_abort),
 
             //---------------
             //trigger
-            .priv_cmd_start_i        (PRIV_CTRL.r_firecmd_priv_start),
-            .priv_cmd_opcode_i       (PRIV_CTRL.r_firecmd_priv_opcode),
-            .priv_cmd_arg0_i         (PRIV_CTRL.r_firecmd_priv_arg0),
-            .priv_cmd_arg1_i         (PRIV_CTRL.r_firecmd_priv_arg1),
-            .priv_cmd_cur_vpe_i      (tcu_fire_cur_vpe_i[31:0]),
-            .priv_cmd_stall_i        (start_recv_msg_s || rm_active ||
-                                        firecmd_start || rpm_active || fm_active || am_active),   //stall xchg_vpe command to prevent race condition
+            .priv_cmd_start_i         (PRIV_CTRL.r_firecmd_priv_start),
+            .priv_cmd_opcode_i        (PRIV_CTRL.r_firecmd_priv_opcode),
+            .priv_cmd_arg0_i          (PRIV_CTRL.r_firecmd_priv_arg0),
+            .priv_cmd_arg1_i          (PRIV_CTRL.r_firecmd_priv_arg1),
+            .priv_cmd_cur_vpe_i       (tcu_fire_cur_vpe_i[31:0]),
+            .priv_cmd_stall_i         (start_recv_msg_s || rm_active ||
+                                         firecmd_start || rpm_active || fm_active || am_active),   //stall xchg_vpe command to prevent race condition
 
             //---------------
             //TCU feature settings
-            .tcu_features_virt_pes_i (tcu_features_virt_pes_i),
+            .tcu_features_virt_pes_i  (tcu_features_virt_pes_i),
 
             //---------------
             //logging
-            .log_priv_fifo_empty_o   (log_priv_fifo_empty_s),
-            .log_priv_fifo_data_out_o(log_priv_fifo_data_out_s),
-            .log_priv_fifo_pop_i     (log_priv_fifo_pop_s),
+            .log_priv_fifo_empty_o    (log_priv_fifo_empty_s),
+            .log_priv_fifo_data_out_o (log_priv_fifo_data_out_s),
+            .log_priv_fifo_pop_i      (log_priv_fifo_pop_s),
 
             //---------------
             //for debugging
-            .home_chipid_i           (home_chipid_i)
+            .home_chipid_i            (home_chipid_i)
         );
 
     end
@@ -3352,6 +3364,8 @@ module tcu_ctrl #(
         assign unpriv_tlb_read_error = TCU_ERROR_NONE;
 
         assign rm_core_req_stall = 1'b0;
+
+        assign core_req_pmpfail_stall_o = 1'b0;
 
         assign unpriv_write_abort = 1'b0;
         assign unpriv_read_abort = 1'b0;
