@@ -145,7 +145,7 @@ module nocif_slave #(
     assign mod_burst_o        = noc_header_arq[NOC_HEADER_SIZE-1];
     assign mod_arq_o          = noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-1 :
                                         NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE];
-    assign mod_bsel_o         = noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-1 :
+    assign mod_bsel_o         = noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE-1 :
                                         NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE-NOC_BSEL_SIZE];
     assign src_mod_x_coord_o  = noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE-NOC_BSEL_SIZE-1 :
                                         NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE-NOC_BSEL_SIZE-MOD_X_COORD_SIZE];
@@ -171,7 +171,7 @@ module nocif_slave #(
 
 
     assign mod_data0_o = noc_payload_arq[NOC_DATA_SIZE-1:0];
-    assign mod_data1_o = {noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_BSEL_SIZE-1:0], noc_payload_arq[NOC_PAYLOAD_SIZE-1:NOC_DATA_SIZE]};
+    assign mod_data1_o = {noc_header_arq[NOC_HEADER_SIZE-NOC_BURST_SIZE-NOC_ARQ_SIZE-NOC_BSEL_SIZE-1:0], noc_payload_arq[NOC_PAYLOAD_SIZE-1:NOC_DATA_SIZE]};
 
 
     //burst from NoC
