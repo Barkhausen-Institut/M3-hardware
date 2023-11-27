@@ -17,8 +17,13 @@ module tcu_top #(
     parameter TCU_ENABLE_PRINT            = 0,  //if enabled, TCU can write print messages to Ethernet interface
     parameter TCU_REGADDR_CORE_REQ_INT    = TCU_REGADDR_CORE_CFG_START + 'h8,  //reg addr of core request interrupt
     parameter TCU_REGADDR_TIMER_INT       = TCU_REGADDR_CORE_CFG_START + 'h10, //reg addr of timer interrupt
-    parameter HOME_MODID                  = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ                 = 100,
+
+    //tile description
+    parameter    [TILE_TYPE_SIZE-1:0] TILE_TYPE    = 0,
+    parameter     [TILE_ISA_SIZE-1:0] TILE_ISA     = 0,
+    parameter    [TILE_ATTR_SIZE-1:0] TILE_ATTR    = 0,
+    parameter [TILE_MEMSIZE_SIZE-1:0] TILE_MEMSIZE = 0,
 
     //timeout when TCU is waiting for NoC or Mem, 0 to disable
     parameter [31:0] TIMEOUT_SEND_CYCLES  = CLKFREQ_MHZ*2000000,    //for sender
@@ -196,8 +201,9 @@ module tcu_top #(
     output wire     [TCU_STATUS_SIZE-1:0] tcu_status_o,
 
     //---------------
-    //Home Chip-ID
+    //Home Chip/Mod-ID
     input  wire     [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire      [NOC_MODID_SIZE-1:0] home_modid_i,
 
     //---------------
     //Mod-ID and Chip-ID for debug print
@@ -234,6 +240,10 @@ module tcu_top #(
     wire  [TCU_REG_DATA_SIZE-1:0] pmp_reg_rdata_s;
     wire                          pmp_reg_stall_s;
 
+    wire                                 core_req_pmpfail_push_s;
+    wire [TCU_CORE_REQ_PMPFAIL_SIZE-1:0] core_req_pmpfail_data_s;
+    wire                                 core_req_pmpfail_stall_s;
+
     wire                    [2:0] tcu_fire_s;
     wire                   [63:0] tcu_fire_cmd_s;
     wire                   [63:0] tcu_fire_data_addr_s;
@@ -246,6 +256,7 @@ module tcu_top #(
 
     wire                          tcu_features_virt_addr_s;
     wire                          tcu_features_virt_pes_s;
+    wire                          tcu_priv_rpt_pmpfail_s;
 
     wire                          tcu_print_valid_s;
 
@@ -362,7 +373,11 @@ module tcu_top #(
         .TCU_ENABLE_PRIV_CMDS     (TCU_ENABLE_PRIV_CMDS),
         .TCU_ENABLE_LOG           (TCU_ENABLE_LOG),
         .TCU_ENABLE_PRINT         (TCU_ENABLE_PRINT),
-        .CLKFREQ_MHZ              (CLKFREQ_MHZ)
+        .CLKFREQ_MHZ              (CLKFREQ_MHZ),
+        .TILE_TYPE                (TILE_TYPE),
+        .TILE_ISA                 (TILE_ISA),
+        .TILE_ATTR                (TILE_ATTR),
+        .TILE_MEMSIZE             (TILE_MEMSIZE)
     ) i_tcu_regs (
         .clk_i                    (clk_i),
         .reset_n_i                (reset_n_i),
@@ -386,6 +401,7 @@ module tcu_top #(
 
         .tcu_features_virt_addr_o (tcu_features_virt_addr_s),
         .tcu_features_virt_pes_o  (tcu_features_virt_pes_s),
+        .tcu_priv_rpt_pmpfail_o   (tcu_priv_rpt_pmpfail_s),
 
         .tcu_print_valid_o        (tcu_print_valid_s),
 
@@ -565,14 +581,13 @@ module tcu_top #(
     generate
     if (TCU_ENABLE_PMP) begin: PMP
 
-        tcu_pmp #(
-            .HOME_MODID              (HOME_MODID)
-        ) i_tcu_pmp (
+        tcu_pmp i_tcu_pmp (
             .clk_i                   (clk_i),
             .reset_n_i               (reset_n_i),
             .tcu_reset_i             (tcu_reset_s),
 
             .home_chipid_i           (home_chipid_i),
+            .home_modid_i            (home_modid_i),
             .pmp_drop_flit_count_o   (),
 
             //---------------
@@ -643,6 +658,13 @@ module tcu_top #(
             .noc_out_rx_stall_o      (nocmux2_rx_stall_s),
 
             //---------------
+            //PMP failures
+            .core_req_enable_i       (tcu_priv_rpt_pmpfail_s),
+            .core_req_push_o         (core_req_pmpfail_push_s),
+            .core_req_data_o         (core_req_pmpfail_data_s),
+            .core_req_stall_i        (core_req_pmpfail_stall_s),
+
+            //---------------
             //logging
             .tcu_log_pmp_o           (tcu_log_pmp_s)
         );
@@ -680,6 +702,9 @@ module tcu_top #(
         assign tcu_byp_noc_rx_data0_o      = nocmux2_rx_data0_s;
         assign tcu_byp_noc_rx_data1_o      = nocmux2_rx_data1_s;
         assign nocmux2_rx_stall_s          = tcu_byp_noc_rx_stall_i;
+
+        assign core_req_pmpfail_push_s = 1'b0;
+        assign core_req_pmpfail_data_s = {TCU_CORE_REQ_PMPFAIL_SIZE{1'b0}};
 
         assign tcu_log_pmp_s = TCU_LOG_NONE;
 
@@ -886,7 +911,6 @@ module tcu_top #(
         .TCU_ENABLE_PRINT         (TCU_ENABLE_PRINT),
         .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT),
         .TCU_REGADDR_TIMER_INT    (TCU_REGADDR_TIMER_INT),
-        .HOME_MODID               (HOME_MODID),
         .CLKFREQ_MHZ              (CLKFREQ_MHZ),
         .TIMEOUT_SEND_CYCLES      (TIMEOUT_SEND_CYCLES),
         .TIMEOUT_RECV_CYCLES      (TIMEOUT_RECV_CYCLES)
@@ -962,6 +986,12 @@ module tcu_top #(
         .tcu_log_pmp_i            (tcu_log_pmp_s),
 
         //---------------
+        //PMP failures
+        .core_req_pmpfail_push_i  (core_req_pmpfail_push_s),
+        .core_req_pmpfail_data_i  (core_req_pmpfail_data_s),
+        .core_req_pmpfail_stall_o (core_req_pmpfail_stall_s),
+
+        //---------------
         //global TCU reset and time
         .tcu_reset_i              (tcu_reset_s),
         .tcu_cur_time_i           (tcu_cur_time_s),
@@ -982,8 +1012,9 @@ module tcu_top #(
         .noc_drop_flit_count_o    (noc_drop_flit_count_s),
 
         //---------------
-        //Home Chip-ID
+        //Home Chip/Mod-ID
         .home_chipid_i            (home_chipid_i),
+        .home_modid_i             (home_modid_i),
 
         //---------------
         //debug print IDs

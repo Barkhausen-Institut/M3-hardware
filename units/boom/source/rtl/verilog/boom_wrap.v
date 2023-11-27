@@ -4,6 +4,7 @@ module boom_wrap #(
     ,`include "tcu_parameter.vh"
     ,`include "mod_ids.vh"
     ,parameter HOME_MODID         = {NOC_MODID_SIZE{1'b0}},
+    parameter PM_UART_ATTACHED    = 0,
     parameter CLKFREQ_MHZ         = 100,
     parameter BOOM_USE_LOCAL_MEM  = 0,
     parameter CORE_DMEM_DATA_SIZE = 64,    //reg interface
@@ -416,8 +417,11 @@ tcu_top #(
     .TCU_ENABLE_PRINT           (1),
     .TCU_REGADDR_CORE_REQ_INT   (TCU_REGADDR_CORE_CFG_START + 'h8),  //first ext. interrupt of Boom core
     .TCU_REGADDR_TIMER_INT      (TCU_REGADDR_CORE_CFG_START + 'h10), //second ext. interrupt
-    .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ),
+    .TILE_TYPE                  ('d0),              //processing tile with Boom core
+    .TILE_ISA                   ('d1),
+    .TILE_ATTR                  ('d1 | (PM_UART_ATTACHED ? 'd8 : 'd0)),
+    .TILE_MEMSIZE               ('d0),
     .CORE_DMEM_DATA_SIZE        (CORE_DMEM_DATA_SIZE),
     .CORE_DMEM_ADDR_SIZE        (CORE_DMEM_ADDR_SIZE),
     .CORE_DMEM_BSEL_SIZE        (CORE_DMEM_BSEL_SIZE),
@@ -563,6 +567,7 @@ tcu_top #(
     .tcu_status_o               (tcu_status),
 
     .home_chipid_i              (home_chipid_i),
+    .home_modid_i               (HOME_MODID),
 
     .print_chipid_i             (host_chipid_i),
     .print_modid_i              (MODID_ETH)

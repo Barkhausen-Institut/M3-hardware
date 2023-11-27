@@ -2,6 +2,7 @@
 module ethernet_fmc_domain #(
     `include "noc_parameter.vh"
     ,parameter ETH_INCLUDE_SHARED_LOGIC = 1,
+    parameter PM_UART_ATTACHED          = 0,
     parameter HOME_MODID                = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ               = 100
 )
@@ -55,6 +56,7 @@ wire [NOC_CHIPID_SIZE-1:0] host_chipid_s;
 
 ethernet_fmc_wrap #(
     .ETH_INCLUDE_SHARED_LOGIC   (ETH_INCLUDE_SHARED_LOGIC),
+    .PM_UART_ATTACHED           (PM_UART_ATTACHED),
     .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ)
 ) i_ethernet_fmc_wrap (

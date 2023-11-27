@@ -10,68 +10,74 @@ module tcu_priv_ctrl #(
     parameter TCU_REGADDR_CORE_REQ_INT = TCU_REGADDR_CORE_CFG_START + 'h8,
     parameter TCU_REGADDR_TIMER_INT    = TCU_REGADDR_CORE_CFG_START + 'h10,
     parameter TCU_ENABLE_LOG           = 0,
-    parameter HOME_MODID               = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ              = 100
 )(
-    input  wire                                clk_i,
-    input  wire                                reset_n_i,
+    input  wire                                 clk_i,
+    input  wire                                 reset_n_i,
 
     //---------------
     //reg IF
-    output reg                                 priv_reg_en_o,
-    output reg         [TCU_REG_BSEL_SIZE-1:0] priv_reg_wben_o,
-    output reg         [TCU_REG_ADDR_SIZE-1:0] priv_reg_addr_o,
-    output reg         [TCU_REG_DATA_SIZE-1:0] priv_reg_wdata_o,
-    input  wire        [TCU_REG_DATA_SIZE-1:0] priv_reg_rdata_i,
-    input  wire                                priv_reg_stall_i,
+    output reg                                  priv_reg_en_o,
+    output reg          [TCU_REG_BSEL_SIZE-1:0] priv_reg_wben_o,
+    output reg          [TCU_REG_ADDR_SIZE-1:0] priv_reg_addr_o,
+    output reg          [TCU_REG_DATA_SIZE-1:0] priv_reg_wdata_o,
+    input  wire         [TCU_REG_DATA_SIZE-1:0] priv_reg_rdata_i,
+    input  wire                                 priv_reg_stall_i,
 
     //---------------
     //TLB IF to translate addr of unprivileged cmds
-    input  wire                                unpriv_tlb_read_i,
-    input  wire       [TCU_TLB_VPEID_SIZE-1:0] unpriv_tlb_vpeid_i,
-    input  wire    [TCU_TLB_VIRTPAGE_SIZE-1:0] unpriv_tlb_virtpage_i,
-    input  wire                          [1:0] unpriv_tlb_read_perm_i,
-    output reg     [TCU_TLB_PHYSPAGE_SIZE-1:0] unpriv_tlb_physpage_o,
-    output wire                                unpriv_tlb_active_o,
-    output reg                                 unpriv_tlb_read_done_o,    //becomes high when correct data is in physpage
-    output reg            [TCU_ERROR_SIZE-1:0] unpriv_tlb_read_error_o,
+    input  wire                                 unpriv_tlb_read_i,
+    input  wire        [TCU_TLB_VPEID_SIZE-1:0] unpriv_tlb_vpeid_i,
+    input  wire     [TCU_TLB_VIRTPAGE_SIZE-1:0] unpriv_tlb_virtpage_i,
+    input  wire                           [1:0] unpriv_tlb_read_perm_i,
+    output reg      [TCU_TLB_PHYSPAGE_SIZE-1:0] unpriv_tlb_physpage_o,
+    output wire                                 unpriv_tlb_active_o,
+    output reg                                  unpriv_tlb_read_done_o,    //becomes high when correct data is in physpage
+    output reg             [TCU_ERROR_SIZE-1:0] unpriv_tlb_read_error_o,
 
     //---------------
     //core req: foreign msg
-    input  wire                                core_req_formsg_push_i,
-    input  wire [TCU_CORE_REQ_FORMSG_SIZE-1:0] core_req_formsg_data_i,
-    output wire                                core_req_formsg_stall_o,
+    input  wire                                 core_req_formsg_push_i,
+    input  wire  [TCU_CORE_REQ_FORMSG_SIZE-1:0] core_req_formsg_data_i,
+    output wire                                 core_req_formsg_stall_o,
+
+    //---------------
+    //PMP failures
+    input  wire                                 core_req_pmpfail_push_i,
+    input  wire [TCU_CORE_REQ_PMPFAIL_SIZE-1:0] core_req_pmpfail_data_i,
+    output wire                                 core_req_pmpfail_stall_o,
 
     //---------------
     //signals to unpriv cmds
-    input  wire          [TCU_OPCODE_SIZE-1:0] unpriv_cmd_opcode_i,
-    output wire                                unpriv_write_abort_o,  //abort transfer of unpriv cmd
-    output wire                                unpriv_read_abort_o,
-    output wire                                unpriv_send_abort_o,
-    output wire                                unpriv_reply_abort_o,
+    input  wire           [TCU_OPCODE_SIZE-1:0] unpriv_cmd_opcode_i,
+    output wire                                 unpriv_write_abort_o,  //abort transfer of unpriv cmd
+    output wire                                 unpriv_read_abort_o,
+    output wire                                 unpriv_send_abort_o,
+    output wire                                 unpriv_reply_abort_o,
 
     //---------------
     //triggers from tcu_ctrl
-    input  wire                                priv_cmd_start_i,
-    input  wire          [TCU_OPCODE_SIZE-1:0] priv_cmd_opcode_i,
-    input  wire        [TCU_PRIV_ARG_SIZE-1:0] priv_cmd_arg0_i,
-    input  wire                         [63:0] priv_cmd_arg1_i,
-    input  wire                         [31:0] priv_cmd_cur_vpe_i,
-    input  wire                                priv_cmd_stall_i,
+    input  wire                                 priv_cmd_start_i,
+    input  wire           [TCU_OPCODE_SIZE-1:0] priv_cmd_opcode_i,
+    input  wire         [TCU_PRIV_ARG_SIZE-1:0] priv_cmd_arg0_i,
+    input  wire                          [63:0] priv_cmd_arg1_i,
+    input  wire                          [31:0] priv_cmd_cur_vpe_i,
+    input  wire                                 priv_cmd_stall_i,
 
     //---------------
     //TCU feature settings
-    input  wire                                tcu_features_virt_pes_i,
+    input  wire                                 tcu_features_virt_pes_i,
 
     //---------------
     //logging
-    output wire                                log_priv_fifo_empty_o,
-    output wire        [TCU_LOG_DATA_SIZE-1:0] log_priv_fifo_data_out_o,
-    input  wire                                log_priv_fifo_pop_i,
+    output wire                                 log_priv_fifo_empty_o,
+    output wire         [TCU_LOG_DATA_SIZE-1:0] log_priv_fifo_data_out_o,
+    input  wire                                 log_priv_fifo_pop_i,
 
     //---------------
     //for debugging
-    input  wire          [NOC_CHIPID_SIZE-1:0] home_chipid_i
+    input  wire           [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire            [NOC_MODID_SIZE-1:0] home_modid_i
 );
 
     `include "tcu_functions.v"
@@ -584,41 +590,32 @@ module tcu_priv_ctrl #(
     );
 
 
-    //core request only for foreign messages, not required when VPEs are disabled
-    generate
-    if (TCU_ENABLE_VIRT_PES) begin: CORE_REQ
-        tcu_priv_core_req #(
-            .TCU_REGADDR_CORE_REQ_INT(TCU_REGADDR_CORE_REQ_INT),
-            .HOME_MODID              (HOME_MODID)
-        ) i_tcu_priv_core_req (
-            .clk_i                   (clk_i),
-            .reset_n_i               (reset_n_i),
+    tcu_priv_core_req #(
+        .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT)
+    ) i_tcu_priv_core_req (
+        .clk_i                    (clk_i),
+        .reset_n_i                (reset_n_i),
 
-            .core_req_reg_en_o       (core_req_reg_en),
-            .core_req_reg_wben_o     (core_req_reg_wben),
-            .core_req_reg_addr_o     (core_req_reg_addr),
-            .core_req_reg_wdata_o    (core_req_reg_wdata),
-            .core_req_reg_rdata_i    (priv_reg_rdata_i),
-            .core_req_reg_stall_i    (priv_reg_stall_i || timer_int),   //only timer interrupt has prio over core req
+        .core_req_reg_en_o        (core_req_reg_en),
+        .core_req_reg_wben_o      (core_req_reg_wben),
+        .core_req_reg_addr_o      (core_req_reg_addr),
+        .core_req_reg_wdata_o     (core_req_reg_wdata),
+        .core_req_reg_rdata_i     (priv_reg_rdata_i),
+        .core_req_reg_stall_i     (priv_reg_stall_i || timer_int),   //only timer interrupt has prio over core req
 
-            .core_req_formsg_push_i  (core_req_formsg_push_i),
-            .core_req_formsg_data_i  (core_req_formsg_data_i),
-            .core_req_formsg_stall_o (core_req_formsg_stall_o),
+        .core_req_formsg_push_i   (core_req_formsg_push_i),
+        .core_req_formsg_data_i   (core_req_formsg_data_i),
+        .core_req_formsg_stall_o  (core_req_formsg_stall_o),
 
-            .tcu_log_core_req_data_o (tcu_log_core_req_data),
+        .core_req_pmpfail_push_i  (core_req_pmpfail_push_i),
+        .core_req_pmpfail_data_i  (core_req_pmpfail_data_i),
+        .core_req_pmpfail_stall_o (core_req_pmpfail_stall_o),
 
-            .home_chipid_i           (home_chipid_i)
-        );
-    end
-    else begin: NO_CORE_REQ
-        assign core_req_reg_en = 1'b0;
-        assign core_req_reg_wben = {TCU_REG_BSEL_SIZE{1'b0}};
-        assign core_req_reg_addr = {TCU_REG_ADDR_SIZE{1'b0}};
-        assign core_req_reg_wdata = {TCU_REG_DATA_SIZE{1'b0}};
-        assign core_req_formsg_stall_o = 1'b0;
-    end
-    endgenerate
+        .tcu_log_core_req_data_o  (tcu_log_core_req_data),
 
+        .home_chipid_i            (home_chipid_i),
+        .home_modid_i             (home_modid_i)
+    );
 
 
     generate

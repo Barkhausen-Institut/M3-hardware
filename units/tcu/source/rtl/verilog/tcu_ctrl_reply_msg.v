@@ -5,7 +5,6 @@ module tcu_ctrl_reply_msg #(
     ,parameter TCU_ENABLE_DRAM           = 0,
     parameter TCU_ENABLE_VIRT_ADDR       = 0,
     parameter TCU_ENABLE_VIRT_PES        = 0,
-    parameter HOME_MODID                 = {NOC_MODID_SIZE{1'b0}},
     parameter [31:0] TIMEOUT_SEND_CYCLES = 0
 )(
     input  wire                             clk_i,
@@ -87,8 +86,9 @@ module tcu_ctrl_reply_msg #(
     input  wire                             tcu_features_virt_pes_i,
 
     //---------------
-    //Home Chip-ID
-    input  wire       [NOC_CHIPID_SIZE-1:0] home_chipid_i
+    //Home Chip/Mod-ID
+    input  wire       [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire        [NOC_MODID_SIZE-1:0] home_modid_i
 );
 
     `include "tcu_functions.v"
@@ -556,7 +556,7 @@ module tcu_ctrl_reply_msg #(
                                     r_recvep,
                                     r_size[TCU_MSGLEN_SIZE-1:0],
                                     home_chipid_i,
-                                    HOME_MODID,
+                                    home_modid_i,
                                     {TCU_RSIZE_SIZE{1'b0}},
                                     TCU_HD_FLAG_REPLY};
 

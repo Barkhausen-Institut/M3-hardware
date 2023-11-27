@@ -224,8 +224,11 @@ tcu_top #(
     .TCU_ENABLE_CMDS            (0),
     .TCU_ENABLE_DRAM            (1),
     .TCU_ENABLE_MEM_ADDR_ALIGN  (0),
-    .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (100),
+    .TILE_TYPE                  ('d1),              //memory tile
+    .TILE_ISA                   ('d0),
+    .TILE_ATTR                  ('d16),             //IMEM
+    .TILE_MEMSIZE               ('h80000000 >> 12), //mem size in 4 kB pages
     .DMEM_DATA_SIZE             (TCU_MEM_DATA_SIZE),
     .DMEM_ADDR_SIZE             (TCU_MEM_ADDR_SIZE),
     .DMEM_BSEL_SIZE             (TCU_MEM_BSEL_SIZE),
@@ -365,6 +368,7 @@ tcu_top #(
     .tcu_status_o               (tcu_status),
 
     .home_chipid_i              (home_chipid_i),
+    .home_modid_i               (HOME_MODID),
 
     .print_chipid_i             ({NOC_CHIPID_SIZE{1'b0}}),  //debug print is disabled
     .print_modid_i              ({NOC_MODID_SIZE{1'b0}})
