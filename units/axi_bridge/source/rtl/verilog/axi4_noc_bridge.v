@@ -316,7 +316,7 @@ module axi4_noc_bridge #(
                             //send NoC request packet
                             noc_tx_wrreq_o = 1'b1;
                             noc_tx_bsel_o = {NOC_BSEL_SIZE{1'b1}};     //unused
-                            noc_tx_data0_o = {(axi4_ar_len_i+1), {LOG_DATA_BYTES{1'b0}}, axi4_ar_addr_i};   //burst length in number of bytes and return addr
+                            noc_tx_data0_o = {(axi4_ar_len_i+8'd1), {LOG_DATA_BYTES{1'b0}}, axi4_ar_addr_i};   //burst length in number of bytes and return addr
                             next_state = S_AXI4_READ;
                         end
                     end
