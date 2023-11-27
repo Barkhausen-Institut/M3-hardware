@@ -257,7 +257,9 @@ eth_mac_1g_fifo #(
     .rx_fifo_bad_frame  (mac_rx_fifo_bad_frame),
     .rx_fifo_good_frame (mac_rx_fifo_good_frame),
 
-    .ifg_delay          (8'd12)
+    .cfg_ifg            (8'd12),
+    .cfg_tx_enable      (1'b1),
+    .cfg_rx_enable      (1'b1)
 );
 
 
