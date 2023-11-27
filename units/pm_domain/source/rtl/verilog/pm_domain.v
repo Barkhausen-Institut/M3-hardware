@@ -5,6 +5,7 @@ module pm_domain #(
     ,parameter [NOC_MODID_SIZE-1:0] HOME_MODID = 0,
     parameter                       PM_CORE_SELECT = PM_TYPE_NONE,
     parameter                       PM_UART_ATTACHED = 0,
+    parameter                       ACC_TYPE = "none",
     parameter                       CLKFREQ_MHZ = 100
 )
 (
@@ -84,6 +85,29 @@ else if (PM_CORE_SELECT == PM_TYPE_BOOM) begin: boom
         .uart_tx_o                  (uart_tx_o),
         .uart_rx_i                  (uart_rx_i)
     );
+end
+else if (PM_CORE_SELECT == PM_TYPE_ACC) begin: acc
+    pm_acc #(
+        .ACC_TYPE                   (ACC_TYPE),
+        .HOME_MODID                 (HOME_MODID),
+        .CLKFREQ_MHZ                (CLKFREQ_MHZ)
+    ) i_pm_acc (
+        .clk_pm_i                   (clk_pm_i),
+        .reset_pm_n_i               (reset_pm_n_i),
+        .home_chipid_i              (home_chipid_i),
+        .host_chipid_i              (host_chipid_i),
+        .noc_fifo_pm_in_data_i      (noc_fifo_pm_in_data_i),
+        .noc_fifo_pm_in_raddr_o     (noc_fifo_pm_in_raddr_o),
+        .noc_fifo_pm_in_waddr_i     (noc_fifo_pm_in_waddr_i),
+        .noc_fifo_pm_out_data_o     (noc_fifo_pm_out_data_o),
+        .noc_fifo_pm_out_raddr_i    (noc_fifo_pm_out_raddr_i),
+        .noc_fifo_pm_out_waddr_o    (noc_fifo_pm_out_waddr_o)
+    );
+
+    assign jtag_tdo_o = 1'b1;
+    assign jtag_tdo_en_o = 1'b0;
+
+    assign uart_tx_o = 1'b1;
 end
 else begin: none
     assign noc_fifo_pm_in_raddr_o = {NOC_ASYNC_FIFO_AWIDTH{1'b0}};

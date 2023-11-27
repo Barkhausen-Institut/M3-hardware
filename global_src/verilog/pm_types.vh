@@ -7,4 +7,5 @@
 parameter PM_TYPE_NONE     = 0,
 parameter PM_TYPE_ROCKET   = 1,
 parameter PM_TYPE_BOOM     = 2,
-parameter PM_TYPE_ETHFMC   = 3
+parameter PM_TYPE_ETHFMC   = 3,
+parameter PM_TYPE_ACC      = 4
