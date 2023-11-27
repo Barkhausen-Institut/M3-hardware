@@ -17,7 +17,6 @@ module tcu_top #(
     parameter TCU_ENABLE_PRINT            = 0,  //if enabled, TCU can write print messages to Ethernet interface
     parameter TCU_REGADDR_CORE_REQ_INT    = TCU_REGADDR_CORE_CFG_START + 'h8,  //reg addr of core request interrupt
     parameter TCU_REGADDR_TIMER_INT       = TCU_REGADDR_CORE_CFG_START + 'h10, //reg addr of timer interrupt
-    parameter HOME_MODID                  = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ                 = 100,
 
     //tile description
@@ -202,8 +201,9 @@ module tcu_top #(
     output wire     [TCU_STATUS_SIZE-1:0] tcu_status_o,
 
     //---------------
-    //Home Chip-ID
+    //Home Chip/Mod-ID
     input  wire     [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire      [NOC_MODID_SIZE-1:0] home_modid_i,
 
     //---------------
     //Mod-ID and Chip-ID for debug print
@@ -581,14 +581,13 @@ module tcu_top #(
     generate
     if (TCU_ENABLE_PMP) begin: PMP
 
-        tcu_pmp #(
-            .HOME_MODID              (HOME_MODID)
-        ) i_tcu_pmp (
+        tcu_pmp i_tcu_pmp (
             .clk_i                   (clk_i),
             .reset_n_i               (reset_n_i),
             .tcu_reset_i             (tcu_reset_s),
 
             .home_chipid_i           (home_chipid_i),
+            .home_modid_i            (home_modid_i),
             .pmp_drop_flit_count_o   (),
 
             //---------------
@@ -912,7 +911,6 @@ module tcu_top #(
         .TCU_ENABLE_PRINT         (TCU_ENABLE_PRINT),
         .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT),
         .TCU_REGADDR_TIMER_INT    (TCU_REGADDR_TIMER_INT),
-        .HOME_MODID               (HOME_MODID),
         .CLKFREQ_MHZ              (CLKFREQ_MHZ),
         .TIMEOUT_SEND_CYCLES      (TIMEOUT_SEND_CYCLES),
         .TIMEOUT_RECV_CYCLES      (TIMEOUT_RECV_CYCLES)
@@ -1014,8 +1012,9 @@ module tcu_top #(
         .noc_drop_flit_count_o    (noc_drop_flit_count_s),
 
         //---------------
-        //Home Chip-ID
+        //Home Chip/Mod-ID
         .home_chipid_i            (home_chipid_i),
+        .home_modid_i             (home_modid_i),
 
         //---------------
         //debug print IDs

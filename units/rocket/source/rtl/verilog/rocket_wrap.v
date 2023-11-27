@@ -417,7 +417,6 @@ tcu_top #(
     .TCU_ENABLE_PRINT           (1),
     .TCU_REGADDR_CORE_REQ_INT   (TCU_REGADDR_CORE_CFG_START + 'h8),  //first ext. interrupt of Rocket core
     .TCU_REGADDR_TIMER_INT      (TCU_REGADDR_CORE_CFG_START + 'h10), //second ext. interrupt
-    .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ),
     .TILE_TYPE                  ('d0),              //processing tile with Rocket core
     .TILE_ISA                   ('d1),
@@ -568,6 +567,7 @@ tcu_top #(
     .tcu_status_o               (tcu_status),
 
     .home_chipid_i              (home_chipid_i),
+    .home_modid_i               (HOME_MODID),
 
     .print_chipid_i             (host_chipid_i),
     .print_modid_i              (MODID_ETH)

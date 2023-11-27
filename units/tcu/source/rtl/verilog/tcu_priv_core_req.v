@@ -4,8 +4,7 @@
 module tcu_priv_core_req #(
     `include "noc_parameter.vh"
     ,`include "tcu_parameter.vh"
-    ,parameter TCU_REGADDR_CORE_REQ_INT = TCU_REGADDR_CORE_CFG_START + 'h8,
-    parameter HOME_MODID                = {NOC_MODID_SIZE{1'b0}}
+    ,parameter TCU_REGADDR_CORE_REQ_INT = TCU_REGADDR_CORE_CFG_START + 'h8
 )(
     input  wire                                 clk_i,
     input  wire                                 reset_n_i,
@@ -37,7 +36,8 @@ module tcu_priv_core_req #(
 
     //---------------
     //for debugging
-    input  wire           [NOC_CHIPID_SIZE-1:0] home_chipid_i
+    input  wire           [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire            [NOC_MODID_SIZE-1:0] home_modid_i
 );
 
 

@@ -12,7 +12,6 @@ module tcu_ctrl #(
     parameter TCU_ENABLE_PRINT           = 0,
     parameter TCU_REGADDR_CORE_REQ_INT   = TCU_REGADDR_CORE_CFG_START + 'h8,
     parameter TCU_REGADDR_TIMER_INT      = TCU_REGADDR_CORE_CFG_START + 'h10,
-    parameter HOME_MODID                 = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ                = 100,
     parameter [31:0] TIMEOUT_SEND_CYCLES = CLKFREQ_MHZ*2000000,
     parameter [31:0] TIMEOUT_RECV_CYCLES = CLKFREQ_MHZ*1000000
@@ -115,8 +114,9 @@ module tcu_ctrl #(
     input  wire                          tcu_print_valid_i,
 
     //---------------
-    //Home Chip-ID
+    //Home Chip/Mod-ID
     input  wire    [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire     [NOC_MODID_SIZE-1:0] home_modid_i,
 
     //---------------
     //debug print IDs
@@ -2145,7 +2145,7 @@ module tcu_ctrl #(
 
 
     assign noc_tx_src_chipid_o = home_chipid_i;
-    assign noc_tx_src_modid_o = HOME_MODID;
+    assign noc_tx_src_modid_o = home_modid_i;
 
 
     assign noc_tx_wrreq_o = r_noc_tx_wrreq;
@@ -2211,7 +2211,7 @@ module tcu_ctrl #(
                     //if header is correct, work on payload in corresponding state
 
                     //check again if this packet is for us, and last packet was not burst
-                    if ((noc_rx_trg_chipid_i == home_chipid_i) && (noc_rx_trg_modid_i == HOME_MODID) && !r_noc_rx_burst) begin
+                    if ((noc_rx_trg_chipid_i == home_chipid_i) && (noc_rx_trg_modid_i == home_modid_i) && !r_noc_rx_burst) begin
 
                         //write or write from response
                         if ((noc_rx_mode_i == MODE_WRITE_POSTED) || (noc_rx_mode_i == MODE_READ_RSP) ||
@@ -2819,7 +2819,6 @@ module tcu_ctrl #(
             .TCU_ENABLE_DRAM         (TCU_ENABLE_DRAM),
             .TCU_ENABLE_VIRT_ADDR    (TCU_ENABLE_VIRT_ADDR),
             .TCU_ENABLE_VIRT_PES     (TCU_ENABLE_VIRT_PES),
-            .HOME_MODID              (HOME_MODID),
             .TIMEOUT_SEND_CYCLES     (TIMEOUT_SEND_CYCLES)
         ) i_tcu_ctrl_send_msg (
             .clk_i                   (clk_i),
@@ -2892,7 +2891,8 @@ module tcu_ctrl #(
             .tcu_features_virt_addr_i(tcu_features_virt_addr_i),
             .tcu_features_virt_pes_i (tcu_features_virt_pes_i),
 
-            .home_chipid_i           (home_chipid_i)
+            .home_chipid_i           (home_chipid_i),
+            .home_modid_i            (home_modid_i)
         );
 
 
@@ -2970,7 +2970,6 @@ module tcu_ctrl #(
             .TCU_ENABLE_DRAM         (TCU_ENABLE_DRAM),
             .TCU_ENABLE_VIRT_ADDR    (TCU_ENABLE_VIRT_ADDR),
             .TCU_ENABLE_VIRT_PES     (TCU_ENABLE_VIRT_PES),
-            .HOME_MODID              (HOME_MODID),
             .TIMEOUT_SEND_CYCLES     (TIMEOUT_SEND_CYCLES)
         ) i_tcu_ctrl_reply_msg (
             .clk_i                   (clk_i),
@@ -3048,7 +3047,8 @@ module tcu_ctrl #(
             .tcu_features_virt_addr_i(tcu_features_virt_addr_i),
             .tcu_features_virt_pes_i (tcu_features_virt_pes_i),
 
-            .home_chipid_i           (home_chipid_i)
+            .home_chipid_i           (home_chipid_i),
+            .home_modid_i            (home_modid_i)
         );
 
 
@@ -3278,7 +3278,6 @@ module tcu_ctrl #(
             .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT),
             .TCU_REGADDR_TIMER_INT    (TCU_REGADDR_TIMER_INT),
             .TCU_ENABLE_LOG           (TCU_ENABLE_LOG),
-            .HOME_MODID               (HOME_MODID),
             .CLKFREQ_MHZ              (CLKFREQ_MHZ)
         ) i_tcu_priv_ctrl (
             .clk_i                    (clk_i),
@@ -3346,7 +3345,8 @@ module tcu_ctrl #(
 
             //---------------
             //for debugging
-            .home_chipid_i            (home_chipid_i)
+            .home_chipid_i            (home_chipid_i),
+            .home_modid_i             (home_modid_i)
         );
 
     end

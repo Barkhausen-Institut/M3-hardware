@@ -224,7 +224,6 @@ tcu_top #(
     .TCU_ENABLE_CMDS            (0),
     .TCU_ENABLE_DRAM            (1),
     .TCU_ENABLE_MEM_ADDR_ALIGN  (0),
-    .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (100),
     .TILE_TYPE                  ('d1),              //memory tile
     .TILE_ISA                   ('d0),
@@ -369,6 +368,7 @@ tcu_top #(
     .tcu_status_o               (tcu_status),
 
     .home_chipid_i              (home_chipid_i),
+    .home_modid_i               (HOME_MODID),
 
     .print_chipid_i             ({NOC_CHIPID_SIZE{1'b0}}),  //debug print is disabled
     .print_modid_i              ({NOC_MODID_SIZE{1'b0}})

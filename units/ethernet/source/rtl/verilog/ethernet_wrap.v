@@ -371,7 +371,6 @@ assign eth_rx_data = {eth_rx_header_s, eth_rx_payload_s};
 tcu_top #(
     .TCU_ENABLE_CMDS            (0),
     .TCU_ENABLE_DRAM            (0),
-    .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (125),
     .TILE_TYPE                  ('d1),
     .TILE_ISA                   ('d0),
@@ -508,6 +507,7 @@ tcu_top #(
     .tcu_status_o               (tcu_status),
 
     .home_chipid_i              (home_chipid_i),
+    .home_modid_i               (HOME_MODID),
 
     .print_chipid_i             (host_chipid),
     .print_modid_i              (MODID_ETH)

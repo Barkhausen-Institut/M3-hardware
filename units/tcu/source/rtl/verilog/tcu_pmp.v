@@ -4,13 +4,13 @@
 module tcu_pmp #(
     `include "tcu_parameter.vh"
     ,`include "noc_parameter.vh"
-    ,parameter HOME_MODID = {NOC_MODID_SIZE{1'b0}}
 )(
     input  wire                          clk_i,
     input  wire                          reset_n_i,
     input  wire                          tcu_reset_i,
 
     input  wire    [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire     [NOC_MODID_SIZE-1:0] home_modid_i,
     output wire [TCU_FLITCOUNT_SIZE-1:0] pmp_drop_flit_count_o, 
 
     //---------------
@@ -528,9 +528,9 @@ module tcu_pmp #(
             noc_in_rx_wrreq_o      = 1'b1;
             noc_in_rx_bsel_o       = {NOC_BSEL_SIZE{1'b1}};
             noc_in_rx_src_chipid_o = home_chipid_i;
-            noc_in_rx_src_modid_o  = HOME_MODID;
+            noc_in_rx_src_modid_o  = home_modid_i;
             noc_in_rx_trg_chipid_o = home_chipid_i;
-            noc_in_rx_trg_modid_o  = HOME_MODID;
+            noc_in_rx_trg_modid_o  = home_modid_i;
             noc_in_rx_mode_o       = MODE_ERROR;
             noc_in_rx_addr_o       = fifo_dataout_addr;
             noc_in_rx_data0_o      = {NOC_DATA_SIZE{1'b0}}; //todo: return TCU error
@@ -546,7 +546,7 @@ module tcu_pmp #(
     assign noc_out_tx_burst_o      = fifo_dataout_burst;
     assign noc_out_tx_arq_o        = fifo_dataout_arq;
     assign noc_out_tx_bsel_o       = fifo_dataout_bsel;
-    assign noc_out_tx_src_modid_o  = HOME_MODID;
+    assign noc_out_tx_src_modid_o  = home_modid_i;
     assign noc_out_tx_trg_modid_o  = mep_pe;
     assign noc_out_tx_src_chipid_o = home_chipid_i;
     assign noc_out_tx_trg_chipid_o = mep_chip;

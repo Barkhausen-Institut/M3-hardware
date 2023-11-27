@@ -10,7 +10,6 @@ module tcu_priv_ctrl #(
     parameter TCU_REGADDR_CORE_REQ_INT = TCU_REGADDR_CORE_CFG_START + 'h8,
     parameter TCU_REGADDR_TIMER_INT    = TCU_REGADDR_CORE_CFG_START + 'h10,
     parameter TCU_ENABLE_LOG           = 0,
-    parameter HOME_MODID               = {NOC_MODID_SIZE{1'b0}},
     parameter CLKFREQ_MHZ              = 100
 )(
     input  wire                                 clk_i,
@@ -77,7 +76,8 @@ module tcu_priv_ctrl #(
 
     //---------------
     //for debugging
-    input  wire           [NOC_CHIPID_SIZE-1:0] home_chipid_i
+    input  wire           [NOC_CHIPID_SIZE-1:0] home_chipid_i,
+    input  wire            [NOC_MODID_SIZE-1:0] home_modid_i
 );
 
     `include "tcu_functions.v"
@@ -591,8 +591,7 @@ module tcu_priv_ctrl #(
 
 
     tcu_priv_core_req #(
-        .TCU_REGADDR_CORE_REQ_INT(TCU_REGADDR_CORE_REQ_INT),
-        .HOME_MODID              (HOME_MODID)
+        .TCU_REGADDR_CORE_REQ_INT (TCU_REGADDR_CORE_REQ_INT)
     ) i_tcu_priv_core_req (
         .clk_i                    (clk_i),
         .reset_n_i                (reset_n_i),
@@ -614,7 +613,8 @@ module tcu_priv_ctrl #(
 
         .tcu_log_core_req_data_o  (tcu_log_core_req_data),
 
-        .home_chipid_i            (home_chipid_i)
+        .home_chipid_i            (home_chipid_i),
+        .home_modid_i             (home_modid_i)
     );
 
 
