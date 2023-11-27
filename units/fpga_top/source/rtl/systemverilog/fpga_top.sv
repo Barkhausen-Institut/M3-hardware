@@ -21,7 +21,7 @@ module fpga_top #(
     parameter FPGA_PORT           = 16'd1800,
 
     parameter PM_COUNT            = 8,
-    parameter int PM_DOMAIN_TYPE[PM_COUNT] = '{PM_TYPE_ROCKET,
+    parameter int PM_DOMAIN_TYPE[PM_COUNT] = '{PM_TYPE_ACC,
                                                PM_TYPE_NONE,
                                                PM_TYPE_NONE,
                                                PM_TYPE_NONE,
