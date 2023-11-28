@@ -29,7 +29,7 @@ acc_wrap #(
     .ACC_TYPE                   (ACC_TYPE),
     .HOME_MODID                 (HOME_MODID),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ)
-) i_asm_wrap (
+) i_acc_wrap (
     .clk_pm_i                   (clk_pm_i),
     .reset_pm_n_i               (reset_sync_n_s),
     .home_chipid_i              (home_chipid_s),
