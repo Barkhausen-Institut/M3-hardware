@@ -256,7 +256,7 @@ parameter TCU_CORE_REQ_PMPFAIL_SIZE = TCU_PHYSADDR_SIZE+TCU_ERROR_SIZE+1,    //3
 //TCU version
 parameter [TCU_VMAJOR_SIZE-1:0] TCU_VMAJOR = 2,
 parameter [TCU_VMINOR_SIZE-1:0] TCU_VMINOR = 0,
-parameter [TCU_VPATCH_SIZE-1:0] TCU_VPATCH = 0,
+parameter [TCU_VPATCH_SIZE-1:0] TCU_VPATCH = 1,
 
 //tile description
 parameter TILE_TYPE_SIZE    = 6,
