@@ -1,0 +1,294 @@
+L2 InclusiveCache Client Map:
+	0 <= slave-port-axi4 ID#0
+	1 <= slave-port-axi4 ID#1
+	2 <= serial-tl
+	3 <= Core 0 DCache
+	4 <= Core 0 ICache
+
+[C0] ======BOOM Tile 0 Params======
+
+[C0] ====Overall Frontend Params====
+
+[C0] ==L1-ICache==
+[C0] Fetch bytes   : 8
+[C0] Block bytes   : 64
+[C0] Row bytes     : 8
+[C0] Word bits     : 64
+[C0] Sets          : 64
+[C0] Ways          : 4
+[C0] Refill cycles : 8
+[C0] RAMs          : (64 x 512) using 1 banks
+[C0] Single-banked
+[C0] I-TLB ways    : 32
+
+[C0] ==Branch Predictor Memory Sizes==
+
+[C0] bank0 tage_l2: 128 x 44 = 704
+[C0] bank0 tage_l4: 128 x 44 = 704
+[C0] bank0 tage_l8: 256 x 48 = 1536
+[C0] bank0 tage_l16: 256 x 48 = 1536
+[C0] bank0 tage_l32: 128 x 52 = 832
+[C0] bank0 tage_l64: 128 x 52 = 832
+[C0] bank0 btb_meta_way0: 128 x 124 = 1984
+[C0] bank0 btb_data_way0: 128 x 56 = 896
+[C0] bank0 btb_meta_way1: 128 x 124 = 1984
+[C0] bank0 btb_data_way1: 128 x 56 = 896
+[C0] bank0 ebtb: 128 x 40 = 640
+[C0] bank0 bim: 2048 x 8 = 2048
+[C0] Total bpd size: 14 KB
+
+[C0] ====Overall Core Params====
+
+[C0] ===ExecutionUnits===
+
+[C0] ==2-wide Machine==
+[C0] ==4 Issue==
+
+[C0] ==ExeUnit==
+[C0]  - Mem
+[C0] ==ExeUnit==
+[C0]  - ALU
+[C0]  - Mul
+[C0]  - IFPU
+[C0] ==ExeUnit==
+[C0]  - ALU
+[C0]  - Div
+
+[C0] ===FP Pipeline===
+
+[C0] ==Floating Point Regfile==
+[C0] Num RF Read Ports     : 3
+[C0] Num RF Write Ports    : 2
+[C0] RF Cost (R+W)*(R+2W)  : 35
+[C0] Bypassable Units      : List(false, false)
+[C0] Num Wakeup Ports      : 2
+[C0] Num Bypass Ports      : 0
+
+[C0] ==ROB==
+[C0] Machine Width      : 2
+[C0] Rob Entries        : 64
+[C0] Rob Rows           : 32
+[C0] Rob Row size       : 5
+[C0] log2Ceil(coreWidth): 1
+[C0] FPU FFlag Ports    : 2
+
+[C0] ===Other Core Params===
+[C0] Fetch Width           : 4
+[C0] Decode Width          : 2
+[C0] Issue Width           : 4
+[C0] ROB Size              : 64
+[C0] Issue Window Size     : List(12, 20, 16) (Age-based Priority)
+[C0] Load/Store Unit Size  : 16/16
+[C0] Num Int Phys Registers: 80
+[C0] Num FP  Phys Registers: 64
+[C0] Max Branch Count      : 12
+[C0] ==Integer Regfile==
+[C0] Num RF Read Ports     : 6
+[C0] Num RF Write Ports    : 3
+[C0] RF Cost (R+W)*(R+2W)  : 108
+[C0] Bypassable Units      : List(true, true, true)
+
+[C0] Num Slow Wakeup Ports : 3
+[C0] Num Fast Wakeup Ports : 2
+[C0] Num Bypass Ports      : 4
+
+[C0] DCache Ways           : 4
+[C0] DCache Sets           : 64
+[C0] DCache nMSHRs         : 2
+[C0] ICache Ways           : 4
+[C0] ICache Sets           : 64
+[C0] D-TLB Ways            : 8
+[C0] I-TLB Ways            : 32
+[C0] Paddr Bits            : 32
+[C0] Vaddr Bits            : 39
+
+[C0] Using FPU Unit?       : true
+[C0] Using FDivSqrt?       : true
+[C0] Using VM?             : true
+
+
+Interrupt map (2 harts 9 interrupts):
+  [1, 8] => system
+  [9, 9] => uart_0
+
+Clock subsystem_pbus_0: using diplomatically specified frequency of 500.0.
+Clock subsystem_mbus_0: using diplomatically specified frequency of 500.0.
+/dts-v1/;
+
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	compatible = "ucb-bar,chipyard-dev";
+	model = "ucb-bar,chipyard";
+	L23: aliases {
+		serial0 = &L17;
+	};
+	L10: chosen {
+		stdout-path = &L17;
+	};
+	L22: cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		timebase-frequency = <1000000>;
+		L5: cpu@0 {
+			clock-frequency = <0>;
+			compatible = "ucb-bar,boom0", "riscv";
+			d-cache-block-size = <64>;
+			d-cache-sets = <64>;
+			d-cache-size = <16384>;
+			d-tlb-sets = <1>;
+			d-tlb-size = <8>;
+			device_type = "cpu";
+			hardware-exec-breakpoint-count = <0>;
+			i-cache-block-size = <64>;
+			i-cache-sets = <64>;
+			i-cache-size = <16384>;
+			i-tlb-sets = <1>;
+			i-tlb-size = <32>;
+			mmu-type = "riscv,sv39";
+			next-level-cache = <&L3>;
+			reg = <0x0>;
+			riscv,isa = "rv64imafdczicsr_zifencei_zihpm";
+			riscv,pmpgranularity = <4>;
+			riscv,pmpregions = <8>;
+			status = "okay";
+			timebase-frequency = <1000000>;
+			tlb-split;
+			L4: interrupt-controller {
+				#interrupt-cells = <1>;
+				compatible = "riscv,cpu-intc";
+				interrupt-controller;
+			};
+		};
+	};
+	L24: htif {
+		compatible = "ucb,htif0";
+	};
+	L13: memory@10000000 {
+		device_type = "memory";
+		reg = <0x10000000 0xe0000000>;
+	};
+	L21: soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "ucb-bar,chipyard-soc", "simple-bus";
+		ranges;
+		L16: boot-address-reg@4000 {
+			reg = <0x4000 0x1000>;
+			reg-names = "control";
+		};
+		L3: cache-controller@2010000 {
+			cache-block-size = <64>;
+			cache-level = <2>;
+			cache-sets = <1024>;
+			cache-size = <524288>;
+			cache-unified;
+			compatible = "sifive,inclusivecache0", "cache";
+			next-level-cache = <&L13>;
+			reg = <0x2010000 0x1000>;
+			reg-names = "control";
+			sifive,mshr-count = <7>;
+		};
+		L7: clint@2000000 {
+			compatible = "riscv,clint0";
+			interrupts-extended = <&L4 3 &L4 7>;
+			reg = <0x2000000 0x10000>;
+			reg-names = "control";
+		};
+		L18: clock-gater@100000 {
+			reg = <0x100000 0x1000>;
+			reg-names = "control";
+		};
+		L8: debug-controller@0 {
+			compatible = "sifive,debug-013", "riscv,debug-013";
+			debug-attach = "jtag";
+			interrupts-extended = <&L4 65535>;
+			reg = <0x0 0x1000>;
+			reg-names = "control";
+		};
+		L1: error-device@3000 {
+			compatible = "sifive,error0";
+			reg = <0x3000 0x1000>;
+		};
+		L11: external-interrupts {
+			interrupt-parent = <&L6>;
+			interrupts = <1 2 3 4 5 6 7 8>;
+		};
+		L6: interrupt-controller@c000000 {
+			#interrupt-cells = <1>;
+			compatible = "riscv,plic0";
+			interrupt-controller;
+			interrupts-extended = <&L4 11 &L4 9>;
+			reg = <0xc000000 0x4000000>;
+			reg-names = "control";
+			riscv,max-priority = <7>;
+			riscv,ndev = <9>;
+		};
+		L14: mmio-port-axi4@f0000000 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "simple-bus";
+			ranges = <0xf0000000 0xf0000000 0x10000000>;
+		};
+		L15: rom@10000 {
+			compatible = "sifive,rom0";
+			reg = <0x10000 0x10000>;
+			reg-names = "mem";
+		};
+		L17: serial@4000000 {
+			clocks = <&L0>;
+			compatible = "sifive,uart0";
+			interrupt-parent = <&L6>;
+			interrupts = <9>;
+			reg = <0x4000000 0x1000>;
+			reg-names = "control";
+		};
+		L2: subsystem_mbus_clock {
+			#clock-cells = <0>;
+			clock-frequency = <500000000>;
+			clock-output-names = "subsystem_mbus_clock";
+			compatible = "fixed-clock";
+		};
+		L0: subsystem_pbus_clock {
+			#clock-cells = <0>;
+			clock-frequency = <500000000>;
+			clock-output-names = "subsystem_pbus_clock";
+			compatible = "fixed-clock";
+		};
+		L19: tile-reset-setter@110000 {
+			reg = <0x110000 0x1000>;
+			reg-names = "control";
+		};
+	};
+};
+
+Generated Address Map
+	       0 -     1000 ARWX  debug-controller@0
+	    3000 -     4000 ARWX  error-device@3000
+	    4000 -     5000 ARW   boot-address-reg@4000
+	   10000 -    20000  R X  rom@10000
+	  100000 -   101000 ARW   clock-gater@100000
+	  110000 -   111000 ARW   tile-reset-setter@110000
+	 2000000 -  2010000 ARW   clint@2000000
+	 2010000 -  2011000 ARW   cache-controller@2010000
+	 4000000 -  4001000 ARW   serial@4000000
+	 c000000 - 10000000 ARW   interrupt-controller@c000000
+	10000000 - f0000000 ARWXC memory@10000000
+	f0000000 - 100000000  RWX  mmio-port-axi4@f0000000
+
+IOCells generated by IOBinders:
+  IOBinder for interface testchipip.CanHavePeripheryCustomBootPin generated:
+    1 X GenericDigitalInIOCell
+  IOBinder for interface sifive.blocks.devices.uart.HasPeripheryUARTModuleImp generated:
+    1 X GenericDigitalInIOCell
+    1 X GenericDigitalOutIOCell
+  IOBinder for interface freechips.rocketchip.devices.debug.HasPeripheryDebug generated:
+    3 X GenericDigitalInIOCell
+    1 X GenericDigitalOutIOCell
+  IOBinder for interface freechips.rocketchip.subsystem.HasExtInterruptsModuleImp generated:
+    8 X GenericDigitalInIOCell
+
+  Total generated 15 IOCells:
+    13 X GenericDigitalInIOCell
+    2 X GenericDigitalOutIOCell
+Harness binder clock is 100.0

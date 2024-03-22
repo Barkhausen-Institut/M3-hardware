@@ -450,26 +450,27 @@ mem_axi4_bridge #(
 
 wire         traceIO_traces_0_clock;
 wire         traceIO_traces_0_reset;
-wire         traceIO_traces_0_insns_0_valid;
-wire [39:0]  traceIO_traces_0_insns_0_iaddr;
-wire [31:0]  traceIO_traces_0_insns_0_insn;
-wire [63:0]  traceIO_traces_0_insns_0_wdata;
-wire [2:0]   traceIO_traces_0_insns_0_priv;
-wire         traceIO_traces_0_insns_0_exception;
-wire         traceIO_traces_0_insns_0_interrupt;
-wire [63:0]  traceIO_traces_0_insns_0_cause;
-wire [39:0]  traceIO_traces_0_insns_0_tval;
-wire         traceIO_traces_0_insns_1_valid;
-wire [39:0]  traceIO_traces_0_insns_1_iaddr;
-wire [31:0]  traceIO_traces_0_insns_1_insn;
-wire [63:0]  traceIO_traces_0_insns_1_wdata;
-wire [2:0]   traceIO_traces_0_insns_1_priv;
-wire         traceIO_traces_0_insns_1_exception;
-wire         traceIO_traces_0_insns_1_interrupt;
-wire [63:0]  traceIO_traces_0_insns_1_cause;
-wire [39:0]  traceIO_traces_0_insns_1_tval;
+wire         traceIO_traces_0_trace_insns_0_valid;
+wire [39:0]  traceIO_traces_0_trace_insns_0_iaddr;
+wire [31:0]  traceIO_traces_0_trace_insns_0_insn;
+wire [63:0]  traceIO_traces_0_trace_insns_0_wdata;
+wire [2:0]   traceIO_traces_0_trace_insns_0_priv;
+wire         traceIO_traces_0_trace_insns_0_exception;
+wire         traceIO_traces_0_trace_insns_0_interrupt;
+wire [63:0]  traceIO_traces_0_trace_insns_0_cause;
+wire [39:0]  traceIO_traces_0_trace_insns_0_tval;
+wire [63:0]  traceIO_traces_0_trace_time;
+wire         traceIO_traces_0_trace_custom_rob_empty;
+wire         traceIO_traces_0_trace_insns_1_valid;
+wire [39:0]  traceIO_traces_0_trace_insns_1_iaddr;
+wire [31:0]  traceIO_traces_0_trace_insns_1_insn;
+wire [63:0]  traceIO_traces_0_trace_insns_1_wdata;
+wire [2:0]   traceIO_traces_0_trace_insns_1_priv;
+wire         traceIO_traces_0_trace_insns_1_exception;
+wire         traceIO_traces_0_trace_insns_1_interrupt;
+wire [63:0]  traceIO_traces_0_trace_insns_1_cause;
+wire [39:0]  traceIO_traces_0_trace_insns_1_tval;
 
-wire debug_ndreset;
 wire debug_dmactive;
 wire debug_dmactive_sync;
 
@@ -483,62 +484,28 @@ util_sync util_sync_dmactive (
 );
 
 
+//enabled by default
+assign jtag_tdo_en_o = 1'b1;
+
 DigitalTop_boom boom_top (
     .clock                                (clk_i),
     .reset                                (~reset_n_i),
 
-    .auto_domain_resetCtrl_async_reset_sink_in_clock                                       (clk_i),
-    .auto_domain_resetCtrl_async_reset_sink_in_reset                                       (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_cbus_0_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_cbus_0_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_mbus_0_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_mbus_0_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_fbus_0_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_fbus_0_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_pbus_0_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_pbus_0_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_sbus_1_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_sbus_1_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_sbus_0_clock  (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_subsystem_sbus_0_reset  (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_implicit_clock_clock    (clk_i),
-    .auto_domain_resetCtrl_tile_reset_provider_in_member_allClocks_implicit_clock_reset    (~reset_n_i),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_cbus_0_clock (),  //outputs unused
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_cbus_0_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_mbus_0_clock (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_mbus_0_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_fbus_0_clock (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_fbus_0_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_pbus_0_clock (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_pbus_0_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_sbus_1_clock (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_sbus_1_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_sbus_0_clock (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_subsystem_sbus_0_reset (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_implicit_clock_clock   (),
-    .auto_domain_resetCtrl_tile_reset_provider_out_member_allClocks_implicit_clock_reset   (),
-    .auto_subsystem_mbus_fixedClockNode_out_1_clock                                        (),
-    .auto_subsystem_mbus_fixedClockNode_out_1_reset                                        (),
-    .auto_subsystem_mbus_fixedClockNode_out_0_clock                                        (),
-    .auto_subsystem_mbus_fixedClockNode_out_0_reset                                        (),
-    .auto_subsystem_mbus_subsystem_mbus_clock_groups_in_member_subsystem_mbus_0_clock      (clk_i),
-    .auto_subsystem_mbus_subsystem_mbus_clock_groups_in_member_subsystem_mbus_0_reset      (~reset_n_i),
-    .auto_subsystem_cbus_fixedClockNode_out_clock                                          (),
-    .auto_subsystem_cbus_fixedClockNode_out_reset                                          (),
-    .auto_subsystem_cbus_subsystem_cbus_clock_groups_in_member_subsystem_cbus_0_clock      (clk_i),
-    .auto_subsystem_cbus_subsystem_cbus_clock_groups_in_member_subsystem_cbus_0_reset      (~reset_n_i),
-    .auto_subsystem_fbus_fixedClockNode_out_clock                                          (),
-    .auto_subsystem_fbus_fixedClockNode_out_reset                                          (),
-    .auto_subsystem_fbus_subsystem_fbus_clock_groups_in_member_subsystem_fbus_0_clock      (clk_i),
-    .auto_subsystem_fbus_subsystem_fbus_clock_groups_in_member_subsystem_fbus_0_reset      (~reset_n_i),
-    .auto_subsystem_pbus_subsystem_pbus_clock_groups_in_member_subsystem_pbus_0_clock      (clk_i),
-    .auto_subsystem_pbus_subsystem_pbus_clock_groups_in_member_subsystem_pbus_0_reset      (~reset_n_i),
-    .auto_subsystem_sbus_subsystem_sbus_clock_groups_in_member_subsystem_sbus_1_clock      (clk_i),
-    .auto_subsystem_sbus_subsystem_sbus_clock_groups_in_member_subsystem_sbus_1_reset      (~reset_n_i),
-    .auto_subsystem_sbus_subsystem_sbus_clock_groups_in_member_subsystem_sbus_0_clock      (clk_i),
-    .auto_subsystem_sbus_subsystem_sbus_clock_groups_in_member_subsystem_sbus_0_reset      (~reset_n_i),
+    .auto_prci_ctrl_domain_reset_setter_clock_in_member_allClocks_uncore_clock (clk_i),
+    .auto_prci_ctrl_domain_reset_setter_clock_in_member_allClocks_uncore_reset (~reset_n_i),
+    .auto_implicitClockGrouper_out_clock                                       (),
+    .auto_implicitClockGrouper_out_reset                                       (),
+    .auto_subsystem_mbus_fixedClockNode_out_clock                              (),  //outputs unused
+    .auto_subsystem_mbus_fixedClockNode_out_reset                              (),
+    .auto_subsystem_cbus_fixedClockNode_out_clock                              (),
+    .auto_subsystem_cbus_fixedClockNode_out_reset                              (),
+    .auto_subsystem_fbus_fixedClockNode_out_clock                              (),
+    .auto_subsystem_sbus_fixedClockNode_out_clock                              (),
+    .auto_subsystem_sbus_fixedClockNode_out_reset                              (),
 
-    .resetctrl_hartIsInReset_0            (debug_ndreset),
+    .resetctrl_hartIsInReset_0            (~reset_n_i),
+
+    .custom_boot                          (1'b0),
 
     .debug_clock                          (clk_i),
     .debug_reset                          (~reset_n_i),
@@ -546,12 +513,7 @@ DigitalTop_boom boom_top (
     .debug_systemjtag_jtag_TMS            (jtag_tms_i),
     .debug_systemjtag_jtag_TDI            (jtag_tdi_i),
     .debug_systemjtag_jtag_TDO_data       (jtag_tdo_o),
-    .debug_systemjtag_jtag_TDO_driven     (jtag_tdo_en_o),
     .debug_systemjtag_reset               (~reset_n_i),
-    .debug_systemjtag_mfr_id              (11'h0),
-    .debug_systemjtag_part_number         (16'h0),
-    .debug_systemjtag_version             (4'h0),
-    .debug_ndreset                        (debug_ndreset),  //debugger can reset hart
     .debug_dmactive                       (debug_dmactive),
     .debug_dmactiveAck                    (debug_dmactive_sync),
 
@@ -560,26 +522,28 @@ DigitalTop_boom boom_top (
     .uart_0_txd                           (uart_tx),
     .uart_0_rxd                           (uart_rx),
 
-    .traceIO_traces_0_clock               (traceIO_traces_0_clock),
-    .traceIO_traces_0_reset               (traceIO_traces_0_reset),
-    .traceIO_traces_0_insns_0_valid       (traceIO_traces_0_insns_0_valid),
-    .traceIO_traces_0_insns_0_iaddr       (traceIO_traces_0_insns_0_iaddr),
-    .traceIO_traces_0_insns_0_insn        (traceIO_traces_0_insns_0_insn),
-    .traceIO_traces_0_insns_0_wdata       (traceIO_traces_0_insns_0_wdata),
-    .traceIO_traces_0_insns_0_priv        (traceIO_traces_0_insns_0_priv),
-    .traceIO_traces_0_insns_0_exception   (traceIO_traces_0_insns_0_exception),
-    .traceIO_traces_0_insns_0_interrupt   (traceIO_traces_0_insns_0_interrupt),
-    .traceIO_traces_0_insns_0_cause       (traceIO_traces_0_insns_0_cause),
-    .traceIO_traces_0_insns_0_tval        (traceIO_traces_0_insns_0_tval),
-    .traceIO_traces_0_insns_1_valid       (traceIO_traces_0_insns_1_valid),
-    .traceIO_traces_0_insns_1_iaddr       (traceIO_traces_0_insns_1_iaddr),
-    .traceIO_traces_0_insns_1_insn        (traceIO_traces_0_insns_1_insn),
-    .traceIO_traces_0_insns_1_wdata       (traceIO_traces_0_insns_1_wdata),
-    .traceIO_traces_0_insns_1_priv        (traceIO_traces_0_insns_1_priv),
-    .traceIO_traces_0_insns_1_exception   (traceIO_traces_0_insns_1_exception),
-    .traceIO_traces_0_insns_1_interrupt   (traceIO_traces_0_insns_1_interrupt),
-    .traceIO_traces_0_insns_1_cause       (traceIO_traces_0_insns_1_cause),
-    .traceIO_traces_0_insns_1_tval        (traceIO_traces_0_insns_1_tval),
+    .traceIO_traces_0_clock                     (traceIO_traces_0_clock),
+    .traceIO_traces_0_reset                     (traceIO_traces_0_reset),
+    .traceIO_traces_0_trace_insns_0_valid       (traceIO_traces_0_trace_insns_0_valid),
+    .traceIO_traces_0_trace_insns_0_iaddr       (traceIO_traces_0_trace_insns_0_iaddr),
+    .traceIO_traces_0_trace_insns_0_insn        (traceIO_traces_0_trace_insns_0_insn),
+    .traceIO_traces_0_trace_insns_0_wdata       (traceIO_traces_0_trace_insns_0_wdata),
+    .traceIO_traces_0_trace_insns_0_priv        (traceIO_traces_0_trace_insns_0_priv),
+    .traceIO_traces_0_trace_insns_0_exception   (traceIO_traces_0_trace_insns_0_exception),
+    .traceIO_traces_0_trace_insns_0_interrupt   (traceIO_traces_0_trace_insns_0_interrupt),
+    .traceIO_traces_0_trace_insns_0_cause       (traceIO_traces_0_trace_insns_0_cause),
+    .traceIO_traces_0_trace_insns_0_tval        (traceIO_traces_0_trace_insns_0_tval),
+    .traceIO_traces_0_trace_time                (traceIO_traces_0_trace_time),
+    .traceIO_traces_0_trace_custom_rob_empty    (traceIO_traces_0_trace_custom_rob_empty),
+    .traceIO_traces_0_trace_insns_1_valid       (traceIO_traces_0_trace_insns_1_valid),
+    .traceIO_traces_0_trace_insns_1_iaddr       (traceIO_traces_0_trace_insns_1_iaddr),
+    .traceIO_traces_0_trace_insns_1_insn        (traceIO_traces_0_trace_insns_1_insn),
+    .traceIO_traces_0_trace_insns_1_wdata       (traceIO_traces_0_trace_insns_1_wdata),
+    .traceIO_traces_0_trace_insns_1_priv        (traceIO_traces_0_trace_insns_1_priv),
+    .traceIO_traces_0_trace_insns_1_exception   (traceIO_traces_0_trace_insns_1_exception),
+    .traceIO_traces_0_trace_insns_1_interrupt   (traceIO_traces_0_trace_insns_1_interrupt),
+    .traceIO_traces_0_trace_insns_1_cause       (traceIO_traces_0_trace_insns_1_cause),
+    .traceIO_traces_0_trace_insns_1_tval        (traceIO_traces_0_trace_insns_1_tval),
 
     .mem_axi4_0_aw_ready                  (mem_axi4_0_aw_ready),
     .mem_axi4_0_aw_valid                  (mem_axi4_0_aw_valid),
@@ -738,14 +702,14 @@ if (BOOM_ENABLE_TRACE) begin: trace_gen
         .trace_ptr_o           (boom_trace_ptr_o),
         .trace_count_o         (boom_trace_count_o),
 
-        .trace_valid           (traceIO_traces_0_insns_0_valid),
-        .trace_iaddr           (traceIO_traces_0_insns_0_iaddr),
-        .trace_insn            (traceIO_traces_0_insns_0_insn),
-        .trace_priv            (traceIO_traces_0_insns_0_priv),
-        .trace_exception       (traceIO_traces_0_insns_0_exception),
-        .trace_interrupt       (traceIO_traces_0_insns_0_interrupt),
-        .trace_cause           (traceIO_traces_0_insns_0_cause),
-        .trace_tval            (traceIO_traces_0_insns_0_tval),
+        .trace_valid           (traceIO_traces_0_trace_insns_0_valid),
+        .trace_iaddr           (traceIO_traces_0_trace_insns_0_iaddr),
+        .trace_insn            (traceIO_traces_0_trace_insns_0_insn),
+        .trace_priv            (traceIO_traces_0_trace_insns_0_priv),
+        .trace_exception       (traceIO_traces_0_trace_insns_0_exception),
+        .trace_interrupt       (traceIO_traces_0_trace_insns_0_interrupt),
+        .trace_cause           (traceIO_traces_0_trace_insns_0_cause),
+        .trace_tval            (traceIO_traces_0_trace_insns_0_tval),
 
         .trace_mem_en_i        (tcu_trace_mem_en),
         .trace_mem_addr_i      (tcu_mem_addr_i),

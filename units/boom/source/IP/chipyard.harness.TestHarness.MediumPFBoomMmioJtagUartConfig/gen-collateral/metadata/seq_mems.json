@@ -1,0 +1,286 @@
+[
+  {
+    "module_name": "cc_dir_ext",
+    "depth": 1024,
+    "width": 160,
+    "masked": true,
+    "read": false,
+    "write": false,
+    "readwrite": true,
+    "mask_granularity": 20,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.subsystem_l2_wrapper.l2.inclusive_cache_bank_sched.directory.cc_dir.cc_dir_ext"
+    ]
+  },
+  {
+    "module_name": "cc_banks_0_ext",
+    "depth": 16384,
+    "width": 64,
+    "masked": false,
+    "read": false,
+    "write": false,
+    "readwrite": true,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.subsystem_l2_wrapper.l2.inclusive_cache_bank_sched.bankedStore.cc_banks_3.cc_banks_0_ext",
+      "DigitalTop.subsystem_l2_wrapper.l2.inclusive_cache_bank_sched.bankedStore.cc_banks_2.cc_banks_0_ext",
+      "DigitalTop.subsystem_l2_wrapper.l2.inclusive_cache_bank_sched.bankedStore.cc_banks_1.cc_banks_0_ext",
+      "DigitalTop.subsystem_l2_wrapper.l2.inclusive_cache_bank_sched.bankedStore.cc_banks_0.cc_banks_0_ext"
+    ]
+  },
+  {
+    "module_name": "tag_array_ext",
+    "depth": 64,
+    "width": 88,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 22,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.dcache.meta_0.tag_array.tag_array_ext"
+    ]
+  },
+  {
+    "module_name": "array_0_0_0_ext",
+    "depth": 512,
+    "width": 64,
+    "masked": false,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.dcache.data.array_3_0_0.array_0_0_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.dcache.data.array_2_0_0.array_0_0_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.dcache.data.array_1_0_0.array_0_0_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.dcache.data.array_0_0_0.array_0_0_0_ext"
+    ]
+  },
+  {
+    "module_name": "tag_array_0_ext",
+    "depth": 64,
+    "width": 80,
+    "masked": true,
+    "read": false,
+    "write": false,
+    "readwrite": true,
+    "mask_granularity": 20,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.icache.tag_array.tag_array_0_ext"
+    ]
+  },
+  {
+    "module_name": "dataArrayWay_0_ext",
+    "depth": 512,
+    "width": 64,
+    "masked": false,
+    "read": false,
+    "write": false,
+    "readwrite": true,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.icache.dataArrayWay_3.dataArrayWay_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.icache.dataArrayWay_2.dataArrayWay_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.icache.dataArrayWay_1.dataArrayWay_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.icache.dataArrayWay_0.dataArrayWay_0_ext"
+    ]
+  },
+  {
+    "module_name": "hi_us_ext",
+    "depth": 128,
+    "width": 4,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 1,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_5.lo_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_5.hi_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_4.lo_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_4.hi_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_1.lo_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_1.hi_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_0.lo_us.hi_us_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_0.hi_us.hi_us_ext"
+    ]
+  },
+  {
+    "module_name": "table_ext",
+    "depth": 128,
+    "width": 44,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 11,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_1.table.table_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_0.table.table_ext"
+    ]
+  },
+  {
+    "module_name": "hi_us_0_ext",
+    "depth": 256,
+    "width": 4,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 1,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_3.lo_us.hi_us_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_3.hi_us.hi_us_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_2.lo_us.hi_us_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_2.hi_us.hi_us_0_ext"
+    ]
+  },
+  {
+    "module_name": "table_0_ext",
+    "depth": 256,
+    "width": 48,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 12,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_3.table.table_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_2.table.table_0_ext"
+    ]
+  },
+  {
+    "module_name": "table_1_ext",
+    "depth": 128,
+    "width": 52,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 13,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_5.table.table_1_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_1.tables_4.table.table_1_ext"
+    ]
+  },
+  {
+    "module_name": "meta_0_ext",
+    "depth": 128,
+    "width": 124,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 31,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_2.meta_1.meta_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_2.meta_0.meta_0_ext"
+    ]
+  },
+  {
+    "module_name": "btb_0_ext",
+    "depth": 128,
+    "width": 56,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 14,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_2.btb_1.btb_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_2.btb_0.btb_0_ext"
+    ]
+  },
+  {
+    "module_name": "ebtb_ext",
+    "depth": 128,
+    "width": 40,
+    "masked": false,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_2.ebtb.ebtb_ext"
+    ]
+  },
+  {
+    "module_name": "data_ext",
+    "depth": 2048,
+    "width": 8,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 2,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.bpd.banked_predictors_0.components_4.data.data_ext"
+    ]
+  },
+  {
+    "module_name": "meta_0_0_ext",
+    "depth": 32,
+    "width": 120,
+    "masked": false,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.ftq.meta_0.meta_0_0_ext"
+    ]
+  },
+  {
+    "module_name": "ghist_0_ext",
+    "depth": 32,
+    "width": 72,
+    "masked": false,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.ftq.ghist_1.ghist_0_ext",
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.frontend.ftq.ghist_0.ghist_0_ext"
+    ]
+  },
+  {
+    "module_name": "rob_debug_inst_mem_ext",
+    "depth": 32,
+    "width": 64,
+    "masked": true,
+    "read": true,
+    "write": true,
+    "readwrite": false,
+    "mask_granularity": 32,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.core.rob.rob_debug_inst_mem.rob_debug_inst_mem_ext"
+    ]
+  },
+  {
+    "module_name": "l2_tlb_ram_0_ext",
+    "depth": 512,
+    "width": 45,
+    "masked": false,
+    "read": false,
+    "write": false,
+    "readwrite": true,
+    "extra_ports": [],
+    "hierarchy": [
+      "DigitalTop.tile_prci_domain.tile_reset_domain_boom_tile.ptw.l2_tlb_ram_0.l2_tlb_ram_0_ext"
+    ]
+  }
+]
