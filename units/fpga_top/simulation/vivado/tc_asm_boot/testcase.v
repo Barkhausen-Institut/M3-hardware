@@ -61,6 +61,8 @@ begin : testcase
     //---------------
     //start testcase-specific stimulus here
 
+    //enable trace
+    write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START+'h50, 64'h1);
 
     //start ASM
     write8b_noc(HOME_CHIPID, MODID_PM0, 8'hFF, TCU_REGADDR_CORE_CFG_START, 64'h1);
