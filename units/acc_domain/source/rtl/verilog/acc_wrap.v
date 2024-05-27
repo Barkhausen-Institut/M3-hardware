@@ -18,6 +18,9 @@ module acc_wrap #(
     parameter ASM_MEM_DATA_SIZE   = 128,
     parameter ASM_MEM_ADDR_SIZE   = 13,
     parameter ASM_MEM_BSEL_SIZE   = ASM_MEM_DATA_SIZE/8,
+    parameter ASM_ENABLE_TRACE    = 1,
+    parameter ASM_TRACE_BASEADDR  = 32'h00100000,
+    parameter ASM_TRACE_SIZE      = 'h2000,
 
     //accelerator
     parameter ACC_MEM_START_ADDR = ASM_DMEM_START_ADDR + ASM_DMEM_SIZE, //0x14000
@@ -128,14 +131,14 @@ module acc_wrap #(
 
     wire                            tcu2asm_mem_en;
     wire    [ASM_MEM_BSEL_SIZE-1:0] tcu2asm_mem_wben;
-    wire    [ASM_MEM_ADDR_SIZE-1:0] tcu2asm_mem_addr;
+    wire   [ASM_CORE_ADDR_SIZE-1:0] tcu2asm_mem_addr;
     wire    [ASM_MEM_DATA_SIZE-1:0] tcu2asm_mem_wdata;
     wire    [ASM_MEM_DATA_SIZE-1:0] tcu2asm_mem_rdata;
     wire                            tcu2asm_mem_stall;
 
     wire                            tcu2acc_mem_en;
     wire    [ACC_MEM_BSEL_SIZE-1:0] tcu2acc_mem_wben;
-    wire    [ACC_MEM_ADDR_SIZE-1:0] tcu2acc_mem_addr;
+    wire   [ACC_CORE_ADDR_SIZE-1:0] tcu2acc_mem_addr;
     wire    [ACC_MEM_DATA_SIZE-1:0] tcu2acc_mem_wdata;
     wire    [ACC_MEM_DATA_SIZE-1:0] tcu2acc_mem_rdata;
     wire                            tcu2acc_mem_stall;
@@ -155,14 +158,20 @@ module acc_wrap #(
     //TCU memory signals
     wire                            tcu_asm_mem_en;
     wire    [ASM_MEM_BSEL_SIZE-1:0] tcu_asm_mem_wben;
-    wire    [ASM_MEM_ADDR_SIZE-1:0] tcu_asm_mem_addr;
+    wire   [ASM_CORE_ADDR_SIZE-1:0] tcu_asm_mem_addr;
     wire    [ASM_MEM_DATA_SIZE-1:0] tcu_asm_mem_wdata;
     wire    [ASM_MEM_DATA_SIZE-1:0] tcu_asm_mem_rdata;
     wire                            tcu_asm_mem_stall;
 
+    wire                            tcu_asm_mux_mem_en;
+    wire                            tcu_asm_mux_mem_stall;
+    wire                            tcu_asm_trace_mem_en;
+    wire    [ASM_MEM_DATA_SIZE-1:0] tcu_trace_mem_rdata;
+    wire    [ASM_MEM_DATA_SIZE-1:0] tcu_asm_mux_mem_rdata;
+
     wire                            tcu_acc_mem_en;
     wire    [ACC_MEM_BSEL_SIZE-1:0] tcu_acc_mem_wben;
-    wire    [ACC_MEM_ADDR_SIZE-1:0] tcu_acc_mem_addr;
+    wire   [ACC_CORE_ADDR_SIZE-1:0] tcu_acc_mem_addr;
     wire    [ACC_MEM_DATA_SIZE-1:0] tcu_acc_mem_wdata;
     wire    [ACC_MEM_DATA_SIZE-1:0] tcu_acc_mem_rdata;
     wire                            tcu_acc_mem_stall;
@@ -182,6 +191,10 @@ module acc_wrap #(
     wire    [ASM_CORE_ADDR_SIZE-1:0] pico_stackaddr;
 
     wire                             acc_en;
+
+    wire                             asm_trace_enabled;
+    wire    [ASM_CORE_ADDR_SIZE-1:0] asm_trace_ptr;
+    wire    [ASM_CORE_ADDR_SIZE-1:0] asm_trace_count;
 
     //status flag
     wire       [TCU_STATUS_SIZE-1:0] tcu_status;
@@ -267,7 +280,11 @@ nocif i_nocif_pm (
 
 picorv32_core #(
     .PICO_MEM_DATA_SIZE (ASM_CORE_DATA_SIZE),
-    .PICO_MEM_ADDR_SIZE (ASM_CORE_ADDR_SIZE)
+    .PICO_MEM_ADDR_SIZE (ASM_CORE_ADDR_SIZE),
+    .ASM_MEM_DATA_SIZE  (ASM_MEM_DATA_SIZE),
+    .ASM_ENABLE_TRACE   (ASM_ENABLE_TRACE),
+    .ASM_TRACE_BASEADDR (ASM_TRACE_BASEADDR),
+    .ASM_TRACE_SIZE     (ASM_TRACE_SIZE)
 ) i_picorv32_core (
     .clk_i              (clk_asm_s),
     .resetn_i           (reset_asm_n_s),
@@ -283,7 +300,15 @@ picorv32_core #(
     .irq_i              (pico_irq),
     .eoi_o              (pico_eoi),
 
-    .stackaddr_i        (pico_stackaddr)
+    .stackaddr_i        (pico_stackaddr),
+
+    .trace_enabled_i    (asm_trace_enabled),
+    .trace_ptr_o        (asm_trace_ptr),
+    .trace_count_o      (asm_trace_count),
+
+    .trace_mem_en_i     (tcu_asm_trace_mem_en),
+    .trace_mem_addr_i   (tcu_asm_mem_addr),
+    .trace_mem_rdata_o  (tcu_trace_mem_rdata)
 );
 
 
@@ -304,7 +329,8 @@ acc_core #(
 
 
 asm_regfile #(
-    .PICO_STACKADDR     (ACC_MEM_START_ADDR)   //stack should start at end of DMEM
+    .PICO_STACKADDR     (ACC_MEM_START_ADDR),   //stack should start at end of DMEM
+    .ASM_CORE_ADDR_SIZE (ASM_CORE_ADDR_SIZE)
 ) i_asm_regfile (
     .clk_i              (clk_pm_i),
     .reset_n_i          (reset_pm_n_i),
@@ -320,9 +346,44 @@ asm_regfile #(
     .pico_trap_i        (pico_trap),
     .pico_irq_o         (pico_irq),
     .pico_eoi_i         (pico_eoi),
-    .pico_stackaddr_o   (pico_stackaddr)
+    .pico_stackaddr_o   (pico_stackaddr),
+
+    .asm_trace_enabled_o        (asm_trace_enabled),
+    .asm_trace_ptr_i            (asm_trace_ptr),
+    .asm_trace_count_i          (asm_trace_count)
 );
 
+
+
+generate
+if (ASM_ENABLE_TRACE) begin: trace_gen
+    //MUX between trace memory and TCU memory interface
+    wire tcu_mem_select_trace = (tcu_asm_mem_addr >= ASM_TRACE_BASEADDR) && (tcu_asm_mem_addr < (ASM_TRACE_BASEADDR+ASM_TRACE_SIZE));
+
+    reg r_tcu_trace_mem_en;
+    always @(posedge clk_pm_i or negedge reset_pm_n_i) begin
+        if (reset_pm_n_i == 1'b0) begin
+            r_tcu_trace_mem_en <= 1'b0;
+        end else begin
+            r_tcu_trace_mem_en <= tcu_asm_trace_mem_en;
+        end
+    end
+
+    assign tcu_asm_mux_mem_en = tcu_mem_select_trace ? 1'b0 : tcu_asm_mem_en;
+    assign tcu_asm_trace_mem_en = tcu_mem_select_trace ? tcu_asm_mem_en : 1'b0;
+    assign tcu_asm_mem_stall = tcu_mem_select_trace ? 1'b0 : tcu_asm_mux_mem_stall;
+    assign tcu_asm_mem_rdata = r_tcu_trace_mem_en ? tcu_trace_mem_rdata : tcu_asm_mux_mem_rdata;
+end
+else begin: no_trace_gen
+    assign tcu_asm_mux_mem_en = tcu_asm_mem_en;
+    assign tcu_asm_trace_mem_en = 1'b0;
+    assign tcu_asm_mem_stall = tcu_asm_mux_mem_stall;
+    assign tcu_asm_mem_rdata = tcu_asm_mux_mem_rdata;
+end
+endgenerate
+
+
+localparam LOG_ASM_MEM_DATA_BYTES = $clog2(ASM_MEM_BSEL_SIZE);
 
 asm_mem_mux #(
     .MEM_DATAWIDTH      (ASM_MEM_DATA_SIZE),
@@ -330,17 +391,17 @@ asm_mem_mux #(
 ) asm_mux_asmtcu (
     .mem_in1_en_i       (tcu2asm_mem_en),
     .mem_in1_wben_i     (tcu2asm_mem_wben),
-    .mem_in1_addr_i     (tcu2asm_mem_addr),
+    .mem_in1_addr_i     (tcu2asm_mem_addr[ASM_MEM_ADDR_SIZE+LOG_ASM_MEM_DATA_BYTES-1:LOG_ASM_MEM_DATA_BYTES]),
     .mem_in1_wdata_i    (tcu2asm_mem_wdata),
     .mem_in1_rdata_o    (tcu2asm_mem_rdata),
     .mem_in1_stall_o    (tcu2asm_mem_stall),
 
-    .mem_in2_en_i       (tcu_asm_mem_en),
+    .mem_in2_en_i       (tcu_asm_mux_mem_en),
     .mem_in2_wben_i     (tcu_asm_mem_wben),
-    .mem_in2_addr_i     (tcu_asm_mem_addr),
+    .mem_in2_addr_i     (tcu_asm_mem_addr[ASM_MEM_ADDR_SIZE+LOG_ASM_MEM_DATA_BYTES-1:LOG_ASM_MEM_DATA_BYTES]),
     .mem_in2_wdata_i    (tcu_asm_mem_wdata),
-    .mem_in2_rdata_o    (tcu_asm_mem_rdata),
-    .mem_in2_stall_o    (tcu_asm_mem_stall),
+    .mem_in2_rdata_o    (tcu_asm_mux_mem_rdata),
+    .mem_in2_stall_o    (tcu_asm_mux_mem_stall),
 
     .mem_out_en_o       (mux_asm_mem_en),
     .mem_out_wben_o     (mux_asm_mem_wben),
@@ -366,20 +427,22 @@ mem_sp_wrap #(
 );
 
 
+localparam LOG_ACC_MEM_DATA_BYTES = $clog2(ACC_MEM_BSEL_SIZE);
+
 asm_mem_mux #(
     .MEM_DATAWIDTH      (ACC_MEM_DATA_SIZE),
     .MEM_ADDRWIDTH      (ACC_MEM_ADDR_SIZE)
 ) asm_mux_acctcu (
     .mem_in1_en_i       (tcu2acc_mem_en),
     .mem_in1_wben_i     (tcu2acc_mem_wben),
-    .mem_in1_addr_i     (tcu2acc_mem_addr),
+    .mem_in1_addr_i     (tcu2acc_mem_addr[ACC_MEM_ADDR_SIZE+LOG_ACC_MEM_DATA_BYTES-1:LOG_ACC_MEM_DATA_BYTES]),
     .mem_in1_wdata_i    (tcu2acc_mem_wdata),
     .mem_in1_rdata_o    (tcu2acc_mem_rdata),
     .mem_in1_stall_o    (tcu2acc_mem_stall),
 
     .mem_in2_en_i       (tcu_acc_mem_en),
     .mem_in2_wben_i     (tcu_acc_mem_wben),
-    .mem_in2_addr_i     (tcu_acc_mem_addr),
+    .mem_in2_addr_i     (tcu_acc_mem_addr[ACC_MEM_ADDR_SIZE+LOG_ACC_MEM_DATA_BYTES-1:LOG_ACC_MEM_DATA_BYTES]),
     .mem_in2_wdata_i    (tcu_acc_mem_wdata),
     .mem_in2_rdata_o    (tcu_acc_mem_rdata),
     .mem_in2_stall_o    (tcu_acc_mem_stall),
@@ -423,7 +486,8 @@ assign {pm_tx_trg_mod_x_coord_s, pm_tx_trg_mod_y_coord_s, pm_tx_trg_mod_z_coord_
 tcu_top #(
     .TCU_ENABLE_CMDS            (1),
     .TCU_ENABLE_DRAM            (0),
-    .TCU_ENABLE_LOG             (0),
+    .TCU_ENABLE_MEM_ADDR_ALIGN  (0),
+    .TCU_ENABLE_LOG             (1),
     .TCU_ENABLE_PRINT           (1),
     .CLKFREQ_MHZ                (CLKFREQ_MHZ),
     .TILE_TYPE                  ('d0),      //processing tile
@@ -437,13 +501,13 @@ tcu_top #(
     .CORE_IMEM_ADDR_SIZE        (ACC_CORE_ADDR_SIZE),
     .CORE_IMEM_BSEL_SIZE        (ACC_CORE_BSEL_SIZE),
     .DMEM_DATA_SIZE             (ASM_MEM_DATA_SIZE),
-    .DMEM_ADDR_SIZE             (ASM_MEM_ADDR_SIZE),
+    .DMEM_ADDR_SIZE             (ASM_CORE_ADDR_SIZE),
     .DMEM_BSEL_SIZE             (ASM_MEM_BSEL_SIZE),
     .IMEM_DATA_SIZE             (ACC_MEM_DATA_SIZE),
-    .IMEM_ADDR_SIZE             (ACC_MEM_ADDR_SIZE),
+    .IMEM_ADDR_SIZE             (ACC_CORE_ADDR_SIZE),
     .IMEM_BSEL_SIZE             (ACC_MEM_BSEL_SIZE),
     .DMEM_START_ADDR            (ASM_IMEM_START_ADDR),
-    .DMEM_SIZE                  (ASM_DMEM_SIZE+ASM_IMEM_SIZE),
+    .DMEM_SIZE                  (ASM_TRACE_BASEADDR+ASM_TRACE_SIZE),    //TCU also accesses trace mem through DMEM interface
     .IMEM_START_ADDR            (ACC_MEM_START_ADDR),
     .IMEM_SIZE                  (ACC_MEM_SIZE),
     .NOCMUX_TX_IF1_PRIO         (1),         //there is only IF1

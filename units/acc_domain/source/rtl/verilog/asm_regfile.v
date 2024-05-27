@@ -1,7 +1,8 @@
 
 module asm_regfile #(
     `include "tcu_parameter.vh"
-    ,parameter PICO_STACKADDR = 'h40000
+    ,parameter PICO_STACKADDR = 'h40000,
+    parameter ASM_CORE_ADDR_SIZE = 32
 )(
     input  wire                          clk_i,
     input  wire                          reset_n_i,
@@ -21,7 +22,11 @@ module asm_regfile #(
     input  wire                          pico_trap_i,
     output wire                   [31:0] pico_irq_o,
     input  wire                   [31:0] pico_eoi_i,
-    output wire                   [31:0] pico_stackaddr_o
+    output wire                   [31:0] pico_stackaddr_o,
+
+    output wire                          asm_trace_enabled_o,
+    input  wire [ASM_CORE_ADDR_SIZE-1:0] asm_trace_ptr_i,
+    input  wire [ASM_CORE_ADDR_SIZE-1:0] asm_trace_count_i
 );
 
     integer i;
@@ -35,6 +40,9 @@ module asm_regfile #(
     localparam REG_PICO_EOI       = 32'h00000020;
     localparam REG_PICO_STACKADDR = 32'h00000028;
 
+    localparam REG_ASM_TRACE_ENABLED  = 32'h00000050;
+    localparam REG_ASM_TRACE_PTR      = 32'h00000058;
+    localparam REG_ASM_TRACE_COUNT    = 32'h00000060;
 
 
     //---------------
@@ -51,6 +59,9 @@ module asm_regfile #(
     
     //stack addr
     reg [31:0] r_pico_stackaddr, rin_pico_stackaddr;
+
+    //traces
+    reg        r_asm_trace_enabled, rin_asm_trace_enabled;
 
     reg [63:0] r_config_rdata, rin_config_rdata;
 
@@ -69,6 +80,8 @@ module asm_regfile #(
             r_pico_eoi <= 32'h0;
             r_pico_stackaddr <= PICO_STACKADDR;
 
+            r_asm_trace_enabled <= 1'b0;
+
             r_config_rdata <= 64'h0;
         end
         else begin
@@ -78,6 +91,8 @@ module asm_regfile #(
             r_pico_irq <= rin_pico_irq;
             r_pico_eoi <= pico_eoi_i;
             r_pico_stackaddr <= rin_pico_stackaddr;
+
+            r_asm_trace_enabled <= rin_asm_trace_enabled;
 
             r_config_rdata <= rin_config_rdata;
         end
@@ -92,6 +107,8 @@ module asm_regfile #(
         rin_acc_en = r_acc_en;
         rin_pico_irq = r_pico_irq;
         rin_pico_stackaddr = r_pico_stackaddr;
+
+        rin_asm_trace_enabled = r_asm_trace_enabled;
 
         rin_config_rdata = r_config_rdata;
 
@@ -115,6 +132,10 @@ module asm_regfile #(
 
                 REG_PICO_STACKADDR: begin
                     for (i=0; i<4; i=i+1) if(config_wben_i[i]) rin_pico_stackaddr[i*8 +: 8] = config_wdata_i[i*8 +: 8];
+                end
+
+                REG_ASM_TRACE_ENABLED: begin
+                    if(config_wben_i[0]) rin_asm_trace_enabled = config_wdata_i[0];
                 end
 
                 //default:
@@ -149,6 +170,18 @@ module asm_regfile #(
                     rin_config_rdata = r_pico_stackaddr;
                 end
 
+                REG_ASM_TRACE_ENABLED: begin
+                    rin_config_rdata = r_asm_trace_enabled;
+                end
+
+                REG_ASM_TRACE_PTR: begin
+                    rin_config_rdata = asm_trace_ptr_i;
+                end
+
+                REG_ASM_TRACE_COUNT: begin
+                    rin_config_rdata = asm_trace_count_i;
+                end
+
                 default: begin
                     rin_config_rdata = 64'h0;
                 end
@@ -165,5 +198,6 @@ module asm_regfile #(
     assign pico_irq_o = r_pico_irq;
     assign pico_stackaddr_o = r_pico_stackaddr;
 
+    assign asm_trace_enabled_o = r_asm_trace_enabled;
 
 endmodule
