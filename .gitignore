@@ -1,2 +1,14 @@
 Makefile.local
 /tmp
+.envrc
+.direnv/
+logfiles/
+.Xil
+*.jou
+*.log
+*.dir
+*.str
+*.pb
+*.wdb
+.dir-locals.el
+.dir-locals-2.el

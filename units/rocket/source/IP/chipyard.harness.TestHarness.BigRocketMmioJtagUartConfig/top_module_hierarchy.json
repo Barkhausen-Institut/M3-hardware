@@ -1,0 +1,4316 @@
+{
+  "instance_name": "DigitalTop",
+  "module_name": "DigitalTop",
+  "instances": [
+    {
+      "instance_name": "ibus_int_bus",
+      "module_name": "IntXbar",
+      "instances": []
+    },
+    {
+      "instance_name": "ibus_intsink",
+      "module_name": "IntSyncAsyncCrossingSink",
+      "instances": [
+        {
+          "instance_name": "chain",
+          "module_name": "SynchronizerShiftReg_w8_d3",
+          "instances": [
+            {
+              "instance_name": "output_chain",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_1",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_2",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_3",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_4",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_5",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_6",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            },
+            {
+              "instance_name": "output_chain_7",
+              "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+              "instances": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_sbus",
+      "module_name": "SystemBus",
+      "instances": [
+        {
+          "instance_name": "fixedClockNode",
+          "module_name": "FixedClockBroadcast",
+          "instances": []
+        },
+        {
+          "instance_name": "system_bus_xbar",
+          "module_name": "TLXbar",
+          "instances": []
+        },
+        {
+          "instance_name": "fixer",
+          "module_name": "TLFIFOFixer",
+          "instances": []
+        },
+        {
+          "instance_name": "coupler_to_port_named_mmio_port_axi4",
+          "module_name": "TLInterconnectCoupler_4",
+          "instances": [
+            {
+              "instance_name": "axi4buf",
+              "module_name": "AXI4Buffer",
+              "instances": [
+                {
+                  "instance_name": "x1_aw_deq",
+                  "module_name": "Queue",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_15",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "x1_w_deq",
+                  "module_name": "Queue_1",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_21",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_b_deq",
+                  "module_name": "Queue_2",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_1",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "x1_ar_deq",
+                  "module_name": "Queue",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_15",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_r_deq",
+                  "module_name": "Queue_4",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_18",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4yank",
+              "module_name": "AXI4UserYanker",
+              "instances": [
+                {
+                  "instance_name": "Queue",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_1",
+                  "module_name": "Queue_6",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_8",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_2",
+                  "module_name": "Queue_6",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_8",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_3",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_4",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_5",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_6",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_7",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_8",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_9",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_10",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_11",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_12",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_13",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_14",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_15",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_16",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_17",
+                  "module_name": "Queue_6",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_8",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_18",
+                  "module_name": "Queue_6",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_8",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_19",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_20",
+                  "module_name": "Queue_5",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_7",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_21",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_22",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_23",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_24",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_25",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_26",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_27",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_28",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_29",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_30",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_31",
+                  "module_name": "Queue_10",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_6",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4deint",
+              "module_name": "AXI4Deinterleaver",
+              "instances": [
+                {
+                  "instance_name": "qs_queue_0",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_1",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_2",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_3",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_4",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_5",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_6",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_7",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_8",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_9",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_10",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_11",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_12",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_13",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_14",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "qs_queue_15",
+                  "module_name": "Queue_37",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_24",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4index",
+              "module_name": "AXI4IdIndexer",
+              "instances": []
+            },
+            {
+              "instance_name": "tl2axi4",
+              "module_name": "TLToAXI4",
+              "instances": [
+                {
+                  "instance_name": "deq",
+                  "module_name": "Queue_53",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_20",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "queue_arw_deq",
+                  "module_name": "Queue_54",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_20",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_pbus",
+      "module_name": "PeripheryBus",
+      "instances": [
+        {
+          "instance_name": "fixedClockNode",
+          "module_name": "FixedClockBroadcast_1",
+          "instances": []
+        },
+        {
+          "instance_name": "fixer",
+          "module_name": "TLFIFOFixer_1",
+          "instances": []
+        },
+        {
+          "instance_name": "out_xbar",
+          "module_name": "TLXbar_2",
+          "instances": []
+        },
+        {
+          "instance_name": "buffer",
+          "module_name": "TLBuffer",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_55",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_36",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_56",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_23",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "atomics",
+          "module_name": "TLAtomicAutomata",
+          "instances": []
+        },
+        {
+          "instance_name": "buffer_1",
+          "module_name": "TLBuffer",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_55",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_36",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_56",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_23",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_bootaddressreg",
+          "module_name": "TLInterconnectCoupler_5",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_device_named_uart_0",
+          "module_name": "TLInterconnectCoupler_6",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_1",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_1",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_fbus",
+      "module_name": "FrontBus",
+      "instances": [
+        {
+          "instance_name": "fixedClockNode",
+          "module_name": "FixedClockBroadcast_1",
+          "instances": []
+        },
+        {
+          "instance_name": "subsystem_fbus_xbar",
+          "module_name": "TLXbar_3",
+          "instances": []
+        },
+        {
+          "instance_name": "buffer",
+          "module_name": "TLBuffer_2",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_59",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_43",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_60",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_26",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_from_port_named_slave_port_axi4",
+          "module_name": "TLInterconnectCoupler_7",
+          "instances": [
+            {
+              "instance_name": "buffer",
+              "module_name": "TLBuffer_3",
+              "instances": [
+                {
+                  "instance_name": "x1_a_q",
+                  "module_name": "Queue_61",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_42",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_q",
+                  "module_name": "Queue_62",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_23",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "fixer",
+              "module_name": "TLFIFOFixer_2",
+              "instances": []
+            },
+            {
+              "instance_name": "widget",
+              "module_name": "TLWidthWidget_4",
+              "instances": [
+                {
+                  "instance_name": "repeated_repeater",
+                  "module_name": "Repeater_2",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "axi42tl",
+              "module_name": "AXI4ToTL",
+              "instances": [
+                {
+                  "instance_name": "deq",
+                  "module_name": "Queue_63",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_44",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "q_b_deq",
+                  "module_name": "Queue_64",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4yank",
+              "module_name": "AXI4UserYanker_1",
+              "instances": [
+                {
+                  "instance_name": "Queue",
+                  "module_name": "Queue_65",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_1",
+                  "module_name": "Queue_65",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_2",
+                  "module_name": "Queue_65",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_3",
+                  "module_name": "Queue_65",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_0",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4frag",
+              "module_name": "AXI4Fragmenter",
+              "instances": [
+                {
+                  "instance_name": "deq",
+                  "module_name": "Queue_69",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_14",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "deq_1",
+                  "module_name": "Queue_69",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_14",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "in_w_deq",
+                  "module_name": "Queue_71",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_46",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4index",
+              "module_name": "AXI4IdIndexer_1",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "serdesser",
+          "module_name": "TLSerdesser",
+          "instances": [
+            {
+              "instance_name": "outArb",
+              "module_name": "HellaPeekingArbiter",
+              "instances": []
+            },
+            {
+              "instance_name": "outSer",
+              "module_name": "GenericSerializer",
+              "instances": []
+            },
+            {
+              "instance_name": "inDes",
+              "module_name": "GenericDeserializer",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_from_port_named_serial_tl_ctrl",
+          "module_name": "TLInterconnectCoupler_8",
+          "instances": [
+            {
+              "instance_name": "buffer",
+              "module_name": "TLBuffer_4",
+              "instances": [
+                {
+                  "instance_name": "x1_a_q",
+                  "module_name": "Queue_72",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_40",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_q",
+                  "module_name": "Queue_62",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_23",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "outer_reset_catcher",
+          "module_name": "ResetCatchAndSync_d3",
+          "instances": [
+            {
+              "instance_name": "io_sync_reset_chain",
+              "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+              "instances": [
+                {
+                  "instance_name": "output_chain",
+                  "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "out_async",
+          "module_name": "AsyncQueue",
+          "instances": [
+            {
+              "instance_name": "source",
+              "module_name": "AsyncQueueSource",
+              "instances": [
+                {
+                  "instance_name": "ridx_ridx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w4_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_1",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_2",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_3",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "sink",
+              "module_name": "AsyncQueueSink",
+              "instances": [
+                {
+                  "instance_name": "widx_widx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w4_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_1",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_2",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_3",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "io_deq_bits_deq_bits_reg",
+                  "module_name": "ClockCrossingReg_w32",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sink_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "in_async",
+          "module_name": "AsyncQueue",
+          "instances": [
+            {
+              "instance_name": "source",
+              "module_name": "AsyncQueueSource",
+              "instances": [
+                {
+                  "instance_name": "ridx_ridx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w4_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_1",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_2",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_3",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "sink",
+              "module_name": "AsyncQueueSink",
+              "instances": [
+                {
+                  "instance_name": "widx_widx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w4_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_1",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_2",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "output_chain_3",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "io_deq_bits_deq_bits_reg",
+                  "module_name": "ClockCrossingReg_w32",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sink_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_cbus",
+      "module_name": "PeripheryBus_1",
+      "instances": [
+        {
+          "instance_name": "fixedClockNode",
+          "module_name": "FixedClockBroadcast_3",
+          "instances": []
+        },
+        {
+          "instance_name": "fixer",
+          "module_name": "TLFIFOFixer_3",
+          "instances": []
+        },
+        {
+          "instance_name": "in_xbar",
+          "module_name": "TLXbar_4",
+          "instances": []
+        },
+        {
+          "instance_name": "out_xbar",
+          "module_name": "TLXbar_5",
+          "instances": []
+        },
+        {
+          "instance_name": "buffer",
+          "module_name": "TLBuffer_5",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_74",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_39",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_75",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_26",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "atomics",
+          "module_name": "TLAtomicAutomata_1",
+          "instances": []
+        },
+        {
+          "instance_name": "wrapped_error_device",
+          "module_name": "ErrorDeviceWrapper",
+          "instances": [
+            {
+              "instance_name": "error",
+              "module_name": "TLError",
+              "instances": [
+                {
+                  "instance_name": "a",
+                  "module_name": "Queue_76",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_29",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "buffer",
+              "module_name": "TLBuffer_6",
+              "instances": [
+                {
+                  "instance_name": "x1_a_q",
+                  "module_name": "Queue_77",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_30",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_q",
+                  "module_name": "Queue_75",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_26",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_l2_ctrl",
+          "module_name": "TLInterconnectCoupler_9",
+          "instances": [
+            {
+              "instance_name": "buffer",
+              "module_name": "TLBuffer_7",
+              "instances": [
+                {
+                  "instance_name": "x1_a_q",
+                  "module_name": "Queue_79",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_38",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_q",
+                  "module_name": "Queue_80",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_27",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_2",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_3",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_plic",
+          "module_name": "TLInterconnectCoupler_11",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_3",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_4",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_clint",
+          "module_name": "TLInterconnectCoupler_12",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_2",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_3",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_debug",
+          "module_name": "TLInterconnectCoupler_14",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_5",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_6",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_bootrom",
+          "module_name": "TLInterconnectCoupler_15",
+          "instances": [
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_6",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_7",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "coupler_to_prci_ctrl",
+          "module_name": "TLInterconnectCoupler_17",
+          "instances": [
+            {
+              "instance_name": "fixer",
+              "module_name": "TLFIFOFixer_4",
+              "instances": []
+            },
+            {
+              "instance_name": "fragmenter",
+              "module_name": "TLFragmenter_7",
+              "instances": [
+                {
+                  "instance_name": "repeater",
+                  "module_name": "Repeater_8",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "buffer",
+              "module_name": "TLBuffer_9",
+              "instances": [
+                {
+                  "instance_name": "x1_a_q",
+                  "module_name": "Queue_81",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_34",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_q",
+                  "module_name": "Queue_56",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_23",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_mbus",
+      "module_name": "MemoryBus",
+      "instances": [
+        {
+          "instance_name": "fixedClockNode",
+          "module_name": "FixedClockBroadcast_1",
+          "instances": []
+        },
+        {
+          "instance_name": "fixer",
+          "module_name": "TLFIFOFixer_5",
+          "instances": []
+        },
+        {
+          "instance_name": "picker",
+          "module_name": "ProbePicker",
+          "instances": []
+        },
+        {
+          "instance_name": "coupler_to_memory_controller_port_named_axi4",
+          "module_name": "TLInterconnectCoupler_19",
+          "instances": [
+            {
+              "instance_name": "axi4yank",
+              "module_name": "AXI4UserYanker_2",
+              "instances": [
+                {
+                  "instance_name": "Queue",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_1",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_2",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_3",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_4",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_5",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_6",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_7",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_8",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_9",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_10",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_11",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_12",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_13",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_14",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_15",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_16",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_17",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_18",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "Queue_19",
+                  "module_name": "Queue_83",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_3",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "axi4index",
+              "module_name": "AXI4IdIndexer_2",
+              "instances": []
+            },
+            {
+              "instance_name": "tl2axi4",
+              "module_name": "TLToAXI4_1",
+              "instances": [
+                {
+                  "instance_name": "deq",
+                  "module_name": "Queue_103",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_46",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "queue_arw_deq",
+                  "module_name": "Queue_104",
+                  "instances": [
+                    {
+                      "instance_name": "ram_ext",
+                      "module_name": "ram_combMem_17",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "widget",
+              "module_name": "TLWidthWidget_8",
+              "instances": [
+                {
+                  "instance_name": "repeated_repeater",
+                  "module_name": "Repeater_9",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "subsystem_l2_wrapper",
+      "module_name": "CoherenceManagerWrapper",
+      "instances": [
+        {
+          "instance_name": "l2",
+          "module_name": "InclusiveCache",
+          "instances": [
+            {
+              "instance_name": "out_back",
+              "module_name": "Queue_105",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_28",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "inclusive_cache_bank_sched",
+              "module_name": "InclusiveCacheBankScheduler",
+              "instances": [
+                {
+                  "instance_name": "sourceA",
+                  "module_name": "SourceA",
+                  "instances": [
+                    {
+                      "instance_name": "io_a_q",
+                      "module_name": "Queue_106",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_37",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sourceB",
+                  "module_name": "SourceB",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sourceC",
+                  "module_name": "SourceC",
+                  "instances": [
+                    {
+                      "instance_name": "queue",
+                      "module_name": "Queue_107",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_33",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sourceD",
+                  "module_name": "SourceD",
+                  "instances": [
+                    {
+                      "instance_name": "queue",
+                      "module_name": "Queue_108",
+                      "instances": [
+                        {
+                          "instance_name": "ram_data_ext",
+                          "module_name": "ram_data_combMem",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "atomics",
+                      "module_name": "Atomics",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sourceE",
+                  "module_name": "SourceE",
+                  "instances": [
+                    {
+                      "instance_name": "io_e_q",
+                      "module_name": "Queue_109",
+                      "instances": [
+                        {
+                          "instance_name": "ram_sink_ext",
+                          "module_name": "ram_sink_combMem",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sourceX",
+                  "module_name": "SourceX",
+                  "instances": [
+                    {
+                      "instance_name": "io_x_q",
+                      "module_name": "Queue_110",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sinkA",
+                  "module_name": "SinkA",
+                  "instances": [
+                    {
+                      "instance_name": "putbuffer",
+                      "module_name": "ListBuffer",
+                      "instances": [
+                        {
+                          "instance_name": "head_ext",
+                          "module_name": "head_combMem_1",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "tail_ext",
+                          "module_name": "tail_combMem_1",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "next_ext",
+                          "module_name": "next_combMem_1",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "data_ext",
+                          "module_name": "data_combMem_1",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sinkC",
+                  "module_name": "SinkC",
+                  "instances": [
+                    {
+                      "instance_name": "c",
+                      "module_name": "Queue_111",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_35",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "io_bs_adr_q",
+                      "module_name": "Queue_112",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_9",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "putbuffer",
+                      "module_name": "ListBuffer_1",
+                      "instances": [
+                        {
+                          "instance_name": "head_ext",
+                          "module_name": "head_combMem",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "tail_ext",
+                          "module_name": "tail_combMem",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "next_ext",
+                          "module_name": "next_combMem",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "data_ext",
+                          "module_name": "data_combMem_0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sinkD",
+                  "module_name": "SinkD",
+                  "instances": [
+                    {
+                      "instance_name": "d",
+                      "module_name": "Queue_113",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_22",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sinkE",
+                  "module_name": "SinkE",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sinkX",
+                  "module_name": "SinkX",
+                  "instances": [
+                    {
+                      "instance_name": "x",
+                      "module_name": "Queue_114",
+                      "instances": [
+                        {
+                          "instance_name": "ram_address_ext",
+                          "module_name": "ram_address_combMem",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "directory",
+                  "module_name": "Directory",
+                  "instances": [
+                    {
+                      "instance_name": "cc_dir",
+                      "module_name": "cc_dir",
+                      "instances": [
+                        {
+                          "instance_name": "cc_dir_ext",
+                          "module_name": "cc_dir_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "write",
+                      "module_name": "Queue_115",
+                      "instances": [
+                        {
+                          "instance_name": "ram_ext",
+                          "module_name": "ram_combMem_10",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "victimLFSR_prng",
+                      "module_name": "MaxPeriodFibonacciLFSR",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bankedStore",
+                  "module_name": "BankedStore",
+                  "instances": [
+                    {
+                      "instance_name": "cc_banks_0",
+                      "module_name": "cc_banks_0",
+                      "instances": [
+                        {
+                          "instance_name": "cc_banks_0_ext",
+                          "module_name": "cc_banks_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "cc_banks_1",
+                      "module_name": "cc_banks_1",
+                      "instances": [
+                        {
+                          "instance_name": "cc_banks_0_ext",
+                          "module_name": "cc_banks_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "cc_banks_2",
+                      "module_name": "cc_banks_2",
+                      "instances": [
+                        {
+                          "instance_name": "cc_banks_0_ext",
+                          "module_name": "cc_banks_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "cc_banks_3",
+                      "module_name": "cc_banks_3",
+                      "instances": [
+                        {
+                          "instance_name": "cc_banks_0_ext",
+                          "module_name": "cc_banks_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "requests",
+                  "module_name": "ListBuffer_2",
+                  "instances": [
+                    {
+                      "instance_name": "head_ext",
+                      "module_name": "head_combMem_0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "tail_ext",
+                      "module_name": "tail_combMem_0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "next_ext",
+                      "module_name": "next_combMem_0",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "data_ext",
+                      "module_name": "data_combMem",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "abc_mshrs_0",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "abc_mshrs_1",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "abc_mshrs_2",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "abc_mshrs_3",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "abc_mshrs_4",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "bc_mshr",
+                  "module_name": "MSHR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "c_mshr",
+                  "module_name": "MSHR",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "InclusiveCache_inner_TLBuffer",
+          "module_name": "TLBuffer_12",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_116",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_41",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_117",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_25",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "cork",
+          "module_name": "TLCacheCork",
+          "instances": [
+            {
+              "instance_name": "pool",
+              "module_name": "IDPool",
+              "instances": []
+            },
+            {
+              "instance_name": "q",
+              "module_name": "Queue_113",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_22",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "q_1",
+              "module_name": "Queue_113",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_22",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "binder",
+          "module_name": "ProbePicker",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "tile_prci_domain",
+      "module_name": "TilePRCIDomain",
+      "instances": [
+        {
+          "instance_name": "tile_reset_domain_tile",
+          "module_name": "RocketTile",
+          "instances": [
+            {
+              "instance_name": "tlMasterXbar",
+              "module_name": "TLXbar_8",
+              "instances": []
+            },
+            {
+              "instance_name": "intXbar",
+              "module_name": "IntXbar_1",
+              "instances": []
+            },
+            {
+              "instance_name": "dcache",
+              "module_name": "DCache",
+              "instances": [
+                {
+                  "instance_name": "tlb_mpu_ppn_barrier",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_pmp",
+                  "module_name": "PMPChecker",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_1",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_2",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_3",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_4",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_5",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_6",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_7",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_8",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_9",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_10",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_11",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb_entries_barrier_12",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_mpu_ppn_barrier",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_pmp",
+                  "module_name": "PMPChecker",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_1",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_2",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_3",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_4",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_5",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_6",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_7",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_8",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_9",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_10",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_11",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "pma_checker_entries_barrier_12",
+                  "module_name": "OptimizationBarrier",
+                  "instances": []
+                },
+                {
+                  "instance_name": "lfsr_prng",
+                  "module_name": "MaxPeriodFibonacciLFSR",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tag_array",
+                  "module_name": "tag_array",
+                  "instances": [
+                    {
+                      "instance_name": "tag_array_ext",
+                      "module_name": "tag_array_ext",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "data",
+                  "module_name": "DCacheDataArray",
+                  "instances": [
+                    {
+                      "instance_name": "data_arrays_0",
+                      "module_name": "data_arrays_0",
+                      "instances": [
+                        {
+                          "instance_name": "data_arrays_0_ext",
+                          "module_name": "data_arrays_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "amoalus_0",
+                  "module_name": "AMOALU",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "frontend",
+              "module_name": "Frontend",
+              "instances": [
+                {
+                  "instance_name": "icache",
+                  "module_name": "ICache",
+                  "instances": [
+                    {
+                      "instance_name": "repl_way_v0_prng",
+                      "module_name": "MaxPeriodFibonacciLFSR",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "tag_array",
+                      "module_name": "tag_array_0",
+                      "instances": [
+                        {
+                          "instance_name": "tag_array_0_ext",
+                          "module_name": "tag_array_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "data_arrays_0",
+                      "module_name": "data_arrays_0_0",
+                      "instances": [
+                        {
+                          "instance_name": "data_arrays_0_0_ext",
+                          "module_name": "data_arrays_0_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "data_arrays_1",
+                      "module_name": "data_arrays_1",
+                      "instances": [
+                        {
+                          "instance_name": "data_arrays_0_0_ext",
+                          "module_name": "data_arrays_0_0_ext",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "fq",
+                  "module_name": "ShiftQueue",
+                  "instances": []
+                },
+                {
+                  "instance_name": "tlb",
+                  "module_name": "TLB_1",
+                  "instances": [
+                    {
+                      "instance_name": "mpu_ppn_barrier",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "pmp",
+                      "module_name": "PMPChecker_2",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_1",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_2",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_3",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_4",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_5",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_6",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_7",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_8",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_9",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_10",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_11",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "entries_barrier_12",
+                      "module_name": "OptimizationBarrier",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "btb",
+                  "module_name": "BTB",
+                  "instances": [
+                    {
+                      "instance_name": "table_ext",
+                      "module_name": "table_combMem",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "fpuOpt",
+              "module_name": "FPU",
+              "instances": [
+                {
+                  "instance_name": "fp_decoder",
+                  "module_name": "FPUDecoder",
+                  "instances": []
+                },
+                {
+                  "instance_name": "regfile_ext",
+                  "module_name": "regfile_combMem",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sfma",
+                  "module_name": "FPUFMAPipe",
+                  "instances": [
+                    {
+                      "instance_name": "fma",
+                      "module_name": "MulAddRecFNPipe",
+                      "instances": [
+                        {
+                          "instance_name": "mulAddRecFNToRaw_preMul",
+                          "module_name": "MulAddRecFNToRaw_preMul",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "mulAddRecFNToRaw_postMul",
+                          "module_name": "MulAddRecFNToRaw_postMul",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "roundRawFNToRecFN",
+                          "module_name": "RoundRawFNToRecFN",
+                          "instances": [
+                            {
+                              "instance_name": "roundAnyRawFNToRecFN",
+                              "module_name": "RoundAnyRawFNToRecFN",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "fpiu",
+                  "module_name": "FPToInt",
+                  "instances": [
+                    {
+                      "instance_name": "dcmp",
+                      "module_name": "CompareRecFN",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "conv",
+                      "module_name": "RecFNToIN",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "narrow",
+                      "module_name": "RecFNToIN_1",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "ifpu",
+                  "module_name": "IntToFP",
+                  "instances": [
+                    {
+                      "instance_name": "i2f",
+                      "module_name": "INToRecFN",
+                      "instances": [
+                        {
+                          "instance_name": "roundAnyRawFNToRecFN",
+                          "module_name": "RoundAnyRawFNToRecFN_1",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "i2f_1",
+                      "module_name": "INToRecFN_1",
+                      "instances": [
+                        {
+                          "instance_name": "roundAnyRawFNToRecFN",
+                          "module_name": "RoundAnyRawFNToRecFN_2",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "fpmu",
+                  "module_name": "FPToFP",
+                  "instances": [
+                    {
+                      "instance_name": "narrower",
+                      "module_name": "RecFNToRecFN",
+                      "instances": [
+                        {
+                          "instance_name": "roundAnyRawFNToRecFN",
+                          "module_name": "RoundAnyRawFNToRecFN_3",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "dfma",
+                  "module_name": "FPUFMAPipe_1",
+                  "instances": [
+                    {
+                      "instance_name": "fma",
+                      "module_name": "MulAddRecFNPipe_1",
+                      "instances": [
+                        {
+                          "instance_name": "mulAddRecFNToRaw_preMul",
+                          "module_name": "MulAddRecFNToRaw_preMul_1",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "mulAddRecFNToRaw_postMul",
+                          "module_name": "MulAddRecFNToRaw_postMul_1",
+                          "instances": []
+                        },
+                        {
+                          "instance_name": "roundRawFNToRecFN",
+                          "module_name": "RoundRawFNToRecFN_1",
+                          "instances": [
+                            {
+                              "instance_name": "roundAnyRawFNToRecFN",
+                              "module_name": "RoundAnyRawFNToRecFN_4",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "divSqrt",
+                  "module_name": "DivSqrtRecFN_small",
+                  "instances": [
+                    {
+                      "instance_name": "divSqrtRecFNToRaw",
+                      "module_name": "DivSqrtRecFNToRaw_small",
+                      "instances": [
+                        {
+                          "instance_name": "divSqrtRawFN",
+                          "module_name": "DivSqrtRawFN_small",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "roundRawFNToRecFN",
+                      "module_name": "RoundRawFNToRecFN",
+                      "instances": [
+                        {
+                          "instance_name": "roundAnyRawFNToRecFN",
+                          "module_name": "RoundAnyRawFNToRecFN",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "divSqrt_1",
+                  "module_name": "DivSqrtRecFN_small_1",
+                  "instances": [
+                    {
+                      "instance_name": "divSqrtRecFNToRaw",
+                      "module_name": "DivSqrtRecFNToRaw_small_1",
+                      "instances": [
+                        {
+                          "instance_name": "divSqrtRawFN",
+                          "module_name": "DivSqrtRawFN_small_1",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "roundRawFNToRecFN",
+                      "module_name": "RoundRawFNToRecFN_1",
+                      "instances": [
+                        {
+                          "instance_name": "roundAnyRawFNToRecFN",
+                          "module_name": "RoundAnyRawFNToRecFN_4",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "dcacheArb",
+              "module_name": "HellaCacheArbiter",
+              "instances": []
+            },
+            {
+              "instance_name": "ptw",
+              "module_name": "PTW",
+              "instances": [
+                {
+                  "instance_name": "arb",
+                  "module_name": "Arbiter",
+                  "instances": []
+                },
+                {
+                  "instance_name": "state_barrier",
+                  "module_name": "OptimizationBarrier_42",
+                  "instances": []
+                },
+                {
+                  "instance_name": "r_pte_barrier",
+                  "module_name": "OptimizationBarrier_43",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "core",
+              "module_name": "Rocket",
+              "instances": [
+                {
+                  "instance_name": "ibuf",
+                  "module_name": "IBuf",
+                  "instances": [
+                    {
+                      "instance_name": "exp",
+                      "module_name": "RVCExpander",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "rf_ext",
+                  "module_name": "rf_combMem",
+                  "instances": []
+                },
+                {
+                  "instance_name": "csr",
+                  "module_name": "CSRFile",
+                  "instances": []
+                },
+                {
+                  "instance_name": "bpu",
+                  "module_name": "BreakpointUnit",
+                  "instances": []
+                },
+                {
+                  "instance_name": "alu",
+                  "module_name": "ALU",
+                  "instances": []
+                },
+                {
+                  "instance_name": "div",
+                  "module_name": "MulDiv",
+                  "instances": []
+                },
+                {
+                  "instance_name": "PlusArgTimeout",
+                  "module_name": "PlusArgTimeout",
+                  "instances": [
+                    {
+                      "instance_name": "plusarg_reader",
+                      "module_name": "plusarg_reader",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "buffer",
+          "module_name": "TLBuffer_16",
+          "instances": [
+            {
+              "instance_name": "x1_a_q",
+              "module_name": "Queue_120",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_37",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_d_q",
+              "module_name": "Queue_121",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_22",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "bundleIn_0_b_q",
+              "module_name": "Queue_122",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_36",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "x1_c_q",
+              "module_name": "Queue_123",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_32",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "x1_e_q",
+              "module_name": "Queue_109",
+              "instances": [
+                {
+                  "instance_name": "ram_sink_ext",
+                  "module_name": "ram_sink_combMem",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "intsink",
+          "module_name": "IntSyncAsyncCrossingSink_1",
+          "instances": [
+            {
+              "instance_name": "chain",
+              "module_name": "SynchronizerShiftReg_w1_d3",
+              "instances": [
+                {
+                  "instance_name": "output_chain",
+                  "module_name": "NonSyncResetSynchronizerPrimitiveShiftReg_d3",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "intsink_1",
+          "module_name": "IntSyncSyncCrossingSink",
+          "instances": []
+        },
+        {
+          "instance_name": "intsink_2",
+          "module_name": "IntSyncSyncCrossingSink_1",
+          "instances": []
+        },
+        {
+          "instance_name": "intsink_3",
+          "module_name": "IntSyncSyncCrossingSink_1",
+          "instances": []
+        },
+        {
+          "instance_name": "intsource_1",
+          "module_name": "IntSyncCrossingSource_1",
+          "instances": [
+            {
+              "instance_name": "reg",
+              "module_name": "AsyncResetRegVec_w1_i0",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "intsource_2",
+          "module_name": "IntSyncCrossingSource_1",
+          "instances": [
+            {
+              "instance_name": "reg",
+              "module_name": "AsyncResetRegVec_w1_i0",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "intsource_3",
+          "module_name": "IntSyncCrossingSource_1",
+          "instances": [
+            {
+              "instance_name": "reg",
+              "module_name": "AsyncResetRegVec_w1_i0",
+              "instances": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "plicDomainWrapper",
+      "module_name": "ClockSinkDomain",
+      "instances": [
+        {
+          "instance_name": "plic",
+          "module_name": "TLPLIC",
+          "instances": [
+            {
+              "instance_name": "gateways_gateway",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_1",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_2",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_3",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_4",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_5",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_6",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_7",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "gateways_gateway_8",
+              "module_name": "LevelGateway",
+              "instances": []
+            },
+            {
+              "instance_name": "fanin",
+              "module_name": "PLICFanIn",
+              "instances": []
+            },
+            {
+              "instance_name": "fanin_1",
+              "module_name": "PLICFanIn",
+              "instances": []
+            },
+            {
+              "instance_name": "out_back",
+              "module_name": "Queue_125",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_31",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "clint",
+      "module_name": "CLINT",
+      "instances": []
+    },
+    {
+      "instance_name": "tileHartIdNexusNode",
+      "module_name": "BundleBridgeNexus_15",
+      "instances": []
+    },
+    {
+      "instance_name": "tlDM",
+      "module_name": "TLDebugModule",
+      "instances": [
+        {
+          "instance_name": "dmOuter",
+          "module_name": "TLDebugModuleOuterAsync",
+          "instances": [
+            {
+              "instance_name": "dmiXbar",
+              "module_name": "TLXbar_10",
+              "instances": []
+            },
+            {
+              "instance_name": "dmi2tl",
+              "module_name": "DMIToTL",
+              "instances": []
+            },
+            {
+              "instance_name": "dmOuter",
+              "module_name": "TLDebugModuleOuter",
+              "instances": []
+            },
+            {
+              "instance_name": "intsource",
+              "module_name": "IntSyncCrossingSource_4",
+              "instances": []
+            },
+            {
+              "instance_name": "dmiBypass",
+              "module_name": "TLBusBypass",
+              "instances": [
+                {
+                  "instance_name": "bar",
+                  "module_name": "TLBusBypassBar",
+                  "instances": []
+                },
+                {
+                  "instance_name": "error",
+                  "module_name": "TLError_1",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "asource",
+              "module_name": "TLAsyncCrossingSource",
+              "instances": [
+                {
+                  "instance_name": "x1_a_source",
+                  "module_name": "AsyncQueueSource_2",
+                  "instances": [
+                    {
+                      "instance_name": "ridx_ridx_gray",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid_0",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid_1",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_extend",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_valid",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_sink",
+                  "module_name": "AsyncQueueSink_2",
+                  "instances": [
+                    {
+                      "instance_name": "widx_widx_gray",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "io_deq_bits_deq_bits_reg",
+                      "module_name": "ClockCrossingReg_w43",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "sink_valid_0",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_valid_1",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_extend",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "dmactiveAck_dmactiveAckSync",
+              "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+              "instances": [
+                {
+                  "instance_name": "output_chain",
+                  "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "io_innerCtrl_source",
+              "module_name": "AsyncQueueSource_3",
+              "instances": [
+                {
+                  "instance_name": "ridx_ridx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "dmInner",
+          "module_name": "TLDebugModuleInnerAsync",
+          "instances": [
+            {
+              "instance_name": "dmInner",
+              "module_name": "TLDebugModuleInner",
+              "instances": [
+                {
+                  "instance_name": "hartIsInResetSync_0_debug_hartReset_0",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "dmiXing",
+              "module_name": "TLAsyncCrossingSink",
+              "instances": [
+                {
+                  "instance_name": "x1_a_sink",
+                  "module_name": "AsyncQueueSink_3",
+                  "instances": [
+                    {
+                      "instance_name": "widx_widx_gray",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "io_deq_bits_deq_bits_reg",
+                      "module_name": "ClockCrossingReg_w55",
+                      "instances": []
+                    },
+                    {
+                      "instance_name": "sink_valid_0",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_valid_1",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_extend",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "bundleIn_0_d_source",
+                  "module_name": "AsyncQueueSource_4",
+                  "instances": [
+                    {
+                      "instance_name": "ridx_ridx_gray",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid_0",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "source_valid_1",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_extend",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "instance_name": "sink_valid",
+                      "module_name": "AsyncValidSync",
+                      "instances": [
+                        {
+                          "instance_name": "io_out_source_valid_0",
+                          "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                          "instances": [
+                            {
+                              "instance_name": "output_chain",
+                              "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                              "instances": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "instance_name": "dmactive_synced_dmactive_synced_dmactiveSync",
+              "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+              "instances": [
+                {
+                  "instance_name": "output_chain",
+                  "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "dmactive_synced_dmInner_io_innerCtrl_sink",
+              "module_name": "AsyncQueueSink_4",
+              "instances": [
+                {
+                  "instance_name": "widx_widx_gray",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "io_deq_bits_deq_bits_reg",
+                  "module_name": "ClockCrossingReg_w15",
+                  "instances": []
+                },
+                {
+                  "instance_name": "sink_valid_0",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "sink_valid_1",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_extend",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "instance_name": "source_valid",
+                  "module_name": "AsyncValidSync",
+                  "instances": [
+                    {
+                      "instance_name": "io_out_source_valid_0",
+                      "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0_1",
+                      "instances": [
+                        {
+                          "instance_name": "output_chain",
+                          "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                          "instances": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "intsource",
+      "module_name": "IntSyncCrossingSource_5",
+      "instances": [
+        {
+          "instance_name": "reg",
+          "module_name": "AsyncResetRegVec_w2_i0",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "intsource_1",
+      "module_name": "IntSyncCrossingSource_1",
+      "instances": [
+        {
+          "instance_name": "reg",
+          "module_name": "AsyncResetRegVec_w1_i0",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "intsource_2",
+      "module_name": "IntSyncCrossingSource_1",
+      "instances": [
+        {
+          "instance_name": "reg",
+          "module_name": "AsyncResetRegVec_w1_i0",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "intsink_1",
+      "module_name": "IntSyncSyncCrossingSink_1",
+      "instances": []
+    },
+    {
+      "instance_name": "intsink_2",
+      "module_name": "IntSyncSyncCrossingSink_1",
+      "instances": []
+    },
+    {
+      "instance_name": "intsink_3",
+      "module_name": "IntSyncSyncCrossingSink_1",
+      "instances": []
+    },
+    {
+      "instance_name": "intsource_3",
+      "module_name": "IntSyncCrossingSource_8",
+      "instances": [
+        {
+          "instance_name": "reg",
+          "module_name": "AsyncResetRegVec_w8_i0",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "bootROMDomainWrapper",
+      "module_name": "ClockSinkDomain_1",
+      "instances": [
+        {
+          "instance_name": "bootrom",
+          "module_name": "TLROM",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "uartClockDomainWrapper",
+      "module_name": "ClockSinkDomain_2",
+      "instances": [
+        {
+          "instance_name": "uart_0",
+          "module_name": "TLUART",
+          "instances": [
+            {
+              "instance_name": "intsource",
+              "module_name": "IntSyncCrossingSource_1",
+              "instances": [
+                {
+                  "instance_name": "reg",
+                  "module_name": "AsyncResetRegVec_w1_i0",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "txm",
+              "module_name": "UARTTx",
+              "instances": [
+                {
+                  "instance_name": "plusarg_reader",
+                  "module_name": "plusarg_reader",
+                  "instances": []
+                },
+                {
+                  "instance_name": "plusarg_reader_1",
+                  "module_name": "plusarg_reader",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "txq",
+              "module_name": "Queue_126",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_5",
+                  "instances": []
+                }
+              ]
+            },
+            {
+              "instance_name": "rxm",
+              "module_name": "UARTRx",
+              "instances": []
+            },
+            {
+              "instance_name": "rxq",
+              "module_name": "Queue_126",
+              "instances": [
+                {
+                  "instance_name": "ram_ext",
+                  "module_name": "ram_combMem_5",
+                  "instances": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "instance_name": "intsink_4",
+      "module_name": "IntSyncSyncCrossingSink_1",
+      "instances": []
+    },
+    {
+      "instance_name": "prci_ctrl_domain",
+      "module_name": "ClockSinkDomain_3",
+      "instances": [
+        {
+          "instance_name": "xbar",
+          "module_name": "TLXbar_11",
+          "instances": []
+        },
+        {
+          "instance_name": "resetSynchronizer",
+          "module_name": "ClockGroupResetSynchronizer",
+          "instances": [
+            {
+              "instance_name": "x1_member_allClocks_uncore_reset_catcher",
+              "module_name": "ResetCatchAndSync_d3",
+              "instances": [
+                {
+                  "instance_name": "io_sync_reset_chain",
+                  "module_name": "AsyncResetSynchronizerShiftReg_w1_d3_i0",
+                  "instances": [
+                    {
+                      "instance_name": "output_chain",
+                      "module_name": "AsyncResetSynchronizerPrimitiveShiftReg_d3_i0",
+                      "instances": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instance_name": "clock_gater",
+          "module_name": "TileClockGater",
+          "instances": [
+            {
+              "instance_name": "regs_0",
+              "module_name": "AsyncResetRegVec_w1_i1",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "reset_setter",
+          "module_name": "TileResetSetter",
+          "instances": []
+        }
+      ]
+    },
+    {
+      "instance_name": "aggregator",
+      "module_name": "ClockGroupAggregator_6",
+      "instances": []
+    },
+    {
+      "instance_name": "clockNamePrefixer",
+      "module_name": "ClockGroupParameterModifier",
+      "instances": []
+    },
+    {
+      "instance_name": "frequencySpecifier",
+      "module_name": "ClockGroupParameterModifier_1",
+      "instances": []
+    },
+    {
+      "instance_name": "clockGroupCombiner",
+      "module_name": "ClockGroupCombiner",
+      "instances": []
+    },
+    {
+      "instance_name": "dtm",
+      "module_name": "DebugTransportModuleJTAG",
+      "instances": [
+        {
+          "instance_name": "dtmInfoChain",
+          "module_name": "CaptureUpdateChain",
+          "instances": []
+        },
+        {
+          "instance_name": "dmiAccessChain",
+          "module_name": "CaptureUpdateChain_1",
+          "instances": []
+        },
+        {
+          "instance_name": "tapIO_idcodeChain",
+          "module_name": "CaptureChain",
+          "instances": []
+        },
+        {
+          "instance_name": "tapIO_controllerInternal",
+          "module_name": "JtagTapController",
+          "instances": [
+            {
+              "instance_name": "stateMachine",
+              "module_name": "JtagStateMachine",
+              "instances": []
+            },
+            {
+              "instance_name": "irChain",
+              "module_name": "CaptureUpdateChain_2",
+              "instances": []
+            }
+          ]
+        },
+        {
+          "instance_name": "tapIO_bypassChain",
+          "module_name": "JtagBypassChain",
+          "instances": []
+        }
+      ]
+    }
+  ]
+}

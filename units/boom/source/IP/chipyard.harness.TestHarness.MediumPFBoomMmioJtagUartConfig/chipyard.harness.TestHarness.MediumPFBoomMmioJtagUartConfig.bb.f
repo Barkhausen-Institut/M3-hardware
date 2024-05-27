@@ -1,0 +1,10 @@
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/ClockSourceAtFreqMHz.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/EICG_wrapper.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/IOCell.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/SimJTAG.cc
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/SimJTAG.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/SimUART.cc
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/SimUART.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/plusarg_reader.v
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/remote_bitbang.cc
+/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.MediumPFBoomMmioJtagUartConfig/gen-collateral/uart.cc

@@ -1,0 +1,14 @@
+[
+	{
+		"class":"sifive.enterprise.firrtl.MarkDUTAnnotation",
+		"target":"~TestHarness|DigitalTop"
+	},
+	{
+		"class": "sifive.enterprise.firrtl.TestHarnessHierarchyAnnotation",
+		"filename": "/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.BigRocketMmioJtagUartConfig/model_module_hierarchy.json"
+	},
+	{
+		"class": "sifive.enterprise.firrtl.ModuleHierarchyAnnotation",
+		"filename": "/home/labu/scoha/git/chipyard-latest/sims/verilator/generated-src/chipyard.harness.TestHarness.BigRocketMmioJtagUartConfig/top_module_hierarchy.json"
+	}
+]

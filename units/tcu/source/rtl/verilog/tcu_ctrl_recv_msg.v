@@ -105,7 +105,8 @@ module tcu_ctrl_recv_msg #(
     localparam S_CTRL_RM_UPDATE_VPE         = 5'h1A;
     localparam S_CTRL_RM_WAIT_DRAM          = 5'h1B;
     localparam S_CTRL_RM_DROP_MSG           = 5'h1C;
-    localparam S_CTRL_RM_ERROR              = 5'h1D;
+    localparam S_CTRL_RM_DROP_MSG_PL        = 5'h1D;
+    localparam S_CTRL_RM_ERROR              = 5'h1E;
     localparam S_CTRL_RM_FINISH             = 5'h1F;
 
     reg [CTRL_RM_STATES_SIZE-1:0] ctrl_rm_state, next_ctrl_rm_state;
@@ -860,7 +861,33 @@ module tcu_ctrl_recv_msg #(
                     //take second part of header
                     rin_hd_2 = rm_header_i[63:0];
                     noc_fifo_pop_o = 1'b1;
-                    next_ctrl_rm_state = S_CTRL_RM_FINISH;
+
+                    //if there is a payload, drop it as well
+                    if (hd_length != {TCU_MSGLEN_SIZE{1'b0}}) begin
+                        next_ctrl_rm_state = S_CTRL_RM_DROP_MSG_PL;
+                    end else begin
+                        next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                    end
+                end
+
+                //timeout
+                else if (TIMEOUT_RECV_CYCLES != 32'h0) begin
+                    rin_rm_timeout = r_rm_timeout + 32'd1;
+                    if (r_rm_timeout > TIMEOUT_RECV_CYCLES) begin
+                        rin_rm_error = TCU_ERROR_TIMEOUT_NOC;
+                        next_ctrl_rm_state = S_CTRL_RM_ERROR;
+                    end
+                end
+            end
+
+            S_CTRL_RM_DROP_MSG_PL: begin
+                if (noc_wrreq_i) begin
+                    noc_fifo_pop_o = 1'b1;
+
+                    //payload ends when NoC burst ends
+                    if (!noc_burst_i) begin
+                        next_ctrl_rm_state = S_CTRL_RM_FINISH;
+                    end
                 end
 
                 //timeout

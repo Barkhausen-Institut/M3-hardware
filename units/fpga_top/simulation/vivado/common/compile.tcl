@@ -123,11 +123,11 @@ if {[info exists VHDL_FILES]} {
 
 #set version of IPs and precompiled libs
 if {[info exists SIMULATION]} {
-    set vivado_versions  [list 2019.1 2019.2 2020.1 2020.2 2020.3 2021.1 2021.2 2021.2.1 2022.1 2022.2]
-    set pcspma_versions  [list 16_1_6 16_1_7 16_2   16_2_1 16_2_3 16_2_4 16_2_6 16_2_7   16_2_8 16_2_9]
-    set xlconst_versions [list 1_1_6  1_1_6  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7    1_1_7  1_1_7]
-    set temac_versions   [list 9_0_14 9_0_15 9_0_16 9_0_17 9_0_18 9_0_19 9_0_20 9_0_21   9_0_22 9_0_23]
-    set utilvl_versions  [list 2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1    2_0_2  2_0_2]
+    set vivado_versions  [list 2019.1 2019.2 2020.1 2020.2 2020.3 2021.1 2021.2 2021.2.1 2022.1 2022.2 2023.1]
+    set pcspma_versions  [list 16_1_6 16_1_7 16_2   16_2_1 16_2_3 16_2_4 16_2_6 16_2_7   16_2_8 16_2_9 16_2_12]
+    set xlconst_versions [list 1_1_6  1_1_6  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7  1_1_7    1_1_7  1_1_7  1_1_7]
+    set temac_versions   [list 9_0_14 9_0_15 9_0_16 9_0_17 9_0_18 9_0_19 9_0_20 9_0_21   9_0_22 9_0_23 9_0_26]
+    set utilvl_versions  [list 2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1  2_0_1    2_0_2  2_0_2  2_0_2]
 
     set pcspma_curr_version [lindex $pcspma_versions [lsearch $vivado_versions [version -short]]]
     set xlconst_curr_version [lindex $xlconst_versions [lsearch $vivado_versions [version -short]]]
