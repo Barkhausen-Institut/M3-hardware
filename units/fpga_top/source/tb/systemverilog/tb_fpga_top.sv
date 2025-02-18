@@ -68,7 +68,7 @@ localparam CLKPERIODE_625MHZ = 1600;
 
 fpga_top #(
     .SIMULATION_ETH             (1),
-    .SIMULATION_DDR4            (1)
+    .SIMULATION_DDR4            (0)
 ) u_dut (
     .SYSCLK1_300_N              (sysclk1_n),    //system clock 300 MHz
     .SYSCLK1_300_P              (~sysclk1_n),
@@ -124,6 +124,7 @@ fpga_top #(
     .UART_TX                    (uart_tx),
     .UART_RX                    (uart_rx)
 
+`ifdef USE_VCU118
 `ifdef USE_DDR4_C1
     ,.DDR4_C1_250MHZ_CLK_N      (1'b0),
     .DDR4_C1_250MHZ_CLK_P       (1'b1),
@@ -160,6 +161,7 @@ fpga_top #(
     .DDR4_C2_DQ                 (),
     .DDR4_C2_DQS_T              (),
     .DDR4_C2_DQS_C              ()
+`endif
 `endif
 
     ,.tb_noc_fifo_in_data_o     (tb_noc_fifo_in_data_s),

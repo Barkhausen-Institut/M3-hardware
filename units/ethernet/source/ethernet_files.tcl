@@ -42,7 +42,7 @@ lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_fpga_config
 lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_udp_wrap.v
 lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_regfile.v
 lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_mdio_wrap.v
-lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_pcs_pma_xcvu9p_wrap.v
+lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_pcs_pma_wrap.v
 lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_wrap.v
 lappend VERILOG_FILES $REPO_DIR/ethernet/source/rtl/verilog/ethernet_domain.v
 

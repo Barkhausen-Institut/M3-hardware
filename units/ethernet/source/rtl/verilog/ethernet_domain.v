@@ -97,9 +97,9 @@ ethernet_fpga_config #(
 
 
 
-ethernet_pcs_pma_xcvu9p_wrap #(
+ethernet_pcs_pma_wrap #(
     .SIMULATION          (SIMULATION)
-) i_ethernet_pcs_pma_xcvu9p_wrap (
+) i_ethernet_pcs_pma_wrap (
     .rst_eth_n_i         (reset_eth_sync_n_s),
 
     //SGMII

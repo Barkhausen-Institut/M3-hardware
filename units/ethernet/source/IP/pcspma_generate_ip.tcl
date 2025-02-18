@@ -1,8 +1,8 @@
 
-set IP_NAME    gig_ethernet_pcs_pma_xcvu9p
+set IP_NAME    gig_ethernet_pcs_pma_xcvu37p
 set IP_TYPE    xilinx.com:ip:gig_ethernet_pcs_pma:16.*
-set BOARD      xilinx.com:vcu118:part0:2.3
-set PART       xcvu9p-flga2104-2L-e
+set BOARD      xilinx.com:vcu128:part0:1.0
+set PART       xcvu37p-fsvh2892-2L-e
 
 
 #skip generating IP if it already exists

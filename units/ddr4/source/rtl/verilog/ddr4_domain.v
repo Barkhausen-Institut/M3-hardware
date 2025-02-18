@@ -24,7 +24,6 @@ module ddr4_domain #(
     output	wire        [NOC_ASYNC_FIFO_AWIDTH:0] noc_fifo_out_waddr_o,
 
     output  wire                                  ddr4_act_n,
-    output  wire                           [16:0] ddr4_addr,
     output  wire                            [1:0] ddr4_ba,
     output  wire                                  ddr4_bg,
     output  wire                                  ddr4_cke,
@@ -34,9 +33,18 @@ module ddr4_domain #(
     output  wire                                  ddr4_ck_c,
     output  wire                                  ddr4_reset_n,
     inout   wire                            [9:0] ddr4_dm_dbi_n,
-    inout   wire                           [79:0] ddr4_dq,
     inout   wire                            [9:0] ddr4_dqs_c,
     inout   wire                            [9:0] ddr4_dqs_t
+
+    `ifdef USE_VCU118
+        ,inout   wire                           [79:0] ddr4_dq
+        ,output  wire                           [16:0] ddr4_addr
+    `endif
+
+    `ifdef USE_VCU128
+        ,inout   wire                           [71:0] ddr4_dq
+        ,output  wire                           [13:0] ddr4_addr
+    `endif
 );
 
     wire ddr4_rst_n_s;
@@ -44,45 +52,85 @@ module ddr4_domain #(
     wire [NOC_CHIPID_SIZE-1:0] home_chipid_s;
 
 
+`ifdef USE_VCU128
+    ddr4_wrap #(
+        .INST                        (INST),
+        .HOME_MODID                  (HOME_MODID),
+        .SIMULATION                  (SIMULATION)
+    ) i_ddr4_wrap (
+        .sys_clk_n                   (sys_clk_n),
+        .sys_clk_p                   (sys_clk_p),
+        .sys_rst                     (sys_rst),
+        .home_chipid_i               (home_chipid_s),
+        .ddr4_clk_i                  (ddr4_clk_i),
+        .ddr4_rst_n_i                (ddr4_rst_n_s),
+        .ddr4_init_calib_complete_o  (ddr4_init_calib_complete_o),
+        .ddr4_status_o               (ddr4_status_o),
 
-ddr4_wrap #(
-    .INST                        (INST),
-    .HOME_MODID                  (HOME_MODID),
-    .SIMULATION                  (SIMULATION)
-) i_ddr4_wrap (
-    .sys_clk_n                   (sys_clk_n),
-    .sys_clk_p                   (sys_clk_p),
-    .sys_rst                     (sys_rst),
-    .home_chipid_i               (home_chipid_s),
-    .ddr4_clk_i                  (ddr4_clk_i),
-    .ddr4_rst_n_i                (ddr4_rst_n_s),
-    .ddr4_init_calib_complete_o  (ddr4_init_calib_complete_o),
-    .ddr4_status_o               (ddr4_status_o),
+        /*.noc_fifo_in_data_i          (noc_fifo_in_data_i),
+        .noc_fifo_in_raddr_o         (noc_fifo_in_raddr_o),
+        .noc_fifo_in_waddr_i         (noc_fifo_in_waddr_i),
+        .noc_fifo_out_data_o         (noc_fifo_out_data_o),
+        .noc_fifo_out_raddr_i        (noc_fifo_out_raddr_i),
+        .noc_fifo_out_waddr_o        (noc_fifo_out_waddr_o),*/
 
-    .noc_fifo_in_data_i          (noc_fifo_in_data_i),
-    .noc_fifo_in_raddr_o         (noc_fifo_in_raddr_o),
-    .noc_fifo_in_waddr_i         (noc_fifo_in_waddr_i),
-    .noc_fifo_out_data_o         (noc_fifo_out_data_o),
-    .noc_fifo_out_raddr_i        (noc_fifo_out_raddr_i),
-    .noc_fifo_out_waddr_o        (noc_fifo_out_waddr_o),
+        .ddr4_act_n                  (ddr4_act_n),
+        .ddr4_addr                   (ddr4_addr),
+        .ddr4_ba                     (ddr4_ba),
+        .ddr4_bg                     (ddr4_bg),
+        .ddr4_cke                    (ddr4_cke),
+        .ddr4_odt                    (ddr4_odt),
+        .ddr4_cs_n                   (ddr4_cs_n),
+        .ddr4_ck_t                   (ddr4_ck_t),
+        .ddr4_ck_c                   (ddr4_ck_c),
+        .ddr4_reset_n                (ddr4_reset_n),
+        .ddr4_dm_dbi_n               (ddr4_dm_dbi_n),
+        .ddr4_dq                     (ddr4_dq),
+        .ddr4_dqs_c                  (ddr4_dqs_c),
+        .ddr4_dqs_t                  (ddr4_dqs_t)
+    );
 
-    .ddr4_act_n                  (ddr4_act_n),
-    .ddr4_addr                   (ddr4_addr),
-    .ddr4_ba                     (ddr4_ba),
-    .ddr4_bg                     (ddr4_bg),
-    .ddr4_cke                    (ddr4_cke),
-    .ddr4_odt                    (ddr4_odt),
-    .ddr4_cs_n                   (ddr4_cs_n),
-    .ddr4_ck_t                   (ddr4_ck_t),
-    .ddr4_ck_c                   (ddr4_ck_c),
-    .ddr4_reset_n                (ddr4_reset_n),
-    .ddr4_dm_dbi_n               (ddr4_dm_dbi_n),
-    .ddr4_dq                     (ddr4_dq),
-    .ddr4_dqs_c                  (ddr4_dqs_c),
-    .ddr4_dqs_t                  (ddr4_dqs_t)
-);
+`endif
 
+`ifdef USE_VCU118
+    ddr4_wrap #(
+        .INST                        (INST),
+        .HOME_MODID                  (HOME_MODID),
+        .SIMULATION                  (SIMULATION)
+    ) i_ddr4_wrap (
+        .sys_clk_n                   (sys_clk_n),
+        .sys_clk_p                   (sys_clk_p),
+        .sys_rst                     (sys_rst),
+        .home_chipid_i               (home_chipid_s),
+        .ddr4_clk_i                  (ddr4_clk_i),
+        .ddr4_rst_n_i                (ddr4_rst_n_s),
+        .ddr4_init_calib_complete_o  (ddr4_init_calib_complete_o),
+        .ddr4_status_o               (ddr4_status_o),
 
+        .noc_fifo_in_data_i          (noc_fifo_in_data_i),
+        .noc_fifo_in_raddr_o         (noc_fifo_in_raddr_o),
+        .noc_fifo_in_waddr_i         (noc_fifo_in_waddr_i),
+        .noc_fifo_out_data_o         (noc_fifo_out_data_o),
+        .noc_fifo_out_raddr_i        (noc_fifo_out_raddr_i),
+        .noc_fifo_out_waddr_o        (noc_fifo_out_waddr_o),
+
+        .ddr4_act_n                  (ddr4_act_n),
+        .ddr4_addr                   (ddr4_addr),
+        .ddr4_ba                     (ddr4_ba),
+        .ddr4_bg                     (ddr4_bg),
+        .ddr4_cke                    (ddr4_cke),
+        .ddr4_odt                    (ddr4_odt),
+        .ddr4_cs_n                   (ddr4_cs_n),
+        .ddr4_ck_t                   (ddr4_ck_t),
+        .ddr4_ck_c                   (ddr4_ck_c),
+        .ddr4_reset_n                (ddr4_reset_n),
+        .ddr4_dm_dbi_n               (ddr4_dm_dbi_n),
+        .ddr4_dq                     (ddr4_dq),
+        .ddr4_dqs_c                  (ddr4_dqs_c),
+        .ddr4_dqs_t                  (ddr4_dqs_t)
+    );
+
+`endif
 
 util_reset_sync i_util_reset_sync_ref (
     .clk_i             (ddr4_clk_i),

@@ -1,7 +1,7 @@
 
 set TOPLEVEL        fpga_top
-set BOARD           xilinx.com:vcu118:part0:2.3
-set PART            xcvu9p-flga2104-2L-e
+set BOARD           xilinx.com:vcu128:part0:1.0
+set PART            xcvu37p-fsvh2892-2L-e
 set IP_DIR          $env(VIVADO_IP_DIR)
 set REPO_DIR        $env(FPGA_DESIGN)/units
 set SYNTH_DIR       $env(VIVADO_SYNTH_DIR)
@@ -9,6 +9,11 @@ set SYNTH_DIR       $env(VIVADO_SYNTH_DIR)
 #comment when DDR4 should be taken out of synthesis
 set USE_DDR4_C1 1
 set USE_DDR4_C2 1
+
+#comment which FPGA BOARD should be taken out of simulation
+#set USE_VCU118 1
+set USE_VCU128 1
+
 
 #comment when Ethernet FMC design should be taken out of synthesis
 #set USE_ETHERNET_FMC 1
@@ -76,8 +81,14 @@ add_files -fileset [current_fileset -constrset] $REPO_DIR/rocket/source/constrai
 add_files -fileset [current_fileset -constrset] $REPO_DIR/boom/source/constraints/constraints_boom.xdc
 
 if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
-    add_files -fileset [current_fileset -constrset] $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc
-    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc]
+    if {[info exists USE_VCU118]} {
+    	    add_files -fileset [current_fileset -constrset] $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc
+    	    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc]
+    }
+    if {[info exists USE_VCU128]} {
+	    add_files -fileset [current_fileset -constrset] $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins_VCU128.xdc
+    	    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins_VCU128.xdc]
+    }
 }
 
 if {[info exists USE_ETHERNET_FMC]} {
@@ -98,6 +109,13 @@ lappend ARGS    -keep_equivalent_registers
 lappend ARGS    -part $PART
 lappend ARGS    -verilog_define "XILINX_FPGA=1"
 lappend ARGS    -verilog_define "SYNTHESIS=1"
+if {[info exists USE_VCU118]} {
+    lappend ARGS    -verilog_define "USE_VCU118=1"
+}
+if {[info exists USE_VCU128]} {
+    lappend ARGS    -verilog_define "USE_VCU128=1"
+}
+
 if {[info exists USE_DDR4_C1]} {
     lappend ARGS    -verilog_define "USE_DDR4_C1=1"
 }

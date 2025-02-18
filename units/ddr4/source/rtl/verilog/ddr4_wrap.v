@@ -26,7 +26,6 @@ module ddr4_wrap #(
     output  wire        [NOC_ASYNC_FIFO_AWIDTH:0] noc_fifo_out_waddr_o,
 
     output  wire                                  ddr4_act_n,
-    output  wire                           [16:0] ddr4_addr,
     output  wire                            [1:0] ddr4_ba,
     output  wire                                  ddr4_bg,
     output  wire                                  ddr4_cke,
@@ -36,10 +35,20 @@ module ddr4_wrap #(
     output  wire                                  ddr4_ck_c,
     output  wire                                  ddr4_reset_n,
     inout   wire                            [9:0] ddr4_dm_dbi_n,
-    inout   wire                           [79:0] ddr4_dq,
     inout   wire                            [9:0] ddr4_dqs_c,
     inout   wire                            [9:0] ddr4_dqs_t
+
+    `ifdef USE_VCU118
+        ,inout   wire                           [79:0] ddr4_dq
+        ,output  wire                           [16:0] ddr4_addr
+    `endif
+
+    `ifdef USE_VCU128
+        ,inout   wire                           [71:0] ddr4_dq
+        ,output  wire                           [13:0] ddr4_addr
+    `endif
 );
+
 
 
 // NoC signals between noc_link_phy and NoCIF
@@ -403,7 +412,7 @@ if (SIMULATION) begin: NO_DDR4
     assign ddr4_init_calib_complete_o = 1'b0;
 
     assign ddr4_act_n    = 1'b0;
-    assign ddr4_addr     = 17'h0;
+    //assign ddr4_addr     = 17'h0;
     assign ddr4_ba       = 2'h0;
     assign ddr4_bg       = 1'b0;
     assign ddr4_cke      = 1'b0;
@@ -413,9 +422,20 @@ if (SIMULATION) begin: NO_DDR4
     assign ddr4_ck_c     = 1'b1;
     assign ddr4_reset_n  = 1'b0;
     assign ddr4_dm_dbi_n = 10'hz;    //inout ports
-    assign ddr4_dq       = 80'hz;
+    //assign ddr4_dq       = 80'hz;
     assign ddr4_dqs_c    = 10'hz;
     assign ddr4_dqs_t    = 10'hz;
+
+    // Conditional DDR4 Address Bus Declaration
+    `ifdef USE_VCU118
+        assign ddr4_addr     = 17'h0;
+        assign ddr4_dq       = 80'hz;
+    `endif
+
+    `ifdef USE_VCU128
+        assign ddr4_addr     = 14'h0;
+        assign ddr4_dq       = 72'hz;
+    `endif
 
 
     //localparam DDR4_SIM_RAM_AWIDTH = 27;  //acutal DRAM size: 2GB = 2^27 * 16byte
@@ -558,10 +578,102 @@ else begin: DDR4_IF
         .ddr4_app_rd_data_valid_i     (ddr4_app_rd_data_valid)
     );
 
+    `ifdef USE_VCU118
+        if (INST == "C1") begin: DDR4_C1
 
-    if (INST == "C1") begin: DDR4_C1
+            ddr4_c1_xcvu9p u_ddr4_c1_xcvu9p (
+                .sys_rst                       (sys_rst),
 
-        ddr4_c1_xcvu9p u_ddr4_c1_xcvu9p (
+                .c0_sys_clk_p                  (sys_clk_p),
+                .c0_sys_clk_n                  (sys_clk_n),
+                .c0_init_calib_complete        (ddr4_init_calib_complete_o),
+
+                .c0_ddr4_act_n                 (ddr4_act_n),
+                .c0_ddr4_adr                   (ddr4_addr),
+                .c0_ddr4_ba                    (ddr4_ba),
+                .c0_ddr4_bg                    (ddr4_bg),
+                .c0_ddr4_cke                   (ddr4_cke),
+                .c0_ddr4_odt                   (ddr4_odt),
+                .c0_ddr4_cs_n                  (ddr4_cs_n),
+                .c0_ddr4_ck_t                  (ddr4_ck_t),
+                .c0_ddr4_ck_c                  (ddr4_ck_c),
+                .c0_ddr4_reset_n               (ddr4_reset_n),
+                .c0_ddr4_dm_dbi_n              (ddr4_dm_dbi_n),
+                .c0_ddr4_dq                    (ddr4_dq),
+                .c0_ddr4_dqs_c                 (ddr4_dqs_c),
+                .c0_ddr4_dqs_t                 (ddr4_dqs_t),
+
+                .c0_ddr4_app_addr              (ddr4_app_addr),
+                .c0_ddr4_app_cmd               (ddr4_app_cmd),
+                .c0_ddr4_app_en                (ddr4_app_en),
+                .c0_ddr4_app_hi_pri            (1'b0),
+                .c0_ddr4_app_wdf_data          (ddr4_app_wdf_data),
+                .c0_ddr4_app_wdf_end           (ddr4_app_wdf_end),
+                .c0_ddr4_app_wdf_mask          (ddr4_app_wdf_mask),
+                .c0_ddr4_app_wdf_wren          (ddr4_app_wdf_wren),
+                .c0_ddr4_app_rd_data           (ddr4_app_rd_data),
+                .c0_ddr4_app_rd_data_end       (ddr4_app_rd_data_end),
+                .c0_ddr4_app_rd_data_valid     (ddr4_app_rd_data_valid),
+                .c0_ddr4_app_rdy               (ddr4_app_rdy),
+                .c0_ddr4_app_wdf_rdy           (ddr4_app_wdf_rdy),
+                .c0_ddr4_ui_clk                (ddr4_ui_clk),
+                .c0_ddr4_ui_clk_sync_rst       (ddr4_ui_clk_rst),
+
+                //unused
+                .dbg_bus                       (),
+                .dbg_clk                       ()
+            );
+        end
+
+        else if (INST == "C2") begin: DDR4_C2
+
+            ddr4_c2_xcvu9p u_ddr4_c2_xcvu9p (
+                .sys_rst                       (sys_rst),
+
+                .c0_sys_clk_p                  (sys_clk_p),
+                .c0_sys_clk_n                  (sys_clk_n),
+                .c0_init_calib_complete        (ddr4_init_calib_complete_o),
+
+                .c0_ddr4_act_n                 (ddr4_act_n),
+                .c0_ddr4_adr                   (ddr4_addr),
+                .c0_ddr4_ba                    (ddr4_ba),
+                .c0_ddr4_bg                    (ddr4_bg),
+                .c0_ddr4_cke                   (ddr4_cke),
+                .c0_ddr4_odt                   (ddr4_odt),
+                .c0_ddr4_cs_n                  (ddr4_cs_n),
+                .c0_ddr4_ck_t                  (ddr4_ck_t),
+                .c0_ddr4_ck_c                  (ddr4_ck_c),
+                .c0_ddr4_reset_n               (ddr4_reset_n),
+                .c0_ddr4_dm_dbi_n              (ddr4_dm_dbi_n),
+                .c0_ddr4_dq                    (ddr4_dq),
+                .c0_ddr4_dqs_c                 (ddr4_dqs_c),
+                .c0_ddr4_dqs_t                 (ddr4_dqs_t),
+
+                .c0_ddr4_app_addr              (ddr4_app_addr),
+                .c0_ddr4_app_cmd               (ddr4_app_cmd),
+                .c0_ddr4_app_en                (ddr4_app_en),
+                .c0_ddr4_app_hi_pri            (1'b0),
+                .c0_ddr4_app_wdf_data          (ddr4_app_wdf_data),
+                .c0_ddr4_app_wdf_end           (ddr4_app_wdf_end),
+                .c0_ddr4_app_wdf_mask          (ddr4_app_wdf_mask),
+                .c0_ddr4_app_wdf_wren          (ddr4_app_wdf_wren),
+                .c0_ddr4_app_rd_data           (ddr4_app_rd_data),
+                .c0_ddr4_app_rd_data_end       (ddr4_app_rd_data_end),
+                .c0_ddr4_app_rd_data_valid     (ddr4_app_rd_data_valid),
+                .c0_ddr4_app_rdy               (ddr4_app_rdy),
+                .c0_ddr4_app_wdf_rdy           (ddr4_app_wdf_rdy),
+                .c0_ddr4_ui_clk                (ddr4_ui_clk),
+                .c0_ddr4_ui_clk_sync_rst       (ddr4_ui_clk_rst),
+
+                //unused
+                .dbg_bus                       (),
+                .dbg_clk                       ()
+        );
+        end
+	`endif
+
+	`ifdef USE_VCU128
+        ddr4_xcvu37p u_ddr4_xcvu37p (
             .sys_rst                       (sys_rst),
 
             .c0_sys_clk_p                  (sys_clk_p),
@@ -603,54 +715,7 @@ else begin: DDR4_IF
             .dbg_bus                       (),
             .dbg_clk                       ()
         );
-
-    end
-    else if (INST == "C2") begin: DDR4_C2
-
-        ddr4_c2_xcvu9p u_ddr4_c2_xcvu9p (
-            .sys_rst                       (sys_rst),
-
-            .c0_sys_clk_p                  (sys_clk_p),
-            .c0_sys_clk_n                  (sys_clk_n),
-            .c0_init_calib_complete        (ddr4_init_calib_complete_o),
-
-            .c0_ddr4_act_n                 (ddr4_act_n),
-            .c0_ddr4_adr                   (ddr4_addr),
-            .c0_ddr4_ba                    (ddr4_ba),
-            .c0_ddr4_bg                    (ddr4_bg),
-            .c0_ddr4_cke                   (ddr4_cke),
-            .c0_ddr4_odt                   (ddr4_odt),
-            .c0_ddr4_cs_n                  (ddr4_cs_n),
-            .c0_ddr4_ck_t                  (ddr4_ck_t),
-            .c0_ddr4_ck_c                  (ddr4_ck_c),
-            .c0_ddr4_reset_n               (ddr4_reset_n),
-            .c0_ddr4_dm_dbi_n              (ddr4_dm_dbi_n),
-            .c0_ddr4_dq                    (ddr4_dq),
-            .c0_ddr4_dqs_c                 (ddr4_dqs_c),
-            .c0_ddr4_dqs_t                 (ddr4_dqs_t),
-
-            .c0_ddr4_app_addr              (ddr4_app_addr),
-            .c0_ddr4_app_cmd               (ddr4_app_cmd),
-            .c0_ddr4_app_en                (ddr4_app_en),
-            .c0_ddr4_app_hi_pri            (1'b0),
-            .c0_ddr4_app_wdf_data          (ddr4_app_wdf_data),
-            .c0_ddr4_app_wdf_end           (ddr4_app_wdf_end),
-            .c0_ddr4_app_wdf_mask          (ddr4_app_wdf_mask),
-            .c0_ddr4_app_wdf_wren          (ddr4_app_wdf_wren),
-            .c0_ddr4_app_rd_data           (ddr4_app_rd_data),
-            .c0_ddr4_app_rd_data_end       (ddr4_app_rd_data_end),
-            .c0_ddr4_app_rd_data_valid     (ddr4_app_rd_data_valid),
-            .c0_ddr4_app_rdy               (ddr4_app_rdy),
-            .c0_ddr4_app_wdf_rdy           (ddr4_app_wdf_rdy),
-            .c0_ddr4_ui_clk                (ddr4_ui_clk),
-            .c0_ddr4_ui_clk_sync_rst       (ddr4_ui_clk_rst),
-
-            //unused
-            .dbg_bus                       (),
-            .dbg_clk                       ()
-        );
-
-    end
+    `endif
 end
 endgenerate
 

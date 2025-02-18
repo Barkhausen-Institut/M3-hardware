@@ -2,8 +2,8 @@
 set TC          [file tail [pwd]]
 set TB          tb_fpga_top
 set TOPLEVEL    fpga_top
-set BOARD       xilinx.com:vcu118:part0:2.3
-set PART        xcvu9p-flga2104-2L-e
+set BOARD       xilinx.com:vcu128:part0:1.0
+set PART        xcvu37p-fsvh2892-2L-e
 set XILINX_PATH $env(XILINX_VIVADO)
 set IP_DIR      $env(VIVADO_IP_DIR)
 set REPO_DIR    $env(FPGA_DESIGN)/units
@@ -12,6 +12,10 @@ set SIM_DIR     $env(VIVADO_SIM_DIR)/$TB/$TC
 #comment when DDR4 should be taken out of simulation
 set USE_DDR4_C1 1
 set USE_DDR4_C2 1
+
+#comment which FPGA BOARD should be taken out of simulation
+#set USE_VCU118 1
+set USE_VCU128 1
 
 #comment when Ethernet FMC design should be taken out from simulation
 #set USE_ETHERNET_FMC 1
@@ -39,6 +43,12 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
 }
 if {[info exists USE_ETHERNET_FMC]} {
 	lappend DEF_MACROS USE_ETHERNET_FMC
+}
+if {[info exists USE_VCU118]} {
+	lappend DEF_MACROS USE_VCU118
+}
+if {[info exists USE_VCU128]} {
+        lappend DEF_MACROS USE_VCU128
 }
 
 #-----------------------------------------------------------------
