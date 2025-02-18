@@ -348,6 +348,15 @@ set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_A[12]}];
 set_property PACKAGE_PIN BF52 [get_ports {PL_DDR4_A[13]}];
 set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_A[13]}];
 
+set_property PACKAGE_PIN BG53 [get_ports {PL_DDR4_A[14]}];
+set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_A[14]}];
+
+set_property PACKAGE_PIN BH54 [get_ports {PL_DDR4_A[15]}];
+set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_A[15]}];
+
+set_property PACKAGE_PIN BJ54 [get_ports {PL_DDR4_A[16]}];
+set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_A[16]}];
+
 # BA 2 bits
 set_property PACKAGE_PIN BE54 [get_ports {PL_DDR4_BA[0]}];
 set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_BA[0]}];

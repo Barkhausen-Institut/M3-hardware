@@ -117,7 +117,7 @@ if {[info exists USE_VCU128]} {
         lappend props_c2 CONFIG.C0.DDR4_TimePeriod {833}
         lappend props_c2 CONFIG.C0.DDR4_InputClockPeriod {4000}
         lappend props_c2 CONFIG.C0.DDR4_CLKOUT0_DIVIDE {5}
-        lappend props_c2 CONFIG.C0.DDR4_MemoryPart {MT40A512M16LY-075}
+        lappend props_c2 CONFIG.C0.DDR4_MemoryPart {MT40A512M16HA-075E}
         lappend props_c2 CONFIG.C0.DDR4_DataWidth {72}
         lappend props_c2 CONFIG.C0.DDR4_CasWriteLatency {12}
         lappend props_c2 CONFIG.C0.DDR4_AxiDataWidth {64}

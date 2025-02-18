@@ -175,7 +175,7 @@ module fpga_top #(
 	,input  wire             DDR4_CLK_100MHZ_N,
          input   wire            DDR4_CLK_100MHZ_P,
          output  wire            PL_DDR4_ACT_B,
-         output  wire     [13:0] PL_DDR4_A,
+         output  wire     [16:0] PL_DDR4_A,
          output  wire      [1:0] PL_DDR4_BA,
          output  wire            PL_DDR4_BG0,
          output  wire            PL_DDR4_CKE,

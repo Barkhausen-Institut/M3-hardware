@@ -45,7 +45,7 @@ module ddr4_wrap #(
 
     `ifdef USE_VCU128
         ,inout   wire                           [71:0] ddr4_dq
-        ,output  wire                           [13:0] ddr4_addr
+        ,output  wire                           [16:0] ddr4_addr
     `endif
 );
 
@@ -433,7 +433,7 @@ if (SIMULATION) begin: NO_DDR4
     `endif
 
     `ifdef USE_VCU128
-        assign ddr4_addr     = 14'h0;
+        assign ddr4_addr     = 17'h0;
         assign ddr4_dq       = 72'hz;
     `endif
 

@@ -43,7 +43,7 @@ module ddr4_domain #(
 
     `ifdef USE_VCU128
         ,inout   wire                           [71:0] ddr4_dq
-        ,output  wire                           [13:0] ddr4_addr
+        ,output  wire                           [16:0] ddr4_addr
     `endif
 );
 
