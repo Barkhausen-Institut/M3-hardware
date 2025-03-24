@@ -21,6 +21,7 @@ lappend VERILOG_FILES $REPO_DIR/jtag/source/rtl/verilog/jtag_tunnel_mc8.v
 
 lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_125.v
 lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_300.v
+lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_100.v
 
 lappend VERILOG_FILES $REPO_DIR/noc_router/source/rtl/verilog/flit_counter.v
 lappend VERILOG_FILES $REPO_DIR/noc_router/source/rtl/verilog/flit_counter_wrap.v

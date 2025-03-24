@@ -1,4 +1,3 @@
-
 set IP_NAME    gig_ethernet_pcs_pma_xcvu37p
 set IP_TYPE    xilinx.com:ip:gig_ethernet_pcs_pma:16.*
 set BOARD      xilinx.com:vcu128:part0:1.0
@@ -17,14 +16,20 @@ if {[file exists $IP_DIR/$IP_NAME/$IP_NAME.xci]} {
     set ipi [get_ips $IP_NAME]
 
     set props {}
+    lappend props CONFIG.ETHERNET_BOARD_INTERFACE {sgmii_lvds}
+    lappend props CONFIG.DIFFCLK_BOARD_INTERFACE {sgmii_phyclk}
     lappend props CONFIG.Standard {SGMII}
     lappend props CONFIG.Physical_Interface {LVDS}
     lappend props CONFIG.Management_Interface {false}
+    #lappend props CONFIG.Ext_Management_Interface {true}
+    #lappend props CONFIG.MDIO_BOARD_INTERFACE {mdio_mdc}
     lappend props CONFIG.SupportLevel {Include_Shared_Logic_in_Core}
     lappend props CONFIG.LvdsRefClk {625}
-    lappend props CONFIG.TxLane0_Placement {DIFF_PAIR_2}
+    lappend props CONFIG.TxLane0_Placement {DIFF_PAIR_0}
     lappend props CONFIG.RxLane0_Placement {DIFF_PAIR_0}
-    lappend props CONFIG.Tx_In_Upper_Nibble {0}
+    lappend props CONFIG.TxLane1_Placement {DIFF_PAIR_1}
+    lappend props CONFIG.RxLane1_Placement {DIFF_PAIR_1}
+    lappend props CONFIG.Tx_In_Upper_Nibble {1}
 
     set_property -dict $props $ipi
     generate_target all $ipi

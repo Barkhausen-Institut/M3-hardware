@@ -367,14 +367,14 @@ set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_BA[1]}];
 set_property PACKAGE_PIN BG54 [get_ports {PL_DDR4_BG0}];
 set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_BG0}];
 
-set_property PACKAGE_PIN BG53 [get_ports {PL_DDR4_WE_B}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_WE_B}];
+#set_property PACKAGE_PIN BG53 [get_ports {PL_DDR4_WE_B}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_WE_B}];
 
-set_property PACKAGE_PIN BJ54 [get_ports {PL_DDR4_RAS_B}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_RAS_B}];
+#set_property PACKAGE_PIN BJ54 [get_ports {PL_DDR4_RAS_B}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_RAS_B}];
 
-set_property PACKAGE_PIN BH54 [get_ports {PL_DDR4_CAS_B}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_CAS_B}];
+#set_property PACKAGE_PIN BH54 [get_ports {PL_DDR4_CAS_B}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_CAS_B}];
 
 set_property PACKAGE_PIN BK53 [get_ports {PL_DDR4_CK_T}];
 set_property IOSTANDARD DIFF_SSTL12_DCI [get_ports {PL_DDR4_CK_T}];
@@ -388,14 +388,14 @@ set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_CKE}];
 set_property PACKAGE_PIN BG52 [get_ports {PL_DDR4_ACT_B}];
 set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_ACT_B}];
 
-set_property PACKAGE_PIN BJ53 [get_ports {PL_DDR4_TEN}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_TEN}];
+#set_property PACKAGE_PIN BJ53 [get_ports {PL_DDR4_TEN}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_TEN}];
 
-set_property PACKAGE_PIN BJ52 [get_ports {PL_DDR4_ALERT_B}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_ALERT_B}];
+#set_property PACKAGE_PIN BJ52 [get_ports {PL_DDR4_ALERT_B}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_ALERT_B}];
 
-set_property PACKAGE_PIN BL48 [get_ports {PL_DDR4_PARITY}];
-set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_PARITY}];
+#set_property PACKAGE_PIN BL48 [get_ports {PL_DDR4_PARITY}];
+#set_property IOSTANDARD SSTL12_DCI [get_ports {PL_DDR4_PARITY}];
 
 set_property PACKAGE_PIN BH50 [get_ports {PL_DDR4_RESET_B}];
 set_property IOSTANDARD LVCMOS12 [get_ports {PL_DDR4_RESET_B}];

@@ -67,15 +67,37 @@ if {[info exists VHDL_FILES]} {
 
 
 #add constraints
-add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_clocks.xdc
-add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_pins.xdc
-set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/fpga_top/source/constraints/constraints_pins.xdc]
+if {[info exists USE_VCU118]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_clocks.xdc
+}
 
-add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins.xdc
-add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/syn/vivado/eth_mac_fifo.tcl
-add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/lib/axis/syn/vivado/axis_async_fifo.tcl
-set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins.xdc]
+if {[info exists USE_VCU128]} {
+     add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_clocks_VCU128.xdc
+}
 
+if {[info exists USE_VCU118]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_pins.xdc
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/fpga_top/source/constraints/constraints_pins.xdc]
+}
+
+if {[info exists USE_VCU128]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/fpga_top/source/constraints/constraints_pins_VCU128.xdc
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/fpga_top/source/constraints/constraints_pins_VCU128.xdc]
+}
+
+if {[info exists USE_VCU118]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins.xdc
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/syn/vivado/eth_mac_fifo.tcl
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/lib/axis/syn/vivado/axis_async_fifo.tcl
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins.xdc]
+}
+
+if {[info exists USE_VCU128]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins_VCU128.xdc
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/syn/vivado/eth_mac_fifo.tcl
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/ethernet/source/IP/verilog-ethernet/lib/axis/syn/vivado/axis_async_fifo.tcl
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ethernet/source/constraints/constraints_ethernet_pins_VCU128.xdc]
+}
 
 add_files -fileset [current_fileset -constrset] $REPO_DIR/rocket/source/constraints/constraints_rocket.xdc
 add_files -fileset [current_fileset -constrset] $REPO_DIR/boom/source/constraints/constraints_boom.xdc

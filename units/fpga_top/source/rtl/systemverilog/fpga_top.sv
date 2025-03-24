@@ -38,13 +38,27 @@ module fpga_top #(
 (
 
     // *** clocks ***
+`ifdef USE_VCU118
+
     input   wire            SYSCLK1_300_N,  //system clock 300 MHz
     input   wire            SYSCLK1_300_P,
 
     input   wire            CLK_125MHZ_N,   //system clock 125 MHz
     input   wire            CLK_125MHZ_P,
 
+`endif
 
+`ifdef USE_VCU128
+
+    input   wire            SYSCLK1_100_P,  //system clock1 100 MHz
+    input   wire            SYSCLK1_100_N,
+
+    input   wire            SYSCLK2_100_P,   //system clock2 100 MHz
+    input   wire            SYSCLK2_100_N,
+
+`endif
+
+`ifdef USE_VCU118
     // *** Ethernet PHY ***
     output  wire            PHY1_RESET_B,
 
@@ -58,6 +72,23 @@ module fpga_top #(
     inout   wire            PHY1_MDIO,
     output  wire            PHY1_MDC,
 
+`endif
+
+`ifdef USE_VCU128
+    // *** Ethernet PHY ***
+    //output  wire            PHY1_RESET_B,
+
+    input   wire            ENET_SGMII_OUT_N,
+    input   wire            ENET_SGMII_OUT_P,
+    output  wire            ENET_SGMII_IN_N,
+    output  wire            ENET_SGMII_IN_P,
+    input   wire            ENET_SGMII_CLK_N,
+    input   wire            ENET_SGMII_CLK_P,
+
+    inout   wire            ENET_MDIO,
+    output  wire            ENET_MDC,
+
+`endif
 
     // *** Ethernet FMC PHYs ***
 `ifdef USE_ETHERNET_FMC
@@ -445,14 +476,15 @@ module fpga_top #(
 
     assign GPIO_LED[4] = pm0_jtag_sel;
     assign GPIO_LED[5] = pm1_jtag_sel;
-    assign GPIO_LED[6] = pm2_jtag_sel;
+    //assign GPIO_LED[6] = pm2_jtag_sel;
     assign GPIO_LED[7] = pm3_jtag_sel;
 
     assign PHY1_RESET_B = phy_reset_n;
 
 
-    //----------------------------------------------------------------------------
+    // //----------------------------------------------------------------------------
     // clock generators
+`ifdef USE_VCU118
     fpga_clk_gen_300 #(
         .CLKOUT0_MHZ  (125),
         .CLKOUT1_MHZ  (100),
@@ -496,12 +528,62 @@ module fpga_top #(
         .clk_in_125_p (CLK_125MHZ_P),
         .clk_in_125_n (CLK_125MHZ_N)
     );
+`endif
 
+`ifdef USE_VCU128
+
+    fpga_clk_gen_100 #(
+        .CLKOUT0_MHZ  (125),
+        .CLKOUT1_MHZ  (100),
+        .CLKOUT2_MHZ  (100),
+        .CLKOUT3_MHZ  (100),
+        .CLKOUT4_MHZ  (CLKFREQ_PM_MHZ[0]),
+        .CLKOUT5_MHZ  (CLKFREQ_PM_MHZ[1]),
+        .CLKOUT6_MHZ  (CLKFREQ_PM_MHZ[2])
+    ) i_fpga_clk1_gen_100 (
+        .clk0_out     (eth_clk),
+        .clk1_out     (noc_clk),
+        .clk2_out     (ddr4_clk),
+        .clk3_out     (),
+        .clk4_out     (pm0_clk),
+        .clk5_out     (pm1_clk),
+        .clk6_out     (pm2_clk),
+
+        .reset        (CPU_RESET || eth_system_reset),
+        .locked       (mmcme0_locked),
+        .clk_in_100_p (SYSCLK1_100_P),
+        .clk_in_100_n (SYSCLK1_100_N)
+    );
+
+    fpga_clk_gen_100 #(
+        .CLKOUT0_MHZ  (125),
+        .CLKOUT1_MHZ  (100),
+        .CLKOUT2_MHZ  (100),
+        .CLKOUT3_MHZ  (100),
+        .CLKOUT4_MHZ  (CLKFREQ_PM_MHZ[0]),
+        .CLKOUT5_MHZ  (CLKFREQ_PM_MHZ[1]),
+        .CLKOUT6_MHZ  (CLKFREQ_PM_MHZ[2])
+    ) i_fpga_clk2_gen_100 (
+        .clk0_out     (pm3_clk),
+        .clk1_out     (pm4_clk),
+        .clk2_out     (pm5_clk),
+        .clk3_out     (pm6_clk),
+        .clk4_out     (pm7_clk),
+        .clk5_out     (),
+        .clk6_out     (),
+
+        .reset        (CPU_RESET || eth_system_reset),
+        .locked       (mmcme0_locked),
+        .clk_in_100_p (SYSCLK2_100_P),
+        .clk_in_100_n (SYSCLK2_100_N)
+    );
+
+`endif
 
     //----------------------------------------------------------------------------
 
 
-
+`ifdef USE_VCU118
     IOBUF mdio_iobuf (
         .I(mdio_o),
         .IO(PHY1_MDIO),
@@ -563,6 +645,71 @@ module fpga_top #(
     assign tile1_noc_fifo_in_raddr_s  = eth_noc_fifo_in_raddr_s;
     assign tile1_noc_fifo_out_waddr_s = eth_noc_fifo_out_waddr_s;
 
+`endif
+
+`ifdef USE_VCU128
+    IOBUF mdio_iobuf (
+        .I(mdio_o),
+        .IO(ENET_MDIO),
+        .O(mdio_i),
+        .T(mdio_t)
+    );
+
+    ethernet_domain #(
+        .HOST_IP              (HOST_IP),
+        .HOST_PORT            (HOST_PORT),
+        .FPGA_IP_BASE         (FPGA_IP_BASE),
+        .FPGA_PORT            (FPGA_PORT),
+        .FPGA_MAC_BASE        (FPGA_MAC_BASE),
+        .GATEWAY_IP_ADDR      (GATEWAY_IP_ADDR),
+        .SUBNET_MASK          (SUBNET_MASK),
+        .HOME_MODID           (MODID_ETH),
+        .SIMULATION           (SIMULATION_ETH)
+    )
+    i_ethernet_domain (
+        .clk_eth_i            (eth_clk),
+        .reset_eth_n_i        (~sys_reset),
+
+        // NoC interface
+        .noc_fifo_in_data_i   (eth_noc_fifo_in_data_s),
+        .noc_fifo_in_raddr_o  (eth_noc_fifo_in_raddr_s),
+        .noc_fifo_in_waddr_i  (eth_noc_fifo_in_waddr_s),
+        .noc_fifo_out_data_o  (eth_noc_fifo_out_data_s),
+        .noc_fifo_out_raddr_i (eth_noc_fifo_out_raddr_s),
+        .noc_fifo_out_waddr_o (eth_noc_fifo_out_waddr_s),
+
+        // physical interface
+        .sgmii_rxn            (ENET_SGMII_OUT_N),
+        .sgmii_rxp            (ENET_SGMII_OUT_P),
+        .sgmii_txn            (ENET_SGMII_IN_N),
+        .sgmii_txp            (ENET_SGMII_IN_P),
+        .sgmii_clk_n          (ENET_SGMII_CLK_N),
+        .sgmii_clk_p          (ENET_SGMII_CLK_P),
+
+        .mdio_mdc             (ENET_MDC),
+        .mdio_mdio_i          (mdio_i),
+        .mdio_mdio_o          (mdio_o),
+        .mdio_mdio_t          (mdio_t),
+
+        .eth_status_vector_o  (eth_status_vector),
+        .eth_system_reset_o   (eth_system_reset),
+        .home_chipid_o        (home_chipid_s),
+        .host_chipid_o        (host_chipid_s),
+
+        .phy_reset_n          (phy_reset_n),
+
+        .gpio_dip_sw_i        (GPIO_DIP_SW)
+    );
+
+
+    assign eth_noc_fifo_in_data_s     = tile1_noc_fifo_in_data_s;
+    assign eth_noc_fifo_in_waddr_s    = tile1_noc_fifo_in_waddr_s;
+    assign eth_noc_fifo_out_raddr_s   = tile1_noc_fifo_out_raddr_s;
+    assign tile1_noc_fifo_out_data_s  = eth_noc_fifo_out_data_s;
+    assign tile1_noc_fifo_in_raddr_s  = eth_noc_fifo_in_raddr_s;
+    assign tile1_noc_fifo_out_waddr_s = eth_noc_fifo_out_waddr_s;
+
+`endif
 
 `ifdef USE_VCU118
 	`ifdef USE_DDR4_C1
@@ -686,7 +833,7 @@ module fpga_top #(
             .sys_clk_n                  (DDR4_CLK_100MHZ_N),
             .sys_rst                    (sys_reset),
             .home_chipid_i              (home_chipid_s),
-            //.ddr4_clk_i                 (ddr4_c2_clk),
+            .ddr4_clk_i                 (ddr4_clk),
             .ddr4_init_calib_complete_o (c0_ddr4_init_calib_complete),
             //.ddr4_status_o              (ddr4_c2_status),
 
@@ -715,12 +862,12 @@ module fpga_top #(
         );
 
 
-        /*assign tile11_noc_fifo_in_raddr_s   = ddr4_c2_noc_fifo_in_raddr_s;
+        assign tile11_noc_fifo_in_raddr_s   = ddr4_c2_noc_fifo_in_raddr_s;
         assign tile11_noc_fifo_out_data_s   = ddr4_c2_noc_fifo_out_data_s;
         assign tile11_noc_fifo_out_waddr_s  = ddr4_c2_noc_fifo_out_waddr_s;
         assign ddr4_c2_noc_fifo_in_data_s   = tile11_noc_fifo_in_data_s;
         assign ddr4_c2_noc_fifo_in_waddr_s  = tile11_noc_fifo_in_waddr_s;
-        assign ddr4_c2_noc_fifo_out_raddr_s = tile11_noc_fifo_out_raddr_s;*/
+        assign ddr4_c2_noc_fifo_out_raddr_s = tile11_noc_fifo_out_raddr_s;
 `endif
 
 

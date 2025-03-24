@@ -29,6 +29,12 @@ module ethernet_pcs_pma_wrap #(
     input  wire  [31:0] eth_config_vector_i,
     output wire         eth_an_complete_o,
     output wire   [1:0] eth_pll_lock_o
+
+   /* input wire          mdc_0,                   // Management Data Clock
+    input wire          mdio_i_0,                // Management Data In
+    input wire    [4:0] phyaddr_0,
+    input wire          configuration_valid_0,
+    input wire          an_adv_config_val_0*/
 );
 
 
@@ -256,6 +262,16 @@ gig_ethernet_pcs_pma_xcvu37p i_gig_ethernet_pcs_pma_xcvu37p (
     .rx_vtc_rdy_3           (1'b1),
     .tx_vtc_rdy_3           (1'b1),
     .tx_rdclk_out           ()
+
+    //New ports
+    /*.an_adv_config_val_0    (an_adv_config_val_0),
+    .ext_mdio_i_0           (1'b0),
+    .mdio_t_in_0            (1'b0),
+    .mdc_0                  (mdc_0),
+    .mdio_i_0               (mdio_i_0),
+    .phyaddr_0              (phyaddr_0),
+    .configuration_valid_0  (configuration_valid_0)*/
+
 );
 `endif
 
