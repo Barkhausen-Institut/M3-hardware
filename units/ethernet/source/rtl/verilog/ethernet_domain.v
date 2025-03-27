@@ -28,6 +28,7 @@ module ethernet_domain #(
     output wire        [NOC_ASYNC_FIFO_AWIDTH:0] noc_fifo_out_waddr_o,
     
     // physical interface
+    input  wire                                  sgmii_dummy_port,
     input  wire                                  sgmii_rxn,
     input  wire                                  sgmii_rxp,
     output wire                                  sgmii_txn,
@@ -103,13 +104,14 @@ ethernet_pcs_pma_wrap #(
     .rst_eth_n_i         (reset_eth_sync_n_s),
 
     //SGMII
+    .sgmii_dummy_port    (sgmii_dummy_port),
     .sgmii_rxn           (sgmii_rxn),
-	.sgmii_rxp           (sgmii_rxp),
-	.sgmii_txn           (sgmii_txn),
-	.sgmii_txp           (sgmii_txp),
+    .sgmii_rxp           (sgmii_rxp),
+    .sgmii_txn           (sgmii_txn),
+    .sgmii_txp           (sgmii_txp),
     .sgmii_clk_n         (sgmii_clk_n),
-	.sgmii_clk_p         (sgmii_clk_p),
-	.phy_rst_n           (phy_reset_n),
+    .sgmii_clk_p         (sgmii_clk_p),
+    .phy_rst_n           (phy_reset_n),
 
     //GMII
     .gmii_clk            (gmii_clk),

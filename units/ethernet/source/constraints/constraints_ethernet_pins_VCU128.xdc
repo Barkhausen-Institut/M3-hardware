@@ -23,3 +23,6 @@ set_property PACKAGE_PIN BJ27     [get_ports "ENET_SGMII_CLK_N"] ;# Bank  67 VCC
 set_property IOSTANDARD  LVDS     [get_ports "ENET_SGMII_CLK_N"] ;# Bank  67 VCCO - VCC1V8   - IO_L12N_T1U_N11_GC_67
 set_property PACKAGE_PIN BH27     [get_ports "ENET_SGMII_CLK_P"] ;# Bank  67 VCCO - VCC1V8   - IO_L12P_T1U_N10_GC_67
 set_property IOSTANDARD  LVDS     [get_ports "ENET_SGMII_CLK_P"] ;# Bank  67 VCCO - VCC1V8   - IO_L12P_T1U_N10_GC_67
+
+set_property PACKAGE_PIN BL23     [get_ports "ENET_DUMMY"];
+set_property IOSTANDARD  LVCMOS18 [get_ports "ENET_DUMMY"];

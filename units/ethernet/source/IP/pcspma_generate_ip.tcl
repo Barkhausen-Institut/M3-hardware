@@ -21,15 +21,13 @@ if {[file exists $IP_DIR/$IP_NAME/$IP_NAME.xci]} {
     lappend props CONFIG.Standard {SGMII}
     lappend props CONFIG.Physical_Interface {LVDS}
     lappend props CONFIG.Management_Interface {false}
-    #lappend props CONFIG.Ext_Management_Interface {true}
-    #lappend props CONFIG.MDIO_BOARD_INTERFACE {mdio_mdc}
     lappend props CONFIG.SupportLevel {Include_Shared_Logic_in_Core}
     lappend props CONFIG.LvdsRefClk {625}
-    lappend props CONFIG.TxLane0_Placement {DIFF_PAIR_0}
-    lappend props CONFIG.RxLane0_Placement {DIFF_PAIR_0}
-    lappend props CONFIG.TxLane1_Placement {DIFF_PAIR_1}
-    lappend props CONFIG.RxLane1_Placement {DIFF_PAIR_1}
+    lappend props CONFIG.TxLane0_Placement {DIFF_PAIR_1}
+    lappend props CONFIG.RxLane0_Placement {DIFF_PAIR_2}
     lappend props CONFIG.Tx_In_Upper_Nibble {1}
+    lappend props CONFIG.InstantiateBitslice0 {true}
+    lappend props CONFIG.RxNibbleBitslice0Used {false}
 
     set_property -dict $props $ipi
     generate_target all $ipi

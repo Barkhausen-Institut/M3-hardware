@@ -6,13 +6,14 @@ module ethernet_pcs_pma_wrap #(
     input  wire         rst_eth_n_i,
     
     //SGMII
+    input  wire         sgmii_dummy_port,
     input  wire         sgmii_rxn,
-	input  wire         sgmii_rxp,
-	output wire         sgmii_txn,
-	output wire         sgmii_txp,
+    input  wire         sgmii_rxp,
+    output wire         sgmii_txn,
+    output wire         sgmii_txp,
     input  wire         sgmii_clk_n,
-	input  wire         sgmii_clk_p,
-	output wire         phy_rst_n,
+    input  wire         sgmii_clk_p,
+    output wire         phy_rst_n,
 
     //GMII
     output wire         gmii_clk,
@@ -169,6 +170,7 @@ gig_ethernet_pcs_pma_xcvu9p i_gig_ethernet_pcs_pma_xcvu9p (
 `ifdef USE_VCU128
 gig_ethernet_pcs_pma_xcvu37p i_gig_ethernet_pcs_pma_xcvu37p (
     // SGMII
+    .dummy_port_in          (sgmii_dummy_port),
     .txp_0                  (sgmii_txp),
     .txn_0                  (sgmii_txn),
     .rxp_0                  (sgmii_rxp),

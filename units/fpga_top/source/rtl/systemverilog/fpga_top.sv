@@ -78,6 +78,7 @@ module fpga_top #(
     // *** Ethernet PHY ***
     //output  wire            PHY1_RESET_B,
 
+    input   wire            ENET_DUMMY,
     input   wire            ENET_SGMII_OUT_N,
     input   wire            ENET_SGMII_OUT_P,
     output  wire            ENET_SGMII_IN_N,
@@ -679,6 +680,7 @@ module fpga_top #(
         .noc_fifo_out_waddr_o (eth_noc_fifo_out_waddr_s),
 
         // physical interface
+        .sgmii_dummy_port     (ENET_DUMMY),
         .sgmii_rxn            (ENET_SGMII_OUT_N),
         .sgmii_rxp            (ENET_SGMII_OUT_P),
         .sgmii_txn            (ENET_SGMII_IN_N),
