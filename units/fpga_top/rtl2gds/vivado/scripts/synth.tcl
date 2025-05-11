@@ -20,6 +20,8 @@ set USE_VCU128 1
 #set number of used ports in synthesis
 set ETHERNET_FMC_PORT_COUNT 1
 
+set USE_QSFP 1
+
 
 #--------------------------------------------------------------------------------
 #map port count to individual variables
@@ -122,6 +124,15 @@ if {[info exists USE_ETHERNET_FMC]} {
     set_property processing_order LATE [get_files $REPO_DIR/ethernet_fmc/source/constraints/constraints_ethernet_fmc_delays.tcl]
 }
 
+if {[info exists USE_QSFP]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_pins.tcl
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_clocks.xdc
+   #add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_pins.tcl]
+    #set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl]
+    #set_property processing_order LATE [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl]
+}
+
 #--------------------------------------------------------------------------------
 
 #do synthesis 
@@ -136,6 +147,10 @@ if {[info exists USE_VCU118]} {
 }
 if {[info exists USE_VCU128]} {
     lappend ARGS    -verilog_define "USE_VCU128=1"
+}
+
+if {[info exists USE_QSFP]} {
+    lappend ARGS    -verilog_define "USE_QSFP=1"
 }
 
 if {[info exists USE_DDR4_C1]} {

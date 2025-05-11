@@ -12,6 +12,9 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
 	source $REPO_DIR/ddr4/source/ddr4_files.tcl
 }
 
+if {[info exists USE_QSFP]} {
+	source $REPO_DIR/qsfp/source/qsfp_files.tcl
+}
 
 lappend INCLUDE_DIRS $REPO_DIR/../global_src/verilog
 

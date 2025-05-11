@@ -21,8 +21,8 @@ module fpga_top #(
     parameter FPGA_PORT           = 16'd1800,
 
     parameter PM_COUNT            = 8,
-    parameter int PM_DOMAIN_TYPE[PM_COUNT] = '{PM_TYPE_ROCKET,
-                                               PM_TYPE_NONE,
+    parameter int PM_DOMAIN_TYPE[PM_COUNT] = '{PM_TYPE_QSFP,
+                                               PM_TYPE_ROCKET,
                                                PM_TYPE_NONE,
                                                PM_TYPE_NONE,
                                                PM_TYPE_NONE,
@@ -88,6 +88,21 @@ module fpga_top #(
 
     inout   wire            ENET_MDIO,
     output  wire            ENET_MDC,
+
+`endif
+
+`ifdef USE_QSFP
+    // *** Ethernet PHY ***
+    //output  wire            PHY1_RESET_B,
+
+    input   wire            QSFP1_RX1_N,
+    input   wire            QSFP1_RX1_P,
+    output  wire            QSFP1_TX1_N,
+    output  wire            QSFP1_TX1_P,
+    input   wire            QSFP1_SI570_CLOCK_N,
+    input   wire            QSFP1_SI570_CLOCK_P,
+    input   wire            QSFP2_SI570_CLOCK_N,
+    input   wire            QSFP2_SI570_CLOCK_P,
 
 `endif
 
@@ -248,6 +263,7 @@ module fpga_top #(
     wire            ddr4_c1_clk;
     wire            ddr4_c2_clk;
     wire            eth_clk;
+    wire            ddr4_clk;
     wire            mmcme0_locked;
     wire            mmcme1_locked;
 
@@ -274,8 +290,14 @@ module fpga_top #(
     wire                        ddr4_c2_init_calib_complete;
     wire [DDR4_STATUS_SIZE-1:0] ddr4_c2_status;
 `endif
+
 `ifdef USE_VCU128
     wire                        c0_ddr4_init_calib_complete;
+`endif
+
+`ifdef USE_QSFP
+    wire                qsfp_mmcme_locked;
+    wire                qsfp_ref_clk;
 `endif
 
 
@@ -457,7 +479,7 @@ module fpga_top #(
 
 
     // ******************** CLOCKS/RESETS ********************
-    assign sys_reset = CPU_RESET || ~mmcme0_locked || ~mmcme1_locked || ~eth_fmc_mmcme_locked;
+    assign sys_reset = CPU_RESET || ~mmcme0_locked || ~mmcme1_locked || ~eth_fmc_mmcme_locked || ~qsfp_mmcme_locked;
 
     assign GPIO_LED[0] = sys_reset;
     assign GPIO_LED[1] = eth_status_vector[0] && eth_status_vector[1];	//internal link is up + sync has been obtained
@@ -562,7 +584,7 @@ module fpga_top #(
         .CLKOUT2_MHZ  (100),
         .CLKOUT3_MHZ  (100),
         .CLKOUT4_MHZ  (CLKFREQ_PM_MHZ[0]),
-        .CLKOUT5_MHZ  (CLKFREQ_PM_MHZ[1]),
+        .CLKOUT5_MHZ  (50),
         .CLKOUT6_MHZ  (CLKFREQ_PM_MHZ[2])
     ) i_fpga_clk2_gen_100 (
         .clk0_out     (pm3_clk),
@@ -570,7 +592,7 @@ module fpga_top #(
         .clk2_out     (pm5_clk),
         .clk3_out     (pm6_clk),
         .clk4_out     (pm7_clk),
-        .clk5_out     (),
+        .clk5_out     (qsfp_ref_clk),
         .clk6_out     (),
 
         .reset        (CPU_RESET || eth_system_reset),
@@ -1028,6 +1050,15 @@ module fpga_top #(
     );
 
 
+    /*qsfp_clk_gen i_qsfp_clk_gen (
+        .clk_out1     (qsfp_ref_clk),    //50 MHz
+        .clk_out2     (),    //125 MHz
+        .reset        (CPU_RESET),
+        .locked       (qsfp_mmcme_locked),
+        .clk_in1_p    (QSFP2_SI570_CLOCK_P),
+        .clk_in1_n    (QSFP2_SI570_CLOCK_N)
+    );*/
+
 
 `ifdef USE_ETHERNET_FMC
     ethernet_fmc_clk_gen i_ethernet_fmc_clk_gen (
@@ -1041,8 +1072,54 @@ module fpga_top #(
 `endif
 
 
-    generate
-    if (PM_DOMAIN_TYPE[0] == PM_TYPE_ETHFMC) begin: PM0_ETHFMC
+   generate
+
+    if (PM_DOMAIN_TYPE[0] == PM_TYPE_QSFP) begin: PM0_QSFP
+`ifdef USE_QSFP
+     qsfp_domain #(
+            .ETH_INCLUDE_SHARED_LOGIC (1),
+            .HOME_MODID               (MODID_PM0),
+            .PM_UART_ATTACHED         (PM_UART_ATTACHED[0]),
+            .CLKFREQ_MHZ              (CLKFREQ_PM_MHZ[0])
+        ) i_qsfp_domain (
+            .clk_axi_i            (pm0_clk),
+            .reset_h_i            (sys_reset),
+
+            // NoC interface
+            .noc_fifo_in_data_i   (tile2_noc_fifo_in_data_s),
+            .noc_fifo_in_raddr_o  (tile2_noc_fifo_in_raddr_s),
+            .noc_fifo_in_waddr_i  (tile2_noc_fifo_in_waddr_s),
+            .noc_fifo_out_data_o  (tile2_noc_fifo_out_data_s),
+            .noc_fifo_out_raddr_i (tile2_noc_fifo_out_raddr_s),
+            .noc_fifo_out_waddr_o (tile2_noc_fifo_out_waddr_s),
+
+            // physical interface
+            .sfp_rtl_rxn              (QSFP1_RX1_N),
+            .sfp_rtl_rxp              (QSFP1_RX1_P),
+            .sfp_rtl_txn              (QSFP1_TX1_N),
+            .sfp_rtl_txp              (QSFP1_TX1_P),
+
+            .ref_clk_i            (qsfp_ref_clk),
+
+            .mgt_clk_n        (QSFP1_SI570_CLOCK_N),//156 MHz but requires 125 MHz
+            .mgt_clk_p        (QSFP1_SI570_CLOCK_P),
+
+            .home_chipid_i        (home_chipid_s),
+            .host_chipid_i        (host_chipid_s),
+
+            .jtag_tck_i           (pm0_jtag_tck),
+            .jtag_tms_i           (pm0_jtag_tms),
+            .jtag_tdi_i           (pm0_jtag_tdi),
+            .jtag_tdo_o           (pm0_jtag_tdo),
+            .jtag_tdo_en_o        (pm0_jtag_tdo_en),
+
+            .uart_tx_o            (pm_uart_tx[0]),
+            .uart_rx_i            (pm_uart_rx[0])
+        );
+`endif
+    end
+
+    else if (PM_DOMAIN_TYPE[0] == PM_TYPE_ETHFMC) begin: PM0_ETHFMC
 `ifdef USE_ETHERNET_FMC
         ethernet_fmc_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),
@@ -1069,7 +1146,6 @@ module fpga_top #(
             .rgmii_tx_ctl         (ETH_FMC_PHY1_RGMII_TX_CTL),
             .rgmii_txc            (ETH_FMC_PHY1_RGMII_TXC),
             .gtx_clk_i            (eth_fmc_gtx_clk),
-            .ref_clk_i            (eth_fmc_ref_clk),
 
             .mdio_mdc_o           (ETH_FMC_PHY1_MDC),
             .mdio_io              (ETH_FMC_PHY1_MDIO),
