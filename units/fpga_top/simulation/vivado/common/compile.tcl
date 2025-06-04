@@ -1,4 +1,3 @@
-
 set TC          [file tail [pwd]]
 set TB          tb_fpga_top
 set TOPLEVEL    fpga_top
@@ -10,12 +9,16 @@ set REPO_DIR    $env(FPGA_DESIGN)/units
 set SIM_DIR     $env(VIVADO_SIM_DIR)/$TB/$TC
 
 #comment when DDR4 should be taken out of simulation
-set USE_DDR4_C1 1
-set USE_DDR4_C2 1
+#set USE_DDR4_C1 1
+#set USE_DDR4_C2 1
+
+set USE_DDR4_VCU128 1
 
 #comment which FPGA BOARD should be taken out of simulation
 #set USE_VCU118 1
 set USE_VCU128 1
+
+set USE_QSFP 1
 
 #comment when Ethernet FMC design should be taken out from simulation
 #set USE_ETHERNET_FMC 1
@@ -38,7 +41,7 @@ if {[info exists USE_DDR4_C1]} {
 if {[info exists USE_DDR4_C2]} {
 	lappend DEF_MACROS USE_DDR4_C2
 }
-if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
+if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_DDR4_VCU128]} {
 	lappend DEF_MACROS USE_DDR4
 }
 if {[info exists USE_ETHERNET_FMC]} {
@@ -48,9 +51,14 @@ if {[info exists USE_VCU118]} {
 	lappend DEF_MACROS USE_VCU118
 }
 if {[info exists USE_VCU128]} {
-        lappend DEF_MACROS USE_VCU128
+   lappend DEF_MACROS USE_VCU128
 }
-
+if {[info exists USE_DDR4_VCU128]} {
+   lappend DEF_MACROS USE_DDR4_VCU128
+}
+if {[info exists USE_QSFP]} {
+        lappend DEF_MACROS USE_QSFP
+}
 #-----------------------------------------------------------------
 #create project
 create_project -name $SIM_DIR/vivado_proj/xsim -part $PART -force
@@ -172,13 +180,14 @@ lappend ELAB_CMD -L c_gate_bit_v12_0_6
 lappend ELAB_CMD -L xbip_counter_v3_0_6
 lappend ELAB_CMD -L c_counter_binary_v12_0_13
 lappend ELAB_CMD -L util_vector_logic_v$utilvl_curr_version
+lappend ELAB_CMD -L gtwizard_ultrascale_v1_7_14
 lappend ELAB_CMD -L unisims_ver
 lappend ELAB_CMD -L unimacro_ver
 lappend ELAB_CMD -L secureip
 lappend ELAB_CMD -L xpm
 
 
-if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_ETHERNET_FMC]} {
+if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]  || [info exists USE_DDR4_VCU128] || [info exists USE_ETHERNET_FMC]} {
     lappend ELAB_CMD -L blk_mem_gen_v8_4_3
     lappend ELAB_CMD -L microblaze_v11_0_1
     lappend ELAB_CMD -L proc_sys_reset_v5_0_13
@@ -186,14 +195,13 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_E
     lappend ELAB_CMD -L lmb_bram_if_cntlr_v4_0_16
     lappend ELAB_CMD -L iomodule_v3_1_4
     lappend ELAB_CMD -L lib_cdc_v1_0_2
-
-    if {[info exists USE_ETHERNET_FMC]} {
-        lappend ELAB_CMD -L tri_mode_ethernet_mac_v$temac_curr_version
-        lappend ELAB_CMD -L smartconnect_v1_0
-        lappend ELAB_CMD -L lib_pkg_v1_0_2
-        lappend ELAB_CMD -L axi_ethernet_buffer_v2_0_20
-        lappend ELAB_CMD -L lib_bmg_v1_0_12
-    }
+}
+if {[info exists USE_ETHERNET_FMC] || [info exists USE_QSFP]} {
+    lappend ELAB_CMD -L tri_mode_ethernet_mac_v$temac_curr_version
+    lappend ELAB_CMD -L smartconnect_v1_0
+    lappend ELAB_CMD -L lib_pkg_v1_0_2
+    lappend ELAB_CMD -L axi_ethernet_buffer_v2_0_20
+    lappend ELAB_CMD -L lib_bmg_v1_0_12
 }
 
 lappend ELAB_CMD --snapshot $TB xil_defaultlib.$TB xil_defaultlib.glbl

@@ -101,8 +101,6 @@ module fpga_top #(
     output  wire            QSFP1_TX1_P,
     input   wire            QSFP1_SI570_CLOCK_N,
     input   wire            QSFP1_SI570_CLOCK_P,
-    input   wire            QSFP2_SI570_CLOCK_N,
-    input   wire            QSFP2_SI570_CLOCK_P,
 
 `endif
 
@@ -177,7 +175,7 @@ module fpga_top #(
     input   wire            UART_RX
 
     // *** SDRAM ***
-`ifdef USE_VCU118	
+
     `ifdef USE_DDR4_C1
         ,input  wire            DDR4_C1_250MHZ_CLK_N,
         input   wire            DDR4_C1_250MHZ_CLK_P,
@@ -215,10 +213,10 @@ module fpga_top #(
         inout   wire      [9:0] DDR4_C2_DQS_T,
         inout   wire      [9:0] DDR4_C2_DQS_C
     `endif
-`endif
 
 
-`ifdef USE_VCU128
+
+`ifdef USE_DDR4_VCU128
 	,input  wire             DDR4_CLK_100MHZ_N,
          input   wire            DDR4_CLK_100MHZ_P,
          output  wire            PL_DDR4_ACT_B,
@@ -404,6 +402,15 @@ module fpga_top #(
     wire           [NOC_ASYNC_FIFO_AWIDTH:0] ddr4_c2_noc_fifo_out_waddr_s;
 `endif
 
+`ifdef USE_VCU128
+    wire    [NOC_ASYNC_FIFO_PACKET_SIZE-1:0] ddr4_noc_fifo_in_data_s;
+    wire           [NOC_ASYNC_FIFO_AWIDTH:0] ddr4_noc_fifo_in_raddr_s;
+    wire           [NOC_ASYNC_FIFO_AWIDTH:0] ddr4_noc_fifo_in_waddr_s;
+    wire    [NOC_ASYNC_FIFO_PACKET_SIZE-1:0] ddr4_noc_fifo_out_data_s;
+    wire           [NOC_ASYNC_FIFO_AWIDTH:0] ddr4_noc_fifo_out_raddr_s;
+    wire           [NOC_ASYNC_FIFO_AWIDTH:0] ddr4_noc_fifo_out_waddr_s;
+`endif
+
     wire pm0_jtag_tck;
     wire pm0_jtag_tms;
     wire pm0_jtag_tdi;
@@ -479,7 +486,7 @@ module fpga_top #(
 
 
     // ******************** CLOCKS/RESETS ********************
-    assign sys_reset = CPU_RESET || ~mmcme0_locked || ~mmcme1_locked || ~eth_fmc_mmcme_locked || ~qsfp_mmcme_locked;
+    assign sys_reset = CPU_RESET || ~mmcme0_locked || ~mmcme1_locked || ~eth_fmc_mmcme_locked;
 
     assign GPIO_LED[0] = sys_reset;
     assign GPIO_LED[1] = eth_status_vector[0] && eth_status_vector[1];	//internal link is up + sync has been obtained
@@ -596,7 +603,7 @@ module fpga_top #(
         .clk6_out     (),
 
         .reset        (CPU_RESET || eth_system_reset),
-        .locked       (mmcme0_locked),
+        .locked       (mmcme1_locked),
         .clk_in_100_p (SYSCLK2_100_P),
         .clk_in_100_n (SYSCLK2_100_N)
     );
@@ -847,10 +854,10 @@ module fpga_top #(
 `endif
 
 
-`ifdef USE_VCU128
+`ifdef USE_DDR4_VCU128
         ddr4_domain #(
             .INST                       ("C0"),
-            .HOME_MODID                 (MODID_DRAM2),
+            .HOME_MODID                 (MODID_DRAM1),
             .SIMULATION                 (SIMULATION_DDR4)
         ) i_ddr4_domain (
             .sys_clk_p                  (DDR4_CLK_100MHZ_P),
@@ -862,12 +869,12 @@ module fpga_top #(
             //.ddr4_status_o              (ddr4_c2_status),
 
             // NoC interface
-            .noc_fifo_in_data_i         (ddr4_c2_noc_fifo_in_data_s),
-            .noc_fifo_in_raddr_o        (ddr4_c2_noc_fifo_in_raddr_s),
-            .noc_fifo_in_waddr_i        (ddr4_c2_noc_fifo_in_waddr_s),
-            .noc_fifo_out_data_o        (ddr4_c2_noc_fifo_out_data_s),
-            .noc_fifo_out_raddr_i       (ddr4_c2_noc_fifo_out_raddr_s),
-            .noc_fifo_out_waddr_o       (ddr4_c2_noc_fifo_out_waddr_s),
+            .noc_fifo_in_data_i         (ddr4_noc_fifo_in_data_s),
+            .noc_fifo_in_raddr_o        (ddr4_noc_fifo_in_raddr_s),
+            .noc_fifo_in_waddr_i        (ddr4_noc_fifo_in_waddr_s),
+            .noc_fifo_out_data_o        (ddr4_noc_fifo_out_data_s),
+            .noc_fifo_out_raddr_i       (ddr4_noc_fifo_out_raddr_s),
+            .noc_fifo_out_waddr_o       (ddr4_noc_fifo_out_waddr_s),
 
             .ddr4_act_n                 (PL_DDR4_ACT_B),
             .ddr4_addr                  (PL_DDR4_A),
@@ -886,14 +893,13 @@ module fpga_top #(
         );
 
 
-        assign tile11_noc_fifo_in_raddr_s   = ddr4_c2_noc_fifo_in_raddr_s;
-        assign tile11_noc_fifo_out_data_s   = ddr4_c2_noc_fifo_out_data_s;
-        assign tile11_noc_fifo_out_waddr_s  = ddr4_c2_noc_fifo_out_waddr_s;
-        assign ddr4_c2_noc_fifo_in_data_s   = tile11_noc_fifo_in_data_s;
-        assign ddr4_c2_noc_fifo_in_waddr_s  = tile11_noc_fifo_in_waddr_s;
-        assign ddr4_c2_noc_fifo_out_raddr_s = tile11_noc_fifo_out_raddr_s;
+        assign tile3_noc_fifo_in_raddr_s   = ddr4_noc_fifo_in_raddr_s;
+        assign tile3_noc_fifo_out_data_s   = ddr4_noc_fifo_out_data_s;
+        assign tile3_noc_fifo_out_waddr_s  = ddr4_noc_fifo_out_waddr_s;
+        assign ddr4_noc_fifo_in_data_s   = tile3_noc_fifo_in_data_s;
+        assign ddr4_noc_fifo_in_waddr_s  = tile3_noc_fifo_in_waddr_s;
+        assign ddr4_noc_fifo_out_raddr_s = tile3_noc_fifo_out_raddr_s;
 `endif
-
 
     //tile0 can be used as off-chip link in simulation
 `ifdef SIMULATION

@@ -7,8 +7,9 @@ set REPO_DIR        $env(FPGA_DESIGN)/units
 set SYNTH_DIR       $env(VIVADO_SYNTH_DIR)
 
 #comment when DDR4 should be taken out of synthesis
-set USE_DDR4_C1 1
-set USE_DDR4_C2 1
+#set USE_DDR4_C1 1
+#set USE_DDR4_C2 1
+set USE_DDR4_VCU128 1
 
 #comment which FPGA BOARD should be taken out of simulation
 #set USE_VCU118 1
@@ -110,7 +111,7 @@ if {[info exists USE_VCU118]} {
     	    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins.xdc]
     }
 }
-if {[info exists USE_VCU128]} {
+if {[info exists USE_DDR4_VCU128]} {
       add_files -fileset [current_fileset -constrset] $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins_VCU128.xdc
       set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/ddr4/source/constraints/constraints_ddr4_pins_VCU128.xdc]
 }
@@ -159,7 +160,10 @@ if {[info exists USE_DDR4_C1]} {
 if {[info exists USE_DDR4_C2]} {
     lappend ARGS    -verilog_define "USE_DDR4_C2=1"
 }
-if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]} {
+if {[info exists USE_DDR4_VCU128]} {
+    lappend ARGS    -verilog_define "USE_DDR4_VCU128=1"
+}
+if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_DDR4_VCU128]} {
     lappend ARGS    -verilog_define "USE_DDR4=1"
 }
 if {[info exists USE_ETHERNET_FMC]} {

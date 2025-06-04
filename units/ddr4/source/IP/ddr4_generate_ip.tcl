@@ -98,7 +98,7 @@ if {[info exists USE_VCU118]} {
     }
 }
 
-if {[info exists USE_VCU128]} {
+if {[info exists USE_DDR4_VCU128]} {
     #skip generating IP if it already exists
     if {[file exists $IP_DIR/$IP_NAME/$IP_NAME.xci]} {
         read_ip -verbose $IP_DIR/$IP_NAME/$IP_NAME.xci

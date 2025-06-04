@@ -67,12 +67,12 @@ module ddr4_domain #(
         .ddr4_init_calib_complete_o  (ddr4_init_calib_complete_o),
         .ddr4_status_o               (ddr4_status_o),
 
-        /*.noc_fifo_in_data_i          (noc_fifo_in_data_i),
+        .noc_fifo_in_data_i          (noc_fifo_in_data_i),
         .noc_fifo_in_raddr_o         (noc_fifo_in_raddr_o),
         .noc_fifo_in_waddr_i         (noc_fifo_in_waddr_i),
         .noc_fifo_out_data_o         (noc_fifo_out_data_o),
         .noc_fifo_out_raddr_i        (noc_fifo_out_raddr_i),
-        .noc_fifo_out_waddr_o        (noc_fifo_out_waddr_o),*/
+        .noc_fifo_out_waddr_o        (noc_fifo_out_waddr_o),
 
         .ddr4_act_n                  (ddr4_act_n),
         .ddr4_addr                   (ddr4_addr),
