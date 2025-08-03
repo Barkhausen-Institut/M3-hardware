@@ -14,6 +14,7 @@ if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2] || [info exists USE_D
 
 if {[info exists USE_QSFP]} {
 	source $REPO_DIR/qsfp/source/qsfp_files.tcl
+	source $REPO_DIR/i2c/source/i2c_files.tcl
 }
 
 lappend INCLUDE_DIRS $REPO_DIR/../global_src/verilog
@@ -25,6 +26,7 @@ lappend VERILOG_FILES $REPO_DIR/jtag/source/rtl/verilog/jtag_tunnel_mc8.v
 lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_125.v
 lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_300.v
 lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_100.v
+lappend VERILOG_FILES $REPO_DIR/fpga_clk_gen/source/rtl/verilog/fpga_clk_gen_khz.v
 
 lappend VERILOG_FILES $REPO_DIR/noc_router/source/rtl/verilog/flit_counter.v
 lappend VERILOG_FILES $REPO_DIR/noc_router/source/rtl/verilog/flit_counter_wrap.v

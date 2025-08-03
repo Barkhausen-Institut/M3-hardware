@@ -56,8 +56,9 @@ module qsfp_wrap #(
     output wire                                     sfp_rtl_txn,
     output wire                                     sfp_rtl_txp,
 
-    input  wire                                   mgt_clk_n,
-    input  wire                                   mgt_clk_p,
+    input  wire                                     mgt_clk_n,
+    input  wire                                     mgt_clk_p,
+    output wire                                     gtref_clk_out,
 
     //input  wire                                     gtx_clk_i,
     input  wire                                     ref_clk_i,
@@ -878,6 +879,7 @@ if (ETH_INCLUDE_SHARED_LOGIC) begin: AXI_ETH
 
         .mgt_clk_0_clk_n          (mgt_clk_n),
         .mgt_clk_0_clk_p          (mgt_clk_p),
+        .gtref_clk_out_0          (gtref_clk_out),
 
         .signal_detect_0          (1'b1),
 

@@ -162,6 +162,8 @@ if { [string match [version -short] "2019.1"] } {
 }
 set s2mm_dma_introut [ create_bd_port -dir O -type intr s2mm_dma_introut ]
 
+set gtref_clk_out_0 [ create_bd_port -dir O -type clk -freq_hz 125000000 gtref_clk_out_0 ]
+
 # Create instance: axi_dma_0, and set properties
 set axi_dma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.* axi_dma_0 ]
 set_property -dict [ list \
@@ -232,6 +234,7 @@ connect_bd_net -net axi_ethernet_0_signal_detect [get_bd_ports signal_detect_0] 
 #connect_bd_net -net axi_ethernet_0_phy_rst_n [get_bd_ports phy_rst_n_0] [get_bd_pins axi_ethernet_0/phy_rst_n]
 #connect_bd_net -net gtx_clk_0_1 [get_bd_ports gtx_clk_0] [get_bd_pins axi_ethernet_0/gtx_clk]
 connect_bd_net -net ref_clk_0_1 [get_bd_ports ref_clk_0] [get_bd_pins axi_ethernet_0/ref_clk]
+connect_bd_net -net gtref_clk_out_0_1 [get_bd_ports gtref_clk_out_0] [get_bd_pins axi_ethernet_0/gtref_clk_out]
 
 # Create address segments
 create_bd_addr_seg -range 0x000100000000 -offset 0x00000000 [get_bd_addr_spaces axi_dma_0/Data_SG] [get_bd_addr_segs M00_AXI_0/Reg] SEG_M00_AXI_0_Reg

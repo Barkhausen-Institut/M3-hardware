@@ -51,6 +51,8 @@ module qsfp_domain #(
     output wire                                  jtag_tdo_o,
     output wire                                  jtag_tdo_en_o,
 
+    output wire                                 gtref_clk_out,
+
     output wire                                  uart_tx_o,
     input  wire                                  uart_rx_i
 );
@@ -95,6 +97,7 @@ qsfp_wrap #(
 
     .mgt_clk_n              (mgt_clk_n),
     .mgt_clk_p              (mgt_clk_p),
+    .gtref_clk_out          (gtref_clk_out),
 
     //.gtx_clk_i                  (gtx_clk_i),
     .ref_clk_i                  (ref_clk_i),

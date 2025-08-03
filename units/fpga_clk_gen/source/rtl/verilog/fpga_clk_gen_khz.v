@@ -1,7 +1,7 @@
 
 `timescale 1ps/1ps
 
-module fpga_clk_gen_100 #(
+module fpga_clk_gen_khz #(
     //Important! Input frequency value must be a divisor of 1000
     parameter CLKOUT0_MHZ = 100,
     parameter CLKOUT1_MHZ = 100,
@@ -22,8 +22,8 @@ module fpga_clk_gen_100 #(
     // Status and control signals
     input         reset,
     output        locked,
-    input         clk_in_100_p,
-    input         clk_in_100_n
+    input         clk_in_p,
+    input         clk_in_n
 );
 
     localparam LOCAL_CLKOUT0_DIV = 1000/CLKOUT0_MHZ;
@@ -35,7 +35,7 @@ module fpga_clk_gen_100 #(
     localparam LOCAL_CLKOUT6_DIV = 1000/CLKOUT6_MHZ;
 
     //f_out = CLKIN1_PERIOD * CLKFBOUT_MULT_F / (DIVCLK_DIVIDE * LOCAL_CLKOUTX_DIV)
-    //f_out = 100 * 10 / (1 * 10) = 1000 / X
+    //f_out = 156.25 * 12.8 / (5 * 1000) = 0.4
 
 
     // Input buffering
@@ -45,8 +45,8 @@ module fpga_clk_gen_100 #(
 
     IBUFDS clkin1_ibufds (
         .O  (clk_in1_clk_wiz_0),
-        .I  (clk_in_100_p),
-        .IB (clk_in_100_n)
+        .I  (clk_in_p),
+        .IB (clk_in_n)
     );
 
 
@@ -88,8 +88,8 @@ module fpga_clk_gen_100 #(
         .CLKOUT4_CASCADE      ("FALSE"),
         .COMPENSATION         ("AUTO"),
         .STARTUP_WAIT         ("FALSE"),
-        .DIVCLK_DIVIDE        (1),
-        .CLKFBOUT_MULT_F      (10.000),
+        .DIVCLK_DIVIDE        (5),
+        .CLKFBOUT_MULT_F      (12.800),
         .CLKFBOUT_PHASE       (0.000),
         .CLKFBOUT_USE_FINE_PS ("FALSE"),
         .CLKOUT0_DIVIDE_F     (LOCAL_CLKOUT0_DIV),
@@ -120,7 +120,7 @@ module fpga_clk_gen_100 #(
         .CLKOUT6_PHASE        (0.000),
         .CLKOUT6_DUTY_CYCLE   (0.500),
         .CLKOUT6_USE_FINE_PS  ("FALSE"),
-        .CLKIN1_PERIOD        (10.000)
+        .CLKIN1_PERIOD        (15.625)
     ) mmcme4_adv_inst (
         // Output clocks
         .CLKFBOUT            (clkfbout_clk_wiz_0),

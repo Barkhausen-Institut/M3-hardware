@@ -56,6 +56,9 @@ module fpga_top #(
     input   wire            SYSCLK2_100_P,   //system clock2 100 MHz
     input   wire            SYSCLK2_100_N,
 
+   // input   wire            SYSCLK3_P,   //system clock3 156.25 MHz
+    //input   wire            SYSCLK2_N,
+
 `endif
 
 `ifdef USE_VCU118
@@ -101,6 +104,10 @@ module fpga_top #(
     output  wire            QSFP1_TX1_P,
     input   wire            QSFP1_SI570_CLOCK_N,
     input   wire            QSFP1_SI570_CLOCK_P,
+
+    output wire             PL_I2C0_SCL_LS,
+    inout wire              PL_I2C0_SDA_LS,
+    //output wire             i2c_config_done_o,
 
 `endif
 
@@ -264,6 +271,7 @@ module fpga_top #(
     wire            ddr4_clk;
     wire            mmcme0_locked;
     wire            mmcme1_locked;
+    wire            mmcme2_locked;
 
     wire            mdio_i, mdio_o, mdio_t;
 
@@ -296,6 +304,15 @@ module fpga_top #(
 `ifdef USE_QSFP
     wire                qsfp_mmcme_locked;
     wire                qsfp_ref_clk;
+    wire                i2c_clk;
+    wire                si570_config_done;
+    wire                si570_config_error;
+    wire                [11:0] freq_count_result;
+    wire                freq_check_done;
+    wire                qsfp_clk_buffered;
+    wire                ip_gtref_clk_out;
+    wire                qsfp_clk_se;
+    reg                 pass_led_reg = 0;
 `endif
 
 
@@ -511,7 +528,7 @@ module fpga_top #(
 
     assign PHY1_RESET_B = phy_reset_n;
 
-
+    //assign i2c_config_done_o = si570_config_done;
     // //----------------------------------------------------------------------------
     // clock generators
 `ifdef USE_VCU118
@@ -574,7 +591,7 @@ module fpga_top #(
         .clk0_out     (eth_clk),
         .clk1_out     (noc_clk),
         .clk2_out     (ddr4_clk),
-        .clk3_out     (),
+        .clk3_out     (i2c_clk),
         .clk4_out     (pm0_clk),
         .clk5_out     (pm1_clk),
         .clk6_out     (pm2_clk),
@@ -607,6 +624,29 @@ module fpga_top #(
         .clk_in_100_p (SYSCLK2_100_P),
         .clk_in_100_n (SYSCLK2_100_N)
     );
+
+    /*fpga_clk_gen_khz #(
+        .CLKOUT0_MHZ  (1),
+        .CLKOUT1_MHZ  (),
+        .CLKOUT2_MHZ  (),
+        .CLKOUT3_MHZ  (),
+        .CLKOUT4_MHZ  (),
+        .CLKOUT5_MHZ  (),
+        .CLKOUT6_MHZ  ()
+    ) i_fpga_clk_gen_khz (
+        .clk0_out     (i2c_clk),
+        .clk1_out     (),
+        .clk2_out     (),
+        .clk3_out     (),
+        .clk4_out     (),
+        .clk5_out     (),
+        .clk6_out     (),
+
+        .reset        (CPU_RESET || eth_system_reset),
+        .locked       (mmcme2_locked),
+        .clk_in_p     (SYSCLK3_P),
+        .clk_in_n     (SYSCLK3_N)
+    );*/
 
 `endif
 
@@ -1065,7 +1105,6 @@ module fpga_top #(
         .clk_in1_n    (QSFP2_SI570_CLOCK_N)
     );*/
 
-
 `ifdef USE_ETHERNET_FMC
     ethernet_fmc_clk_gen i_ethernet_fmc_clk_gen (
         .clk_out1     (eth_fmc_ref_clk),    //333.333 MHz
@@ -1082,6 +1121,65 @@ module fpga_top #(
 
     if (PM_DOMAIN_TYPE[0] == PM_TYPE_QSFP) begin: PM0_QSFP
 `ifdef USE_QSFP
+
+    // IBUFDS_GTE4 #(
+    //   .REFCLK_EN_TX_PATH (1'b0 ), // Must be 1'b0
+    //   .REFCLK_HROW_CK_SEL(2'b00), // ODIV2 output is not divided
+    //   .REFCLK_ICNTL_RX   (2'b00)  // Reserved
+    // ) i_qsfp_clk_ibufds_gte3  (
+    //   .I     (QSFP1_SI570_CLOCK_P),
+    //   .IB    (QSFP1_SI570_CLOCK_N),
+    //   .CEB   (1'b0),     // Enabled
+    //   .ODIV2 (qsfp_clk_se),     // Clock to BUFG_GT
+    //   .O     ()      // Clock to transceiver block (unused)
+    // );
+    //
+    // BUFG_GT i_bufg_gt (
+    //     .I(qsfp_clk_se),
+    //     .CE(1'b1),
+    //     .CLR(1'b0),
+    //     .O(qsfp_clk_buffered)
+    // );
+    //
+    // si570_i2c_config i_si570_i2c_config (
+    //     .clk_sys        (i2c_clk),
+    //     .rst_n          (~sys_reset),
+    //     .config_done_o  (si570_config_done),
+    //     .config_error_o (si570_config_error),
+    //
+    //     .i2c_scl_o      (PL_I2C0_SCL_LS),
+    //     .i2c_sda_io     (PL_I2C0_SDA_LS)
+    // );
+    //
+    // hw_freq_counter #(
+    //     .REF_CYCLES(1000),
+    //     .COUNTER_WIDTH(12)
+    // ) i_freq_checker (
+    //     .ref_clk_i(i2c_clk),
+    //     .rst_n_i(~sys_reset),
+    //     .clk_to_measure_i(qsfp_clk_buffered),
+    //     .trigger_i(si570_config_done),   // Start after I2C is done
+    //     .count_result_o(freq_count_result),
+    //     .measurement_done_o(freq_check_done)
+    // );
+    //
+    //
+    // always @(posedge i2c_clk) begin
+    //     if (reset) begin
+    //         pass_led_reg <= 1'b0;
+    //     end
+    //     else if(freq_check_done) begin
+    //         if (freq_count_result > 1550 && freq_count_result < 1600) begin
+    //             pass_led_reg <= 1'b1;
+    //         end
+    //     end
+    //     else begin
+    //         pass_led_reg <= pass_led_reg;
+    //     end
+    // end
+    //
+    // assign GPIO_LED[6] = pass_led_reg;
+
      qsfp_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),
             .HOME_MODID               (MODID_PM0),
@@ -1110,6 +1208,8 @@ module fpga_top #(
             .mgt_clk_n        (QSFP1_SI570_CLOCK_N),//156 MHz but requires 125 MHz
             .mgt_clk_p        (QSFP1_SI570_CLOCK_P),
 
+            .gtref_clk_out      (ip_gtref_clk_out),
+
             .home_chipid_i        (home_chipid_s),
             .host_chipid_i        (host_chipid_s),
 
@@ -1121,7 +1221,7 @@ module fpga_top #(
 
             .uart_tx_o            (pm_uart_tx[0]),
             .uart_rx_i            (pm_uart_rx[0])
-        );
+         );
 `endif
     end
 

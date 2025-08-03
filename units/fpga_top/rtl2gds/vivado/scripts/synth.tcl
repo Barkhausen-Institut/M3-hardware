@@ -128,6 +128,7 @@ if {[info exists USE_ETHERNET_FMC]} {
 if {[info exists USE_QSFP]} {
     add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_pins.tcl
     add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_clocks.xdc
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/i2c/source/constraints/i2c_constraints.xdc
    #add_files -fileset [current_fileset -constrset] $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl
     set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_pins.tcl]
     #set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl]
