@@ -103,10 +103,10 @@ initial begin
         for (addr=`MEM_START_ADDR+ddr4_ram_block*(`DDR4_RAM_BLOCK_SIZE<<1); addr<`MEM_START_ADDR+ddr4_ram_block*(`DDR4_RAM_BLOCK_SIZE<<1)+(`DDR4_RAM_BLOCK_SIZE<<1); addr=addr+2) begin
             //index to generated code must be a constant
             case(ddr4_ram_block)
-                 0: tb_fpga_top.u_dut.i_ddr4_c1_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[0].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
-                 1: tb_fpga_top.u_dut.i_ddr4_c1_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[1].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
-                 2: tb_fpga_top.u_dut.i_ddr4_c1_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[2].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
-                 3: tb_fpga_top.u_dut.i_ddr4_c1_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[3].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
+                 0: tb_fpga_top.u_dut.i_ddr4_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[0].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
+                 1: tb_fpga_top.u_dut.i_ddr4_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[1].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
+                 2: tb_fpga_top.u_dut.i_ddr4_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[2].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
+                 3: tb_fpga_top.u_dut.i_ddr4_domain.i_ddr4_wrap.NO_DDR4.SIM_RAM[3].i_ddr4_sim_ram.i_xpm_sp_ram.xpm_memory_spram_inst.xpm_memory_base_inst.mem[addr[`DDR4_RAM_BLOCK_AWIDTH:1]] = {mem_content_off[addr+1], mem_content_off[addr]};
             endcase
         end
     end

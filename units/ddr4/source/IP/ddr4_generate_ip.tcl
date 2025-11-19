@@ -114,12 +114,12 @@ if {[info exists USE_DDR4_VCU128]} {
         set props_c2 {}
         lappend props_c2 CONFIG.C0_CLOCK_BOARD_INTERFACE {Custom}
         lappend props_c2 CONFIG.C0_DDR4_BOARD_INTERFACE {Custom}
-        lappend props_c2 CONFIG.C0.DDR4_TimePeriod {833}
-        lappend props_c2 CONFIG.C0.DDR4_InputClockPeriod {4000}
-        lappend props_c2 CONFIG.C0.DDR4_CLKOUT0_DIVIDE {5}
-        lappend props_c2 CONFIG.C0.DDR4_MemoryPart {MT40A512M16HA-075E}
+        lappend props_c2 CONFIG.C0.DDR4_TimePeriod {750}
+        lappend props_c2 CONFIG.C0.DDR4_InputClockPeriod {10000}
+        lappend props_c2 CONFIG.C0.DDR4_CLKOUT0_DIVIDE {3}
+        lappend props_c2 CONFIG.C0.DDR4_MemoryPart {MT40A512M16LY-075}
         lappend props_c2 CONFIG.C0.DDR4_DataWidth {72}
-        lappend props_c2 CONFIG.C0.DDR4_CasWriteLatency {12}
+        lappend props_c2 CONFIG.C0.DDR4_CasWriteLatency {14}
         lappend props_c2 CONFIG.C0.DDR4_AxiDataWidth {64}
         lappend props_c2 CONFIG.C0.DDR4_AxiAddressWidth {32}
         lappend props_c2 CONFIG.C0.DDR4_isCustom {false}

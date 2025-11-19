@@ -79,7 +79,7 @@ module fpga_top #(
 
 `ifdef USE_VCU128
     // *** Ethernet PHY ***
-    //output  wire            PHY1_RESET_B,
+    output  wire            ENET_PDWN_B_I_INT_B_O,
 
     input   wire            ENET_DUMMY,
     input   wire            ENET_SGMII_OUT_N,
@@ -95,8 +95,6 @@ module fpga_top #(
 `endif
 
 `ifdef USE_QSFP
-    // *** Ethernet PHY ***
-    //output  wire            PHY1_RESET_B,
 
     input   wire            QSFP1_RX1_N,
     input   wire            QSFP1_RX1_P,
@@ -767,9 +765,9 @@ module fpga_top #(
         .home_chipid_o        (home_chipid_s),
         .host_chipid_o        (host_chipid_s),
 
-        .phy_reset_n          (phy_reset_n),
+        .phy_reset_n          (ENET_PDWN_B_I_INT_B_O),
 
-        .gpio_dip_sw_i        (GPIO_DIP_SW)
+        .gpio_dip_sw_i        (0)
     );
 
 
@@ -1096,15 +1094,6 @@ module fpga_top #(
     );
 
 
-    /*qsfp_clk_gen i_qsfp_clk_gen (
-        .clk_out1     (qsfp_ref_clk),    //50 MHz
-        .clk_out2     (),    //125 MHz
-        .reset        (CPU_RESET),
-        .locked       (qsfp_mmcme_locked),
-        .clk_in1_p    (QSFP2_SI570_CLOCK_P),
-        .clk_in1_n    (QSFP2_SI570_CLOCK_N)
-    );*/
-
 `ifdef USE_ETHERNET_FMC
     ethernet_fmc_clk_gen i_ethernet_fmc_clk_gen (
         .clk_out1     (eth_fmc_ref_clk),    //333.333 MHz
@@ -1116,11 +1105,6 @@ module fpga_top #(
     );
 `endif
 
-
-   generate
-
-    if (PM_DOMAIN_TYPE[0] == PM_TYPE_QSFP) begin: PM0_QSFP
-`ifdef USE_QSFP
 
     // IBUFDS_GTE4 #(
     //   .REFCLK_EN_TX_PATH (1'b0 ), // Must be 1'b0
@@ -1162,23 +1146,25 @@ module fpga_top #(
     //     .count_result_o(freq_count_result),
     //     .measurement_done_o(freq_check_done)
     // );
-    //
-    //
+
+
     // always @(posedge i2c_clk) begin
-    //     if (reset) begin
+    //     if (sys_reset) begin
     //         pass_led_reg <= 1'b0;
     //     end
     //     else if(freq_check_done) begin
-    //         if (freq_count_result > 1550 && freq_count_result < 1600) begin
+    //         if (freq_count_result > 1240 && freq_count_result < 1300) begin
     //             pass_led_reg <= 1'b1;
     //         end
-    //     end
-    //     else begin
-    //         pass_led_reg <= pass_led_reg;
     //     end
     // end
     //
     // assign GPIO_LED[6] = pass_led_reg;
+
+
+generate
+if (PM_DOMAIN_TYPE[0] == PM_TYPE_QSFP) begin: PM0_QSFP
+    `ifdef USE_QSFP
 
      qsfp_domain #(
             .ETH_INCLUDE_SHARED_LOGIC (1),

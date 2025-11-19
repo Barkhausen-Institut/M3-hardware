@@ -13,7 +13,7 @@ module tb_fpga_top #(
     ,`include "mod_ids.vh"
     ,`include "noc_parameter.vh"
     ,`include "tcu_parameter.vh"
-    ,parameter HOME_CHIPID = {NOC_CHIPID_SIZE{1'b0}}
+    ,parameter HOME_CHIPID = 0
 )();
 
 
@@ -28,6 +28,9 @@ reg sgmii_clk_n;
 wire PHY1_MDIO;
 wire PHY1_MDC;
 
+wire ENET_MDIO;
+wire ENET_MDC;
+
 // clocks
 reg axi_clk_n;
 reg mgt_clk1_n, mgt_clk2_n, mgt_clk3_n;
@@ -36,11 +39,15 @@ reg clk_125mhz_n;
 // system clock 300 MHz
 reg sysclk1_n;
 
+// system clock 100 MHz
+reg clk1_100mhz_n;
+reg clk2_100mhz_n;
+
 //300 MHz clock
 reg user_clk_n;
 
 wire [7:0] GPIO_LED;
-wire [3:0] GPIO_DIP_SW = HOME_CHIPID[3:0];  //SW12 - determines chip-id
+wire [3:0] GPIO_DIP_SW = HOME_CHIPID;  //SW12 - determines chip-id
 
 wire eth_link_status = GPIO_LED[1];
 
@@ -55,6 +62,19 @@ wire [NOC_ASYNC_FIFO_PACKET_SIZE-1:0] tb_noc_fifo_out_data_s;
 wire        [NOC_ASYNC_FIFO_AWIDTH:0] tb_noc_fifo_out_raddr_s;
 wire        [NOC_ASYNC_FIFO_AWIDTH:0] tb_noc_fifo_out_waddr_s;
 
+//wire i2c_scl;
+//wire i2c_sda;
+
+// Wire to capture the 'done' signal from the I2C config module
+//wire i2c_config_done;
+
+pullup(i2c_scl);
+pullup(i2c_sda);
+
+reg trigger_i = 0;
+
+wire [11:0] count_result_o;
+wire        measurement_done_o;
 
 reg reset_l, reset_h;
 
@@ -70,13 +90,24 @@ fpga_top #(
     .SIMULATION_ETH             (1),
     .SIMULATION_DDR4            (0)
 ) u_dut (
+
+`ifdef USE_VCU118
     .SYSCLK1_300_N              (sysclk1_n),    //system clock 300 MHz
     .SYSCLK1_300_P              (~sysclk1_n),
 
     .CLK_125MHZ_N               (clk_125mhz_n), //system clock 125 MHz
     .CLK_125MHZ_P               (~clk_125mhz_n),
+`endif
 
+`ifdef USE_VCU128
+    .SYSCLK1_100_P              (~clk1_100mhz_n),
+    .SYSCLK1_100_N              (clk1_100mhz_n),
 
+    .SYSCLK2_100_P              (~clk2_100mhz_n),
+    .SYSCLK2_100_N              (clk2_100mhz_n),
+`endif
+
+`ifdef USE_VCU118
     // *** Ethernet PHY ***
     .PHY1_RESET_B               (PHY1_RESET_B),
 
@@ -89,7 +120,22 @@ fpga_top #(
 
     .PHY1_MDIO                  (PHY1_MDIO),
     .PHY1_MDC                   (PHY1_MDC),
+`endif
 
+`ifdef USE_VCU128
+    // *** Ethernet PHY ***
+    .ENET_DUMMY                 (),
+
+    .ENET_SGMII_OUT_N           (sgmii_rxn_dut),
+    .ENET_SGMII_OUT_P           (sgmii_rxp_dut),
+    .ENET_SGMII_IN_N            (sgmii_txn_dut),
+    .ENET_SGMII_IN_P            (sgmii_txp_dut),
+    .ENET_SGMII_CLK_N           (sgmii_clk_n),
+    .ENET_SGMII_CLK_P           (~sgmii_clk_n),
+
+    .ENET_MDIO                  (ENET_MDIO),
+    .ENET_MDC                   (ENET_MDC),
+`endif
 
     // *** Ethernet FMC PHYs ***
 `ifdef USE_ETHERNET_FMC
@@ -105,6 +151,20 @@ fpga_top #(
     .ETH_FMC_PHY1_RESET_N       (),
     .ETH_FMC_PHY1_MDIO          (),
     .ETH_FMC_PHY1_MDC           (),
+`endif
+
+`ifdef USE_QSFP
+
+    .QSFP1_RX1_N                (1'b1),
+    .QSFP1_RX1_P                (1'b0),
+    .QSFP1_TX1_N                (),
+    .QSFP1_TX1_P                (),
+    .QSFP1_SI570_CLOCK_N        (clk_125mhz_n),
+    .QSFP1_SI570_CLOCK_P        (~clk_125mhz_n),
+
+    //.PL_I2C0_SCL_LS             (i2c_scl),
+    //.PL_I2C0_SDA_LS             (i2c_sda),
+    //.i2c_config_done_o         (i2c_config_done),
 `endif
 
     // *** Switches ***
@@ -164,6 +224,25 @@ fpga_top #(
 `endif
 `endif
 
+`ifdef USE_DDR4_VCU128
+    ,.DDR4_CLK_100MHZ_N      (clk1_100mhz_n),
+    .DDR4_CLK_100MHZ_P       (~clk1_100mhz_n),
+    .PL_DDR4_ACT_B              (),
+    .PL_DDR4_A                  (),
+    .PL_DDR4_BA                 (),
+    .PL_DDR4_BG0                (),
+    .PL_DDR4_CKE                (),
+    .PL_DDR4_ODT                (),
+    .PL_DDR4_CS_B               (),
+    .PL_DDR4_CK_T               (),
+    .PL_DDR4_CK_C               (),
+    .PL_DDR4_RESET_B            (),
+    .PL_DDR4_DM_B               (),
+    .PL_DDR4_DQ                 (),
+    .PL_DDR4_DQS_T              (),
+    .PL_DDR4_DQS_C              ()
+`endif
+
     ,.tb_noc_fifo_in_data_o     (tb_noc_fifo_in_data_s),
     .tb_noc_fifo_in_raddr_i     (tb_noc_fifo_in_raddr_s),
     .tb_noc_fifo_in_waddr_o     (tb_noc_fifo_in_waddr_s),
@@ -172,6 +251,22 @@ fpga_top #(
     .tb_noc_fifo_out_waddr_i    (tb_noc_fifo_out_waddr_s)
 );
 
+// hw_freq_counter #(
+//         .REF_CYCLES(1000),
+//         .COUNTER_WIDTH(12)
+//     ) uut (
+//         .ref_clk_i(clk2_100mhz_n),
+//         .rst_n_i(reset_l),
+//         .trigger_i(trigger_i),
+//         .clk_to_measure_i(clk_125mhz_n),
+//         .count_result_o(count_result_o),
+//         .measurement_done_o(measurement_done_o)
+//     );
+//
+// i2c_dummy_slave i_dummy_slave (
+//     .i2c_scl(i2c_scl),
+//     .i2c_sda(i2c_sda)
+// );
 
 assign tb_noc_fifo_in_raddr_s = {(NOC_ASYNC_FIFO_AWIDTH+1){1'b0}};
 assign tb_noc_fifo_out_data_s = {NOC_ASYNC_FIFO_PACKET_SIZE{1'b0}};
@@ -188,6 +283,8 @@ initial sysclk1_n = 1'b0;
 initial user_clk_n = 1'b0;
 initial axi_clk_n = 1'b0;
 initial clk_125mhz_n = 1'b0;
+initial clk1_100mhz_n = 1'b0;
+initial clk2_100mhz_n = 1'b0;
 initial mgt_clk1_n = 1'b0;
 initial mgt_clk2_n = 1'b0;
 initial mgt_clk3_n = 1'b0;
@@ -198,6 +295,14 @@ end
 
 always #(CLKPERIODE_125MHZ/2.0) begin
     clk_125mhz_n = ~clk_125mhz_n;
+end
+
+always #(CLKPERIODE_100MHZ/2.0) begin
+    clk1_100mhz_n = ~clk1_100mhz_n;
+end
+
+always #(CLKPERIODE_100MHZ/2.0) begin
+    clk2_100mhz_n = ~clk2_100mhz_n;
 end
 
 always #(CLKPERIODE_300MHZ/2.0) begin
@@ -212,6 +317,44 @@ always #(CLKPERIODE_625MHZ/2.0) begin
     sgmii_clk_n = ~sgmii_clk_n;
 end
 
+// initial begin
+//         $display("Starting testbench for hardware_freq_counter...");
+//
+//         // Apply reset
+//         #1000; // Wait a bit
+//         reset_l = 1'b1;
+//         $display("TB: Reset de-asserted.");
+//
+//         // Wait a few cycles after reset
+//         repeat(5) @(posedge clk2_100mhz_n);
+//
+//         // Send a single-cycle trigger pulse
+//         $display("TB: Sending trigger to start measurement...");
+//         trigger_i = 1'b1;
+//         @(posedge clk2_100mhz_n);
+//         trigger_i = 1'b0;
+//
+//         // Wait for the measurement to complete
+//         $display("TB: Waiting for measurement_done_o signal...");
+//         wait (measurement_done_o == 1'b1);
+//
+//         // Add a small delay to allow result to be captured cleanly
+//         #100;
+//
+//         // 5. Verification
+//         $display("-------------------------------------------");
+//         $display("TB: Measurement complete.");
+//         $display("TB: Final count from DUT is: %0d", count_result_o);
+//
+//         if (count_result_o == 1250) begin
+//             $display("TB: RESULT: PASS! Correctly counted 1250 cycles.");
+//         end else begin
+//             $display("TB: RESULT: FAIL! Expected 1250 but got %0d.", count_result_o);
+//         end
+//         $display("-------------------------------------------");
+//
+//         $stop;
+//     end
 
 initial begin
     reset_l = 1'b0;

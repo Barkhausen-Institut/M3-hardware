@@ -188,7 +188,7 @@ lappend ELAB_CMD -L xpm
 
 
 if {[info exists USE_DDR4_C1] || [info exists USE_DDR4_C2]  || [info exists USE_DDR4_VCU128] || [info exists USE_ETHERNET_FMC]} {
-    lappend ELAB_CMD -L blk_mem_gen_v8_4_3
+    lappend ELAB_CMD -L blk_mem_gen_v8_4_5
     lappend ELAB_CMD -L microblaze_v11_0_1
     lappend ELAB_CMD -L proc_sys_reset_v5_0_13
     lappend ELAB_CMD -L lmb_v10_v3_0_9
