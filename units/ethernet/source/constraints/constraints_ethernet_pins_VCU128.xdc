@@ -26,3 +26,7 @@ set_property IOSTANDARD  LVDS     [get_ports "ENET_SGMII_CLK_P"] ;# Bank  67 VCC
 
 set_property PACKAGE_PIN BL23     [get_ports "ENET_DUMMY"];
 set_property IOSTANDARD  LVCMOS18 [get_ports "ENET_DUMMY"];
+
+set_property PACKAGE_PIN BF22     [get_ports "ENET_PDWN_B_I_INT_B_O"];
+set_property IOSTANDARD  LVCMOS18 [get_ports "ENET_PDWN_B_I_INT_B_O"];
+

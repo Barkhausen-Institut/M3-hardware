@@ -243,6 +243,26 @@ fpga_top #(
     .PL_DDR4_DQS_C              ()
 `endif
 
+`ifdef USE_RLD3_VCU128
+    ,.c0_sys_clk_n          (clk1_100mhz_n),
+    .c0_sys_clk_p           (~clk1_100mhz_n),
+    .c0_rld3_a                   (),
+    .c0_rld3_ba                  (),
+    .c0_rld3_cs_n                (),
+    .c0_rld3_ck_p                (),
+    .c0_rld3_ck_n                (),
+    .c0_rld3_dk_p                (),
+    .c0_rld3_dk_n                (),
+    .c0_rld3_ref_n               (),
+    .c0_rld3_we_n                (),
+    .c0_rld3_dq                  (),
+    .c0_rld3_dm                  (),
+    .c0_rld3_qk_p                (),
+    .c0_rld3_qk_n                (),
+    .c0_rld3_qvld                (),
+    .c0_rld3_reset_n             ()
+`endif
+
     ,.tb_noc_fifo_in_data_o     (tb_noc_fifo_in_data_s),
     .tb_noc_fifo_in_raddr_i     (tb_noc_fifo_in_raddr_s),
     .tb_noc_fifo_in_waddr_o     (tb_noc_fifo_in_waddr_s),

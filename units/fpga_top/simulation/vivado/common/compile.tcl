@@ -12,13 +12,14 @@ set SIM_DIR     $env(VIVADO_SIM_DIR)/$TB/$TC
 #set USE_DDR4_C1 1
 #set USE_DDR4_C2 1
 
-set USE_DDR4_VCU128 1
+#set USE_DDR4_VCU128 1
 
 #comment which FPGA BOARD should be taken out of simulation
 #set USE_VCU118 1
 set USE_VCU128 1
 
 set USE_QSFP 1
+set USE_RLD3_VCU128 1
 
 #comment when Ethernet FMC design should be taken out from simulation
 #set USE_ETHERNET_FMC 1
@@ -58,6 +59,10 @@ if {[info exists USE_DDR4_VCU128]} {
 }
 if {[info exists USE_QSFP]} {
         lappend DEF_MACROS USE_QSFP
+}
+
+if {[info exists USE_RLD3_VCU128]} {
+        lappend DEF_MACROS USE_RLD3_VCU128
 }
 #-----------------------------------------------------------------
 #create project

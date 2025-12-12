@@ -1,8 +1,8 @@
 #DDR 4 Clk Signals
-set_property PACKAGE_PIN BJ51   [get_ports {DDR4_CLK_100MHZ_N}];
-set_property IOSTANDARD  LVDS 	[get_ports {DDR4_CLK_100MHZ_N}]; 
-set_property PACKAGE_PIN BH51   [get_ports {DDR4_CLK_100MHZ_P}];
-set_property IOSTANDARD  LVDS	[get_ports {DDR4_CLK_100MHZ_P}];
+#set_property PACKAGE_PIN BJ51   [get_ports {DDR4_CLK_100MHZ_N}];
+#set_property IOSTANDARD  LVDS 	[get_ports {DDR4_CLK_100MHZ_N}];
+#set_property PACKAGE_PIN BH51   [get_ports {DDR4_CLK_100MHZ_P}];
+#set_property IOSTANDARD  LVDS	[get_ports {DDR4_CLK_100MHZ_P}];
 
 # DQ Signals 72 bit
 set_property PACKAGE_PIN BM45 [get_ports {PL_DDR4_DQ[0]}];

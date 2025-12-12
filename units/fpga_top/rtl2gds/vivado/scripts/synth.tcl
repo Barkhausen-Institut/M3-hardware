@@ -9,12 +9,13 @@ set SYNTH_DIR       $env(VIVADO_SYNTH_DIR)
 #comment when DDR4 should be taken out of synthesis
 #set USE_DDR4_C1 1
 #set USE_DDR4_C2 1
-set USE_DDR4_VCU128 1
+#set USE_DDR4_VCU128 1
 
 #comment which FPGA BOARD should be taken out of simulation
 #set USE_VCU118 1
 set USE_VCU128 1
 
+set USE_RLD3_VCU128 1
 
 #comment when Ethernet FMC design should be taken out of synthesis
 #set USE_ETHERNET_FMC 1
@@ -133,8 +134,13 @@ if {[info exists USE_QSFP]} {
     set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_pins.tcl]
     #set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl]
     #set_property processing_order LATE [get_files $REPO_DIR/qsfp/source/constraints/constraints_qsfp_delays.tcl]
+
 }
 
+if {[info exists USE_RLD3_VCU128]} {
+    add_files -fileset [current_fileset -constrset] $REPO_DIR/rld3/source/constraints/constraints_rld3_pins.xdc
+    set_property USED_IN_SYNTHESIS false [get_files $REPO_DIR/rld3/source/constraints/constraints_rld3_pins.xdc]
+}
 #--------------------------------------------------------------------------------
 
 #do synthesis 
@@ -153,6 +159,10 @@ if {[info exists USE_VCU128]} {
 
 if {[info exists USE_QSFP]} {
     lappend ARGS    -verilog_define "USE_QSFP=1"
+}
+
+if {[info exists USE_RLD3_VCU128]} {
+    lappend ARGS    -verilog_define "USE_RLD3_VCU128=1"
 }
 
 if {[info exists USE_DDR4_C1]} {

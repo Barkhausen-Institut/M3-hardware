@@ -13,10 +13,15 @@ set_property PACKAGE_PIN BK3         [get_ports "SYSCLK1_100_N"];
 set_property IOSTANDARD  LVDS        [get_ports "SYSCLK1_100_N"];
 
 #RLD3 CLK 100 MHz
-set_property PACKAGE_PIN F35         [get_ports "SYSCLK2_100_P"];
-set_property IOSTANDARD  LVDS        [get_ports "SYSCLK2_100_P"];
-set_property PACKAGE_PIN F36         [get_ports "SYSCLK2_100_N"];
-set_property IOSTANDARD  LVDS        [get_ports "SYSCLK2_100_N"];
+#set_property PACKAGE_PIN F35         [get_ports "SYSCLK2_100_P"];
+#set_property IOSTANDARD  LVDS        [get_ports "SYSCLK2_100_P"];
+#set_property PACKAGE_PIN F36         [get_ports "SYSCLK2_100_N"];
+#set_property IOSTANDARD  LVDS        [get_ports "SYSCLK2_100_N"];
+
+set_property PACKAGE_PIN BJ51   [get_ports "SYSCLK2_100_N"];
+set_property IOSTANDARD  LVDS 	[get_ports "SYSCLK2_100_N"];
+set_property PACKAGE_PIN BH51   [get_ports "SYSCLK2_100_P"];
+set_property IOSTANDARD  LVDS	[get_ports "SYSCLK2_100_P"];
 
 
 #define I/O for LEDs and buttons
@@ -30,8 +35,8 @@ set_input_delay 0                 [get_ports {GPIO_DIP_SW[*]}];
 
 #set_property PACKAGE_PIN BB24     [get_ports {GPIO_SW_N}];
 #set_property IOSTANDARD  LVCMOS18 [get_ports {GPIO_SW_N}];
-set_property PACKAGE_PIN BF22     [get_ports {GPIO_SW_W}];
-set_property IOSTANDARD  LVCMOS18 [get_ports {GPIO_SW_W}];
+#set_property PACKAGE_PIN BF22     [get_ports {GPIO_SW_W}];
+#set_property IOSTANDARD  LVCMOS18 [get_ports {GPIO_SW_W}];
 #set_property PACKAGE_PIN BE22     [get_ports {GPIO_SW_S}];
 #set_property IOSTANDARD  LVCMOS18 [get_ports {GPIO_SW_S}];
 #set_property PACKAGE_PIN BE23     [get_ports {GPIO_SW_E}];
